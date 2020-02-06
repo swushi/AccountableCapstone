@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, Text } from "react-native";
 
-class WelcomeScreen extends Component {
+class SignUpScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -10,10 +10,10 @@ class WelcomeScreen extends Component {
   render() {
     return (
       <View>
-        <Text> WelcomeScreen </Text>
+        <Text> SignUpScreen </Text>
       </View>
     );
   }
 }
 
-export default WelcomeScreen;
+export default SignUpScreen;

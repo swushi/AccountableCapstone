@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-
-import { WelcomeScreen } from "./src/screens";
+import AppContainer from "./src/navigation";
 
 class App extends React.Component {
   constructor() {
@@ -10,11 +9,7 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <WelcomeScreen />
-      </View>
-    );
+    return <AppContainer />;
   }
 }
 
