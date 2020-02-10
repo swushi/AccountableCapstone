@@ -3,11 +3,6 @@ import { StyleSheet, Text, View } from "react-native";
 import AppContainer from "./src/navigation";
 
 class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {};
-  }
-
   render() {
     return <AppContainer />;
   }
