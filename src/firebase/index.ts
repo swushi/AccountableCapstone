@@ -1,15 +1,13 @@
 import * as firebase from "firebase";
-import config from "./config";
-
-const auth = firebase.auth();
-const db = firebase.database();
+import { FirebaseConfig } from "../config";
+import { User } from "../types";
 
 /**
  * Creates and initializes a Firebase instance.
  */
 export const init = () => {
   if (!firebase.apps.length) {
-    return firebase.initializeApp(config);
+    return firebase.initializeApp(FirebaseConfig);
   }
   return;
 };
@@ -21,6 +19,7 @@ export const init = () => {
  * Note: The email address acts as a unique identifier for the user and enables an email-based password reset. This function will create a new user account and set the initial user password.
  */
 export const signUp = (email: string, password: string) => {
+  const auth = firebase.auth();
   return auth.createUserWithEmailAndPassword(email, password);
 };
 
@@ -28,5 +27,16 @@ export const signUp = (email: string, password: string) => {
  * Asynchronously signs in using an email and password.
  */
 export const signIn = (email: string, password: string) => {
+  const auth = firebase.auth();
   return auth.signInWithEmailAndPassword(email, password);
+};
+
+/**
+ * Creates a new user in the database at location ref(`/users/${user.uid}`).
+ * Returns a promise with snapshot if successful
+ * @param user
+ */
+export const createUser = (user: User) => {
+  const db = firebase.database();
+  return db.ref(`/users/${user.uid}`).set(user);
 };

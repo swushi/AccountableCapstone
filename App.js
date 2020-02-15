@@ -3,10 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import AppContainer from "./src/navigation";
 import * as firebase from "./src/firebase";
 
+firebase.init();
+
 class App extends React.Component {
-  componentDidMount() {
-    console.log(firebase.init());
-  }
+  componentDidMount() {}
 
   render() {
     return <AppContainer />;
