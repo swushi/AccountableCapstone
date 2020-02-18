@@ -1,6 +1,19 @@
 import React, { Component } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput
+} from "react-native";
+import {
+  TextField,
+  FilledTextField,
+  OutlinedTextField
+} from "react-native-material-textfield";
 import * as firebase from "../firebase";
+import { Config } from "../config";
+const { colors } = Config;
 
 type SignUpState = {
   err: boolean;
@@ -21,7 +34,6 @@ class SignUpScreen extends Component<{}, SignUpState> {
   }
 
   signUpAsync = async () => {
-    const timeStart = new Date();
     console.log("in func");
 
     // deref
@@ -46,8 +58,6 @@ class SignUpScreen extends Component<{}, SignUpState> {
 
       // wait for async signIn and createUser to finish
       await Promise.all([signIn, createUser]);
-      const timeTook = new Date().getTime() - timeStart.getTime();
-      console.log("Time took:", timeTook);
 
       // navigate to MainStack upon success
       navigate("Main");
@@ -63,9 +73,17 @@ class SignUpScreen extends Component<{}, SignUpState> {
   render() {
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => this.signUpAsync()}>
-          <Text>Sign up user</Text>
-        </TouchableOpacity>
+        <Text style={styles.logo}>Accountable</Text>
+        <View style={styles.inputsContainer}>
+          <TextField label="Email" />
+          <TextField label="Password" />
+          <TextField label="Confirm Password" />
+          <TouchableOpacity onPress={() => this.handlePress()}>
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Login</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -74,8 +92,33 @@ class SignUpScreen extends Component<{}, SignUpState> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: Config.padding,
+    justifyContent: "space-around",
+    paddingTop: Config.height * 0.14,
+    paddingBottom: Config.height * 0.2,
+    backgroundColor: colors.background
+  },
+  logo: {
+    fontSize: 50,
+    alignSelf: "center",
+    color: colors.primary
+  },
+  inputsContainer: {
+    padding: Config.padding,
+    backgroundColor: "#fff",
+    borderRadius: Config.roundness
+  },
+  loginContainer: {
+    height: Config.height * 0.07,
+    alignItems: "center",
     justifyContent: "center",
-    padding: 8
+    backgroundColor: colors.primary,
+    borderRadius: Config.roundness,
+    marginVertical: Config.height * 0.03
+  },
+  loginText: {
+    color: "#fff",
+    fontSize: 23
   }
 });
 
