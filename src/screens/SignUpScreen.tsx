@@ -6,13 +6,10 @@ import {
   StyleSheet,
   TextInput
 } from "react-native";
-import {
-  TextField,
-  FilledTextField,
-  OutlinedTextField
-} from "react-native-material-textfield";
+import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
 import { Config } from "../config";
+import { User } from "../types";
 const { colors } = Config;
 
 type SignUpState = {
@@ -25,17 +22,14 @@ type SignUpProps = {
   navigation: any;
 };
 
-class SignUpScreen extends Component<{}, SignUpState> {
-  state: SignUpState;
-  props: SignUpProps;
+class SignUpScreen extends Component<SignUpProps, SignUpState> {
   constructor(props) {
     super(props);
     this.state = { err: null, email: "test@gmail.com", password: "password" };
+    this.signUpAsync = this.signUpAsync.bind(this);
   }
 
   signUpAsync = async () => {
-    console.log("in func");
-
     // deref
     const { navigate } = this.props.navigation;
     const { email, password, err } = this.state;
@@ -48,13 +42,19 @@ class SignUpScreen extends Component<{}, SignUpState> {
       // Sign in user
       const signIn = firebase.signIn(email, password);
 
-      // Initialize user in database
-      const createUser = firebase.createUser({
+      // create user obj
+      const User: User = {
         uid,
         email,
         firstName: "John",
         lastName: "Doe"
-      });
+      };
+
+      // Initialize user in database
+      const createUser = firebase.createUser(User);
+
+      // Store user globally in Redux
+      // storeUser(User);
 
       // wait for async signIn and createUser to finish
       await Promise.all([signIn, createUser]);
@@ -78,7 +78,7 @@ class SignUpScreen extends Component<{}, SignUpState> {
           <TextField label="Email" />
           <TextField label="Password" />
           <TextField label="Confirm Password" />
-          <TouchableOpacity onPress={() => this.handlePress()}>
+          <TouchableOpacity onPress={this.signUpAsync}>
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Login</Text>
             </View>
