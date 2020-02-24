@@ -18,25 +18,23 @@ export const init = () => {
  * User account creation can fail if the account already exists or the password is invalid.
  * Note: The email address acts as a unique identifier for the user and enables an email-based password reset. This function will create a new user account and set the initial user password.
  */
-export const signUp = (email: string, password: string) => {
-  const auth = firebase.auth();
-  return auth.createUserWithEmailAndPassword(email, password);
-};
+export const signUp = (email: string, password: string) =>
+  firebase.auth().createUserWithEmailAndPassword(email, password);
 
 /**
  * Asynchronously signs in using an email and password.
  */
-export const signIn = (email: string, password: string) => {
-  const auth = firebase.auth();
-  return auth.signInWithEmailAndPassword(email, password);
-};
+export const signIn = (email: string, password: string) =>
+  firebase.auth().signInWithEmailAndPassword(email, password);
 
 /**
  * Creates a new user in the database at location ref(`/users/${user.uid}`).
  * Returns a promise with snapshot if successful
  * @param user
  */
-export const createUser = (user: User) => {
-  const db = firebase.database();
-  return db.ref(`/users/${user.uid}`).set(user);
-};
+export const createUser = (user: User) =>
+  firebase
+    .firestore()
+    .collection("users")
+    .doc(user.uid)
+    .set(user);
