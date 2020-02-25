@@ -23,7 +23,7 @@ class SignInScreen extends React.Component<
   }
 
   navToSignUp = () => {
-    this.props.navigation.navigate("Signup");
+    this.props.navigation.navigate("SignUp");
   };
 
   handlePress = async () => {
