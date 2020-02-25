@@ -1,6 +1,7 @@
 import * as React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as firebase from "../firebase";
+import { TextField } from "react-native-material-textfield";
 import { User } from "../types";
 
 type SignInScreenProps = {
@@ -10,7 +11,7 @@ type SignInScreenProps = {
 type SignInScreenState = {
   email: string;
   password: string;
-  err: any;
+  errorMessage: any;
 };
 
 class SignInScreen extends React.Component<
@@ -19,7 +20,11 @@ class SignInScreen extends React.Component<
 > {
   constructor(props: SignInScreenProps) {
     super(props);
-    this.state = { email: "", password: "", err: null };
+    this.state = { 
+      email: "", 
+      password: "", 
+      errorMessage: null 
+    };
   }
 
   navToSignUp = () => {
@@ -39,46 +44,33 @@ class SignInScreen extends React.Component<
   signInAsync = async () => {
     // deref
     const { navigate } = this.props.navigation;
-    const { email, password, err } = this.state;
+    const { email, password, errorMessage } = this.state;
 
     try {
-      // Sign up user
-      const { user } = await firebase.signUp(email, password);
-      const { uid } = user;
-
       // Sign in user
-      const signIn = firebase.signIn(email, password);
-
-      // create user obj
-      const User: User = {
-        uid,
-        email,
-        firstName: "John",
-        lastName: "Doe"
-      };
-
-      // Initialize user in database
-      const createUser = firebase.createUser(User);
-
-      // Store user globally in Redux
-      // storeUser(User);
+      const signIn =  await firebase.signIn(email, password);
 
       // wait for async signIn and createUser to finish
-      await Promise.all([signIn, createUser]);
+      await Promise.all([signIn]);
+      this.props.navigation.navigate("Main");
     } catch (err) {
-      // log error
       alert(err);
 
       // set error in state
-      this.setState({ err });
+      this.setState({ errorMessage: err });
     }
   };
 
   render() {
     return (
       <View style={styles.container}>
+        <TextField label="email" onChangeText={ (text: string) => this.setState({email: text})}/>
+        <TextField error={this.state.errorMessage} label="password" onChangeText={ (text: string) => this.setState({password: text})} />
+        <TouchableOpacity onPress={() => this.signInAsync()}>
+          <Text>Sign In</Text>
+        </TouchableOpacity> 
         <TouchableOpacity onPress={() => this.navToSignUp()}>
-          <Text>Go to Sign Up</Text>
+          <Text>Create an account</Text>
         </TouchableOpacity>
       </View>
     );
@@ -89,7 +81,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
+  },
+  input: {
+
   }
 });
 
