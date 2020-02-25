@@ -1,5 +1,7 @@
 import * as React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import * as firebase from "../firebase";
+import { User } from "../types";
 
 type SignInScreenProps = {
   navigation: any;
@@ -20,13 +22,17 @@ class SignInScreen extends React.Component<
     this.state = { email: "", password: "", err: null };
   }
 
+  navToSignUp = () => {
+    this.props.navigation.navigate("Signup");
+  };
+
   handlePress = async () => {
     try {
       // handle sign up
-      // await this.signInAsync();
+      await this.signInAsync();
 
       // navigate if okay
-      this.props.navigation.navigate("SignUp");
+      this.props.navigation.navigate("Main");
     } catch (err) {}
   };
 
@@ -59,9 +65,6 @@ class SignInScreen extends React.Component<
 
       // wait for async signIn and createUser to finish
       await Promise.all([signIn, createUser]);
-
-      // navigate to MainStack upon success
-      navigate("Main");
     } catch (err) {
       // log error
       alert(err);
@@ -74,8 +77,8 @@ class SignInScreen extends React.Component<
   render() {
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => this.handlePress()}>
-          <Text>SignInScreen Component</Text>
+        <TouchableOpacity onPress={() => this.navToSignUp()}>
+          <Text>Go to Sign Up</Text>
         </TouchableOpacity>
       </View>
     );
