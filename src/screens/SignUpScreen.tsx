@@ -8,9 +8,8 @@ import {
 } from "react-native";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
-import { Config } from "../config";
+import { Design, Colors } from "../config";
 import { User } from "../types";
-const { colors } = Config;
 
 type SignUpState = {
   err: boolean;
@@ -93,38 +92,38 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             label="First Name"
             value={firstName}
             onChangeText={text => this.setState({ firstName: text })}
-            tintColor={colors.primary}
-            textColor={colors.textPrimary}
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
           />
           <TextField
             label="Last Name"
             value={lastName}
             onChangeText={text => this.setState({ lastName: text })}
-            tintColor={colors.primary}
-            textColor={colors.textPrimary}
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
           />
           <TextField
             label="Email"
             keyboardType="email-address"
             value={email}
             onChangeText={text => this.setState({ email: text })}
-            tintColor={colors.primary}
-            textColor={colors.textPrimary}
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
           />
           <TextField
             label="Password"
             value={password}
             onChangeText={text => this.setState({ password: text })}
-            tintColor={colors.primary}
-            textColor={colors.textPrimary}
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
             secureTextEntry
           />
           <TextField
             label="Confirm Password"
             value={confirm}
             onChangeText={text => this.setState({ confirm: text })}
-            tintColor={colors.primary}
-            textColor={colors.textPrimary}
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
             secureTextEntry
           />
           <TouchableOpacity onPress={this.signUpAsync}>
@@ -141,29 +140,29 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Config.padding,
+    padding: Design.padding,
     justifyContent: "space-around",
-    paddingTop: Config.height * 0.14,
-    paddingBottom: Config.height * 0.2,
-    backgroundColor: colors.background
+    paddingTop: Design.height * 0.14,
+    paddingBottom: Design.height * 0.2,
+    backgroundColor: Colors.background
   },
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: colors.primary
+    color: Colors.primary
   },
   inputsContainer: {
-    padding: Config.padding,
+    padding: Design.padding,
     backgroundColor: "#fff",
-    borderRadius: Config.roundness
+    borderRadius: Design.roundness
   },
   loginContainer: {
-    height: Config.height * 0.07,
+    height: Design.height * 0.07,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.primary,
-    borderRadius: Config.roundness,
-    marginVertical: Config.height * 0.03
+    backgroundColor: Colors.primary,
+    borderRadius: Design.roundness,
+    marginVertical: Design.height * 0.03
   },
   loginText: {
     color: "#fff",
