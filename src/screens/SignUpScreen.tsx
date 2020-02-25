@@ -14,8 +14,11 @@ const { colors } = Config;
 
 type SignUpState = {
   err: boolean;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  confirm: string;
 };
 
 type SignUpProps = {
@@ -25,16 +28,26 @@ type SignUpProps = {
 class SignUpScreen extends Component<SignUpProps, SignUpState> {
   constructor(props) {
     super(props);
-    this.state = { err: null, email: "test@gmail.com", password: "password" };
+    this.state = {
+      err: null,
+      email: "",
+      password: "",
+      confirm: "",
+      firstName: "",
+      lastName: ""
+    };
     this.signUpAsync = this.signUpAsync.bind(this);
   }
 
   signUpAsync = async () => {
     // deref
     const { navigate } = this.props.navigation;
-    const { email, password, err } = this.state;
+    const { firstName, lastName, email, password, confirm, err } = this.state;
 
     try {
+      // make sure that passwords match
+      if (password !== confirm) throw "Passwords dont match";
+
       // Sign up user
       const { user } = await firebase.signUp(email, password);
       const { uid } = user;
@@ -46,8 +59,8 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       const User: User = {
         uid,
         email,
-        firstName: "John",
-        lastName: "Doe"
+        firstName,
+        lastName
       };
 
       // Initialize user in database
@@ -71,13 +84,49 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
   };
 
   render() {
+    const { email, password, confirm, firstName, lastName } = this.state;
     return (
       <View style={styles.container}>
         <Text style={styles.logo}>Accountable</Text>
         <View style={styles.inputsContainer}>
-          <TextField label="Email" />
-          <TextField label="Password" />
-          <TextField label="Confirm Password" />
+          <TextField
+            label="First Name"
+            value={firstName}
+            onChangeText={text => this.setState({ firstName: text })}
+            tintColor={colors.primary}
+            textColor={colors.textPrimary}
+          />
+          <TextField
+            label="Last Name"
+            value={lastName}
+            onChangeText={text => this.setState({ lastName: text })}
+            tintColor={colors.primary}
+            textColor={colors.textPrimary}
+          />
+          <TextField
+            label="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={text => this.setState({ email: text })}
+            tintColor={colors.primary}
+            textColor={colors.textPrimary}
+          />
+          <TextField
+            label="Password"
+            value={password}
+            onChangeText={text => this.setState({ password: text })}
+            tintColor={colors.primary}
+            textColor={colors.textPrimary}
+            secureTextEntry
+          />
+          <TextField
+            label="Confirm Password"
+            value={confirm}
+            onChangeText={text => this.setState({ confirm: text })}
+            tintColor={colors.primary}
+            textColor={colors.textPrimary}
+            secureTextEntry
+          />
           <TouchableOpacity onPress={this.signUpAsync}>
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Login</Text>

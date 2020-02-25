@@ -1,4 +1,5 @@
 import * as firebase from "firebase";
+import "firebase/firestore";
 import { FirebaseConfig } from "../config";
 import { User } from "../types";
 
