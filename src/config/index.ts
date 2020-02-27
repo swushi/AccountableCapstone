@@ -24,3 +24,8 @@ export const FirebaseConfig = {
   appId: "1:806395418095:web:6124cb947e2df6b779121a",
   measurementId: "G-33XWPTKTK5"
 };
+
+export const validateEmail = email => {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+};
