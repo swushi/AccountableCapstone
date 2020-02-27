@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
-import { Design, Colors } from "../config";
+import { Design, Colors, validateEmail } from "../config";
 import { User } from "../types";
 
 type SignUpState = {
@@ -121,7 +121,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       // navigate to MainStack upon success
       navigate("Main");
     } catch (err) {
-      console.log("SIGNUP ERROR", err);
+      console.log("SIGNUP ERROR", err.code);
 
       // set error in state
       this.setState({ err });
@@ -148,9 +148,22 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       });
       err = true;
     }
-    if (email === "") {
+    if (!validateEmail(email)) {
       this.setState({
-        emailErr: "Please enter valid Last Name"
+        emailErr: "Please enter valid Email Address"
+      });
+      err = true;
+    }
+    if (password !== confirm) {
+      this.setState({
+        passwordErr: "These passwords must match",
+        confirmErr: "These passwords must match"
+      });
+      err = true;
+    }
+    if (password.length <= 6) {
+      this.setState({
+        passwordErr: "Password must be greater than 6 characters"
       });
       err = true;
     }
