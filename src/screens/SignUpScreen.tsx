@@ -1,11 +1,6 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
 import { Design, Colors } from "../config";
@@ -25,6 +20,7 @@ type SignUpProps = {
 };
 
 class SignUpScreen extends Component<SignUpProps, SignUpState> {
+  containerRef: any;
   constructor(props) {
     super(props);
     this.state = {
@@ -36,8 +32,35 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       lastName: ""
     };
     this.signUpAsync = this.signUpAsync.bind(this);
+    this.containerRef = null;
   }
 
+  /**
+   * Function that is called when any of the inputs are focused
+   */
+  handleFocus = () => {
+    this.slide("up");
+  };
+
+  handleBlur = () => {
+    this.slide("down");
+  };
+
+  /**
+   * slides the container up or down
+   */
+  slide = (direction: "up" | "down") => {
+    const slideAmount = Design.height * 0.3;
+    const translation = direction === "up" ? -1 * slideAmount : 0;
+
+    this.containerRef.transitionTo({
+      transform: [{ translateY: translation }]
+    });
+  };
+
+  /**
+   * Sign ups the user through firebase auth
+   */
   signUpAsync = async () => {
     // deref
     const { navigate } = this.props.navigation;
@@ -85,53 +108,69 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
   render() {
     const { email, password, confirm, firstName, lastName } = this.state;
     return (
-      <View style={styles.container}>
-        <Text style={styles.logo}>Accountable</Text>
-        <View style={styles.inputsContainer}>
-          <TextField
-            label="First Name"
-            value={firstName}
-            onChangeText={text => this.setState({ firstName: text })}
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-          />
-          <TextField
-            label="Last Name"
-            value={lastName}
-            onChangeText={text => this.setState({ lastName: text })}
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-          />
-          <TextField
-            label="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={text => this.setState({ email: text })}
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-          />
-          <TextField
-            label="Password"
-            value={password}
-            onChangeText={text => this.setState({ password: text })}
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-            secureTextEntry
-          />
-          <TextField
-            label="Confirm Password"
-            value={confirm}
-            onChangeText={text => this.setState({ confirm: text })}
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-            secureTextEntry
-          />
-          <TouchableOpacity onPress={this.signUpAsync}>
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Login</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+      <View style={{ flex: 1 }}>
+        <Animatable.View
+          style={styles.container}
+          ref={ref => (this.containerRef = ref)}
+          useNativeDriver
+        >
+          <Text style={styles.logo}>Accountable</Text>
+          <View style={styles.inputsContainer}>
+            <TextField
+              label="First Name"
+              value={firstName}
+              onChangeText={text => this.setState({ firstName: text })}
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              onFocus={() => this.handleFocus()}
+              onSubmitEditing={() => this.handleBlur()}
+            />
+            <TextField
+              label="Last Name"
+              value={lastName}
+              onChangeText={text => this.setState({ lastName: text })}
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              onFocus={() => this.handleFocus()}
+              onSubmitEditing={() => this.handleBlur()}
+            />
+            <TextField
+              label="Email"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={text => this.setState({ email: text })}
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              onFocus={() => this.handleFocus()}
+              onSubmitEditing={() => this.handleBlur()}
+            />
+            <TextField
+              label="Password"
+              value={password}
+              onChangeText={text => this.setState({ password: text })}
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              onFocus={() => this.handleFocus()}
+              secureTextEntry
+              onSubmitEditing={() => this.handleBlur()}
+            />
+            <TextField
+              label="Confirm Password"
+              value={confirm}
+              onChangeText={text => this.setState({ confirm: text })}
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              onFocus={() => this.handleFocus()}
+              secureTextEntry
+              onSubmitEditing={() => this.handleBlur()}
+            />
+            <TouchableOpacity onPress={this.signUpAsync}>
+              <View style={styles.loginContainer}>
+                <Text style={styles.loginText}>Login</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </Animatable.View>
       </View>
     );
   }
@@ -140,10 +179,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: Design.padding,
+    paddingHorizontal: Design.padding,
+    paddingTop: Design.padding,
     justifyContent: "space-around",
-    paddingTop: Design.height * 0.14,
-    paddingBottom: Design.height * 0.2,
     backgroundColor: Colors.background
   },
   logo: {
@@ -152,12 +190,12 @@ const styles = StyleSheet.create({
     color: Colors.primary
   },
   inputsContainer: {
-    padding: Design.padding,
+    paddingHorizontal: Design.padding,
     backgroundColor: "#fff",
     borderRadius: Design.roundness
   },
   loginContainer: {
-    height: Design.height * 0.07,
+    height: Design.height * 0.06,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primary,
