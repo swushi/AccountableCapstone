@@ -85,10 +85,8 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
    */
   signUpAsync = async () => {
     // validate inputs and produce errors before communication with backend
-    if (!this.validateInputs()) {
-      console.log("error in one text");
-      return;
-    }
+    if (!this.validateInputs()) return;
+
     // deref
     const { navigate } = this.props.navigation;
     const { firstName, lastName, email, password, confirm, err } = this.state;
@@ -121,7 +119,10 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       // navigate to MainStack upon success
       navigate("Main");
     } catch (err) {
-      console.log("SIGNUP ERROR", err.code);
+      const { code } = err;
+      if (code === "auth/email-already-in-use") {
+        this.setState({ emailErr: "Email already in use" });
+      }
 
       // set error in state
       this.setState({ err });
