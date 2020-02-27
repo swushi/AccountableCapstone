@@ -13,6 +13,11 @@ type SignUpState = {
   email: string;
   password: string;
   confirm: string;
+  firstNameErr: any;
+  lastNameErr: any;
+  emailErr: any;
+  passwordErr: any;
+  confirmErr: any;
 };
 
 type SignUpProps = {
@@ -24,12 +29,19 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
   constructor(props) {
     super(props);
     this.state = {
-      err: null,
       email: "",
       password: "",
       confirm: "",
       firstName: "",
-      lastName: ""
+      lastName: "",
+
+      // error handlers
+      err: null,
+      firstNameErr: null,
+      lastNameErr: null,
+      emailErr: null,
+      passwordErr: null,
+      confirmErr: null
     };
     this.signUpAsync = this.signUpAsync.bind(this);
     this.containerRef = null;
@@ -39,7 +51,17 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
    * Function that is called when any of the inputs are focused
    */
   handleFocus = () => {
+    // animate card
     this.slide("up");
+
+    // reset error states
+    this.setState({
+      firstNameErr: null,
+      lastNameErr: null,
+      emailErr: null,
+      passwordErr: null,
+      confirmErr: null
+    });
   };
 
   handleBlur = () => {
@@ -62,14 +84,16 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
    * Sign ups the user through firebase auth
    */
   signUpAsync = async () => {
+    // validate inputs and produce errors before communication with backend
+    if (!this.validateInputs()) {
+      console.log("error in one text");
+      return;
+    }
     // deref
     const { navigate } = this.props.navigation;
     const { firstName, lastName, email, password, confirm, err } = this.state;
 
     try {
-      // make sure that passwords match
-      if (password !== confirm) throw "Passwords dont match";
-
       // Sign up user
       const { user } = await firebase.signUp(email, password);
       const { uid } = user;
@@ -97,16 +121,57 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       // navigate to MainStack upon success
       navigate("Main");
     } catch (err) {
-      // log error
-      alert(err);
+      console.log("SIGNUP ERROR", err);
 
       // set error in state
       this.setState({ err });
     }
   };
 
+  /**
+   * Validates each input and shows error if any fail
+   */
+  validateInputs = () => {
+    const { firstName, lastName, email, password, confirm } = this.state;
+    let err = false;
+
+    if (firstName === "") {
+      this.setState({
+        firstNameErr: "Please enter valid First Name"
+      });
+      err = true;
+    }
+
+    if (lastName === "") {
+      this.setState({
+        lastNameErr: "Please enter valid Last Name"
+      });
+      err = true;
+    }
+    if (email === "") {
+      this.setState({
+        emailErr: "Please enter valid Last Name"
+      });
+      err = true;
+    }
+
+    if (err) return false;
+    else return true;
+  };
+
   render() {
-    const { email, password, confirm, firstName, lastName } = this.state;
+    const {
+      email,
+      password,
+      confirm,
+      firstName,
+      lastName,
+      emailErr,
+      passwordErr,
+      confirmErr,
+      firstNameErr,
+      lastNameErr
+    } = this.state;
     return (
       <View style={{ flex: 1 }}>
         <Animatable.View
@@ -119,6 +184,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             <TextField
               label="First Name"
               value={firstName}
+              error={firstNameErr}
               onChangeText={text => this.setState({ firstName: text })}
               tintColor={Colors.primary}
               textColor={Colors.textPrimary}
@@ -128,6 +194,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             <TextField
               label="Last Name"
               value={lastName}
+              error={lastNameErr}
               onChangeText={text => this.setState({ lastName: text })}
               tintColor={Colors.primary}
               textColor={Colors.textPrimary}
@@ -138,6 +205,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               label="Email"
               keyboardType="email-address"
               value={email}
+              error={emailErr}
               onChangeText={text => this.setState({ email: text })}
               tintColor={Colors.primary}
               textColor={Colors.textPrimary}
@@ -147,6 +215,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             <TextField
               label="Password"
               value={password}
+              error={passwordErr}
               onChangeText={text => this.setState({ password: text })}
               tintColor={Colors.primary}
               textColor={Colors.textPrimary}
@@ -157,6 +226,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             <TextField
               label="Confirm Password"
               value={confirm}
+              error={confirmErr}
               onChangeText={text => this.setState({ confirm: text })}
               tintColor={Colors.primary}
               textColor={Colors.textPrimary}
