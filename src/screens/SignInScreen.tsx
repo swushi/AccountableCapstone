@@ -13,11 +13,9 @@ type SignInScreenProps = {
 type SignInScreenState = {
   email: string;
   password: string;
-  errorMessage: any;
   error: boolean;
   emailError: any;
   passwordError: any;
-  inputs: any;
 };
 
 class SignInScreen extends React.Component<
@@ -30,11 +28,9 @@ class SignInScreen extends React.Component<
     this.state = { 
       email: "", 
       password: "", 
-      inputs: {},
       error: null,
       emailError: null,
       passwordError: null,
-      errorMessage: null 
     };
     this.signInAsync = this.signInAsync.bind(this);
     this.containerRef = null;
@@ -95,7 +91,7 @@ class SignInScreen extends React.Component<
       alert(err);
 
       // set error in state
-      this.setState({ errorMessage: err });
+      //this.setState({ emailError: error });
     }
   };
 
