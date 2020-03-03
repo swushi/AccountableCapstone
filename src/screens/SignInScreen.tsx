@@ -126,15 +126,15 @@ class SignInScreen extends React.Component<
         <Animatable.View style={styles.container} ref={ref => (this.containerRef = ref)} useNativeDriver>
           <Text style={styles.logo}>Accountable</Text>
           <View style={styles.inputContainer}>
-            <TextField error={this.state.emailError} label="email" onChangeText={ (text: string) => this.setState({email: text})} onFocus={() => this.handleOnFocus()} onSubmitEditing={() => this.handleOnBlur()}/>
-            <TextField error={this.state.passwordError} label="password" onChangeText={ (text: string) => this.setState({password: text})} onFocus={() => this.handleOnFocus()} onSubmitEditing={() => this.handleOnBlur()}/>
+            <TextField tintColor={Colors.primary} textColor={Colors.textPrimary} error={this.state.emailError} label="email" onChangeText={ (text: string) => this.setState({email: text})} onFocus={() => this.handleOnFocus()} onSubmitEditing={() => this.handleOnBlur()}/>
+            <TextField tintColor={Colors.primary} textColor={Colors.textPrimary} error={this.state.passwordError} secureTextEntry={true} label="password" onChangeText={ (text: string) => this.setState({password: text})} onFocus={() => this.handleOnFocus()} onSubmitEditing={() => this.handleOnBlur()}/>
             <TouchableOpacity onPress={() => this.signInAsync()}>
               <View style={styles.signInContainer}>
                 <Text style={styles.signInText}>Sign In</Text>
               </View>
             </TouchableOpacity> 
             <TouchableOpacity onPress={() => this.navToSignUp()}>
-              <Text style={styles.newMember}>new member?</Text>
+              <Text style={styles.newMember}>New Member?</Text>
               <Text style={styles.createAccount}>Create an account here!</Text>
             </TouchableOpacity>
           </View>
@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
   createAccount: {
     alignItems: "center",
     textAlign: "center",
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    marginBottom: 5
   },
   newMember: {
     textAlign: "center",
