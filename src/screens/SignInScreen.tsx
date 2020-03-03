@@ -25,12 +25,12 @@ class SignInScreen extends React.Component<
   containerRef: any;
   constructor(props: SignInScreenProps) {
     super(props);
-    this.state = { 
-      email: "", 
-      password: "", 
+    this.state = {
+      email: "",
+      password: "",
       error: null,
       emailError: null,
-      passwordError: null,
+      passwordError: null
     };
     this.signInAsync = this.signInAsync.bind(this);
     this.containerRef = null;
@@ -44,9 +44,7 @@ class SignInScreen extends React.Component<
     });
   };
   handleOnBlur = () => {
-
     this.slide("down");
-
   };
   slide = (direction: "up" | "down") => {
     const slideAmount = Design.height * 0.3;
@@ -55,7 +53,6 @@ class SignInScreen extends React.Component<
       transform: [{ translateY: translation }]
     });
   };
-
 
   navToSignUp = () => {
     this.props.navigation.navigate("SignUp");
@@ -67,7 +64,7 @@ class SignInScreen extends React.Component<
       await this.signInAsync();
 
       // navigate if okay
-      this.props.navigation.navigate("Main");
+      this.props.navigation.navigate("App");
     } catch (err) {}
   };
 
@@ -75,18 +72,18 @@ class SignInScreen extends React.Component<
     // deref
     const { navigate } = this.props.navigation;
     const { email, password, error } = this.state;
-    
-    if(!this.validateInput()) {
+
+    if (!this.validateInput()) {
       return;
     }
 
     try {
       // Sign in user
-      const signIn =  await firebase.signIn(email, password);
+      const signIn = await firebase.signIn(email, password);
 
       // wait for async signIn and createUser to finish
       await Promise.all([signIn]);
-      this.props.navigation.navigate("Main");
+      this.props.navigation.navigate("App");
     } catch (err) {
       alert(err);
 
@@ -96,45 +93,64 @@ class SignInScreen extends React.Component<
   };
 
   validateInput = () => {
-      const { email, password } = this.state;
-      let inputisValid = false;
+    const { email, password } = this.state;
+    let inputisValid = false;
 
-      if(!validateEmail(email)) {
-        inputisValid = true;
-        this.setState({
-          emailError: "Please enter a valid email."
-        });
-      }
-      if(password === "") {
-        inputisValid = true;
-        this.setState ({
-          passwordError: "Please enter your password."
-        });
-      }
-     if(inputisValid)
-      {
-        return false;
-      }
-      else {
-        return true;
-      }
-  }
+    if (!validateEmail(email)) {
+      inputisValid = true;
+      this.setState({
+        emailError: "Please enter a valid email."
+      });
+    }
+    if (password === "") {
+      inputisValid = true;
+      this.setState({
+        passwordError: "Please enter your password."
+      });
+    }
+    if (inputisValid) {
+      return false;
+    } else {
+      return true;
+    }
+  };
 
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <Animatable.View style={styles.container} ref={ref => (this.containerRef = ref)} useNativeDriver>
+        <Animatable.View
+          style={styles.container}
+          ref={ref => (this.containerRef = ref)}
+          useNativeDriver
+        >
           <Text style={styles.logo}>Accountable</Text>
           <View style={styles.inputContainer}>
-            <TextField error={this.state.emailError} label="email" onChangeText={ (text: string) => this.setState({email: text})} onFocus={() => this.handleOnFocus()} onSubmitEditing={() => this.handleOnBlur()}/>
-            <TextField error={this.state.passwordError} label="password" onChangeText={ (text: string) => this.setState({password: text})} onFocus={() => this.handleOnFocus()} onSubmitEditing={() => this.handleOnBlur()}/>
+            <TextField
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              error={this.state.emailError}
+              label="email"
+              onChangeText={(text: string) => this.setState({ email: text })}
+              onFocus={() => this.handleOnFocus()}
+              onSubmitEditing={() => this.handleOnBlur()}
+            />
+            <TextField
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
+              error={this.state.passwordError}
+              secureTextEntry={true}
+              label="password"
+              onChangeText={(text: string) => this.setState({ password: text })}
+              onFocus={() => this.handleOnFocus()}
+              onSubmitEditing={() => this.handleOnBlur()}
+            />
             <TouchableOpacity onPress={() => this.signInAsync()}>
               <View style={styles.signInContainer}>
                 <Text style={styles.signInText}>Sign In</Text>
               </View>
-            </TouchableOpacity> 
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => this.navToSignUp()}>
-              <Text style={styles.newMember}>new member?</Text>
+              <Text style={styles.newMember}>New Member?</Text>
               <Text style={styles.createAccount}>Create an account here!</Text>
             </TouchableOpacity>
           </View>
@@ -150,7 +166,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Design.padding,
     paddingTop: Design.padding,
     justifyContent: "space-around",
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.background
     //justifyContent: "center",
   },
   logo: {
@@ -180,10 +196,11 @@ const styles = StyleSheet.create({
   createAccount: {
     alignItems: "center",
     textAlign: "center",
-    textDecorationLine: 'underline'
+    textDecorationLine: "underline",
+    marginBottom: 5
   },
   newMember: {
-    textAlign: "center",
+    textAlign: "center"
   }
 });
 
