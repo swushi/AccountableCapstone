@@ -126,6 +126,8 @@ class SignInScreen extends React.Component<
           <Text style={styles.logo}>Accountable</Text>
           <View style={styles.inputContainer}>
             <TextField
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
               error={this.state.emailError}
               label="email"
               onChangeText={(text: string) => this.setState({ email: text })}
@@ -133,7 +135,10 @@ class SignInScreen extends React.Component<
               onSubmitEditing={() => this.handleOnBlur()}
             />
             <TextField
+              tintColor={Colors.primary}
+              textColor={Colors.textPrimary}
               error={this.state.passwordError}
+              secureTextEntry={true}
               label="password"
               onChangeText={(text: string) => this.setState({ password: text })}
               onFocus={() => this.handleOnFocus()}
@@ -145,7 +150,7 @@ class SignInScreen extends React.Component<
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.navToSignUp()}>
-              <Text style={styles.newMember}>new member?</Text>
+              <Text style={styles.newMember}>New Member?</Text>
               <Text style={styles.createAccount}>Create an account here!</Text>
             </TouchableOpacity>
           </View>
@@ -191,7 +196,8 @@ const styles = StyleSheet.create({
   createAccount: {
     alignItems: "center",
     textAlign: "center",
-    textDecorationLine: "underline"
+    textDecorationLine: "underline",
+    marginBottom: 5
   },
   newMember: {
     textAlign: "center"
