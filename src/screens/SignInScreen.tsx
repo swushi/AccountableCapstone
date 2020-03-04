@@ -43,6 +43,7 @@ class SignInScreen extends React.Component<
       passwordError: null
     });
   };
+
   handleOnBlur = () => {
     this.slide("down");
   };
@@ -76,17 +77,22 @@ class SignInScreen extends React.Component<
     if (!this.validateInput()) {
       return;
     }
-
     try {
       // Sign in user
-      const signIn = await firebase.signIn(email, password);
 
+      const signIn = await firebase.signIn(email, password);
       // wait for async signIn and createUser to finish
       await Promise.all([signIn]);
       this.props.navigation.navigate("App");
-    } catch (err) {
-      alert(err);
-
+    } catch (error) {
+      //alert(err);
+      const { code } = error;
+      if (code === "auth/user-not-found") {
+        this.setState({ emailError: "Please enter a valid email" });
+      }
+      if (code === "auth/wrong-password") {
+        this.setState({ passwordError: "Please enter a valid password" });
+      }
       // set error in state
       //this.setState({ emailError: error });
     }
@@ -102,6 +108,7 @@ class SignInScreen extends React.Component<
         emailError: "Please enter a valid email."
       });
     }
+
     if (password === "") {
       inputisValid = true;
       this.setState({
@@ -169,22 +176,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background
     //justifyContent: "center",
   },
+
   logo: {
     fontSize: 50,
     alignSelf: "center",
     color: Colors.primary,
     marginTop: 200
   },
+
   inputContainer: {
     paddingHorizontal: Design.padding,
     backgroundColor: "#fff",
     borderRadius: Design.roundness,
     marginBottom: 100
   },
+
   signInText: {
     color: "#fff",
     fontSize: 23
   },
+
   signInContainer: {
     height: Design.height * 0.06,
     alignItems: "center",
@@ -193,6 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: Design.roundness,
     marginVertical: Design.height * 0.03
   },
+
   createAccount: {
     alignItems: "center",
     textAlign: "center",
@@ -203,5 +215,4 @@ const styles = StyleSheet.create({
     textAlign: "center"
   }
 });
-
 export default SignInScreen;
