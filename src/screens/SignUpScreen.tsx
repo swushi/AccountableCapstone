@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
@@ -14,7 +8,6 @@ import { User } from "../types";
 
 type SignUpState = {
   err: boolean;
-  loading: boolean;
   firstName: string;
   lastName: string;
   email: string;
@@ -41,7 +34,6 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       confirm: "",
       firstName: "",
       lastName: "",
-      loading: false,
 
       // error handlers
       err: null,
@@ -97,12 +89,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
 
     // deref
     const { navigate } = this.props.navigation;
-    const { firstName, lastName, email, password } = this.state;
+    const { firstName, lastName, email, password, confirm, err } = this.state;
 
     try {
-      // set in loading state
-      this.setState({ loading: true });
-
       // Sign up user
       const { user } = await firebase.signUp(email, password);
       const { uid } = user;
@@ -127,17 +116,10 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       // wait for async signIn and createUser to finish
       await Promise.all([signIn, createUser]);
 
-      // stop loading
-      this.setState({ loading: false });
-
       // navigate to MainStack upon success
       navigate("Main");
     } catch (err) {
       const { code } = err;
-
-      // stop loading
-      this.setState({ loading: false });
-
       if (code === "auth/email-already-in-use") {
         this.setState({ emailErr: "Email already in use" });
       }
@@ -202,8 +184,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       passwordErr,
       confirmErr,
       firstNameErr,
-      lastNameErr,
-      loading
+      lastNameErr
     } = this.state;
     return (
       <View style={{ flex: 1 }}>
@@ -269,11 +250,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             />
             <TouchableOpacity onPress={this.signUpAsync}>
               <View style={styles.loginContainer}>
-                {loading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Text style={styles.loginText}>Login</Text>
-                )}
+                <Text style={styles.loginText}>Login</Text>
               </View>
             </TouchableOpacity>
           </View>

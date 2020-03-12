@@ -8,7 +8,7 @@ const Stack = createStackNavigator();
 
 export default function MainStack() {
   return (
-    <Stack.Navigator initialRouteName="Home" headerMode="none">
+    <Stack.Navigator initialRouteName="SignIn" headerMode="none">
       <Stack.Screen name="Home" component={HomeScreen} />
     </Stack.Navigator>
   );
