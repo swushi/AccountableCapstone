@@ -140,10 +140,10 @@ class SignInScreen extends React.Component<
               </View>
             </TouchableOpacity> 
             <TouchableOpacity onPress={() => this.navToSignUp()}>
-              <Text style={styles.newMember}>new member?</Text>
-              <Text style={styles.createAccount}>Create an account here!</Text>
+              <Text style={styles.createAccount}>New member?  Create an account here!</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>this.navToPasswordReset()}>
+              <Text style ={styles.Forgot} >Forgot Password?</Text>
 
               </TouchableOpacity>
           </View>
@@ -190,9 +190,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     textDecorationLine: 'underline'
-  },
-  newMember: {
+      },
+  Forgot: {
     textAlign: "center",
+    color: Colors.primary,
+    fontStyle: "italic",
+    fontWeight:"bold"
   }
 });
 
