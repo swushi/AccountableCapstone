@@ -61,6 +61,12 @@ class SignInScreen extends React.Component<
     this.props.navigation.navigate("SignUp");
   };
 
+  navToPasswordReset = () => {
+    this.props.navigation.navigate("ForgotPassword");
+  };
+
+  
+
   handlePress = async () => {
     try {
       // handle sign up
@@ -137,6 +143,9 @@ class SignInScreen extends React.Component<
               <Text style={styles.newMember}>new member?</Text>
               <Text style={styles.createAccount}>Create an account here!</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={()=>this.navToPasswordReset()}>
+
+              </TouchableOpacity>
           </View>
         </Animatable.View>
       </View>
