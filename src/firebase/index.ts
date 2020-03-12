@@ -39,3 +39,8 @@ export const createUser = (user: User) =>
     .collection("users")
     .doc(user.uid)
     .set(user);
+/**
+ * Sends users a email to rest password 
+ */
+export const passwordReset= (email:string) =>
+  firebase.auth().sendPasswordResetEmail(email);
