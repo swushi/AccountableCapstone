@@ -1,5 +1,3 @@
-import { Notifications } from "expo";
-
 export type UserID = string;
 export type ReminderID = string;
 export type HabitID = string;
