@@ -1,6 +1,7 @@
 import * as React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { Layout, Colors, validateEmail } from "../config";
+import { Header } from "../components";
 import * as Animatable from "react-native-animatable";
 
 export interface ProfileScreenProps {}
@@ -19,16 +20,11 @@ class ProfileScreen extends React.Component<
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <Animatable.View
-          style={styles.container}
-          ref={ref => (this.containerRef = ref)}
-          useNativeDriver
-        >
-          <View style={styles.topBar}>
-            <Text style={styles.headerText}> Accountable</Text>
-          </View>
-        </Animatable.View>
+      <View>
+        <Header hideBack/>
+
+        <Text style={styles.notify}> Notifications </Text>
+        <Text style={styles.signOut}> Sign Out </Text>
       </View>
     );
   }
@@ -43,14 +39,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background
     //justifyContent: "center",
   },
-  topBar: {
-    //headerStyle:
+  notify: {
+    
   },
-  headerText: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10,
-    fontWeight: "bold"
+  signOut: {
+
   }
 });
 export default ProfileScreen;
