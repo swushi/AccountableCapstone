@@ -10,12 +10,15 @@ import * as Animatable from "react-native-animatable";
 import { Header, HabitButton } from "../components";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+const AnimatableTouchable = Animatable.createAnimatableComponent(
+  TouchableOpacity
+);
 
-export interface HomeScreenProps {}
+export interface HomeScreenProps {
+  navigation: any;
+}
 
-export interface HomeScreenState {}
-
-class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
+class HomeScreen extends React.Component<HomeScreenProps, any> {
   state = {
     habits: HABITS,
     createWidth: 0,
@@ -27,6 +30,11 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   createRef = null;
   breakRef = null;
   fabRef = null; // floating action button
+
+  handleAction(screen: "CreateHabit" | "BreakHabit") {
+    this.slideOutActions();
+    this.props.navigation.navigate(screen);
+  }
 
   handleFab() {
     const { animated } = this.state;
@@ -78,10 +86,11 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
 
   render() {
     const { habits, breakWidth } = this.state;
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <Header hideBack />
-        <View style={styles.contentContainer}>
+        <View style={styles.contentContainer} pointerEvents="none">
           <View style={styles.progressCircleContainer}></View>
           <Text style={styles.currentHabitsText}>Current Habits</Text>
           <FlatList
@@ -89,66 +98,63 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
             keyExtractor={item => item.name}
             renderItem={({ item }) => <HabitButton data={item} />}
           />
-          <TouchableOpacity
-            style={styles.floatingActionButtonContainer}
-            onPress={() => this.handleFab()}
+        </View>
+        <TouchableOpacity
+          style={styles.floatingActionButtonContainer}
+          onPress={() => this.handleFab()}
+        >
+          <Animatable.View
+            ref={ref => (this.fabRef = ref)}
+            useNativeDriver
+            style={{ transform: [{ rotate: "0deg" }] }}
           >
-            <Animatable.View
-              ref={ref => (this.fabRef = ref)}
-              useNativeDriver
-              style={{ transform: [{ rotate: "0deg" }] }}
-            >
-              <MaterialCommunityIcons
-                name="plus-circle"
-                size={50}
-                color={Colors.primary}
-              />
-            </Animatable.View>
-          </TouchableOpacity>
-          <View
+            <MaterialCommunityIcons
+              name="plus-circle"
+              size={50}
+              color={Colors.primary}
+            />
+          </Animatable.View>
+        </TouchableOpacity>
+        <View
+          style={{
+            ...styles.actionOptionsContainer,
+            bottom: 65,
+            right: -breakWidth
+          }}
+        >
+          <AnimatableTouchable
+            onPress={() => this.handleAction("CreateHabit")}
+            useNativeDriver
+            onLayout={({ nativeEvent }) =>
+              this.setState({
+                breakWidth: nativeEvent.layout.width,
+                breakHeight: nativeEvent.layout.height
+              })
+            }
+            ref={ref => (this.createRef = ref)}
             style={{
-              ...styles.actionOptionsContainer,
-              bottom: 65,
-              right: -breakWidth
+              ...styles.actionOptionContainer,
+              borderColor: Colors.good
             }}
           >
-            <TouchableOpacity>
-              <Animatable.View
-                useNativeDriver
-                onLayout={({ nativeEvent }) =>
-                  this.setState({
-                    breakWidth: nativeEvent.layout.width,
-                    breakHeight: nativeEvent.layout.height
-                  })
-                }
-                ref={ref => (this.createRef = ref)}
-                style={{
-                  ...styles.actionOptionContainer,
-                  borderColor: Colors.good
-                }}
-              >
-                <Text style={styles.actionText}>Create Habit</Text>
-              </Animatable.View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Animatable.View
-                useNativeDriver
-                onLayout={({ nativeEvent }) =>
-                  this.setState({
-                    createWidth: nativeEvent.layout.width,
-                    createHeight: nativeEvent.layout.height
-                  })
-                }
-                ref={ref => (this.breakRef = ref)}
-                style={{
-                  ...styles.actionOptionContainer,
-                  borderColor: Colors.bad
-                }}
-              >
-                <Text style={styles.actionText}>Break Habit</Text>
-              </Animatable.View>
-            </TouchableOpacity>
-          </View>
+            <Text style={styles.actionText}>Create Habit</Text>
+          </AnimatableTouchable>
+          <AnimatableTouchable
+            useNativeDriver
+            onLayout={({ nativeEvent }) =>
+              this.setState({
+                createWidth: nativeEvent.layout.width,
+                createHeight: nativeEvent.layout.height
+              })
+            }
+            ref={ref => (this.breakRef = ref)}
+            style={{
+              ...styles.actionOptionContainer,
+              borderColor: Colors.bad
+            }}
+          >
+            <Text style={styles.actionText}>Break Habit</Text>
+          </AnimatableTouchable>
         </View>
       </View>
     );
