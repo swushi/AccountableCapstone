@@ -1,5 +1,6 @@
 import * as React from "react";
 import { View, StyleSheet, Text } from "react-native";
+import { Header } from "../components";
 
 export interface HomeScreenProps {}
 
@@ -14,6 +15,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   render() {
     return (
       <View>
+        <Header />
         <Text>HomeScreen Component</Text>
       </View>
     );

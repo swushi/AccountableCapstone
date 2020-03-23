@@ -2,7 +2,7 @@ import * as React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as firebase from "../firebase";
 import { TextField } from "react-native-material-textfield";
-import { Design, Colors, validateEmail } from "../config";
+import { Layout, Colors, validateEmail } from "../config";
 import * as Animatable from "react-native-animatable";
 import { User } from "../types";
 
@@ -48,7 +48,7 @@ class SignInScreen extends React.Component<
     this.slide("down");
   };
   slide = (direction: "up" | "down") => {
-    const slideAmount = Design.height * 0.3;
+    const slideAmount = Layout.height * 0.3;
     const translation = direction === "up" ? -1 * slideAmount : 0;
     this.containerRef.transitionTo({
       transform: [{ translateY: translation }]
@@ -178,8 +178,8 @@ class SignInScreen extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Design.padding,
-    paddingTop: Design.padding,
+    paddingHorizontal: Layout.padding,
+    paddingTop: Layout.padding,
     justifyContent: "space-around",
     backgroundColor: Colors.background
     //justifyContent: "center",
@@ -193,9 +193,9 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
-    paddingHorizontal: Design.padding,
+    paddingHorizontal: Layout.padding,
     backgroundColor: "#fff",
-    borderRadius: Design.roundness,
+    borderRadius: Layout.roundness,
     marginBottom: 100
   },
 
@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
   },
 
   signInContainer: {
-    height: Design.height * 0.06,
+    height: Layout.height * 0.06,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primary,
-    borderRadius: Design.roundness,
-    marginVertical: Design.height * 0.03
+    borderRadius: Layout.roundness,
+    marginVertical: Layout.height * 0.03
   },
 
   createAccount: {

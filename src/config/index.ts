@@ -1,4 +1,5 @@
 import { Dimensions } from "react-native";
+import Constants from "expo-constants";
 const { height, width } = Dimensions.get("window");
 
 export const Colors = {
@@ -8,11 +9,13 @@ export const Colors = {
   inactive: "#424242"
 };
 
-export const Design = {
+export const Layout = {
   padding: 12,
   height,
   width,
-  roundness: 12
+  roundness: 12,
+  headerHeight: height * 0.1,
+  statusBarHeight: Constants.statusBarHeight
 };
 
 export const FirebaseConfig = {

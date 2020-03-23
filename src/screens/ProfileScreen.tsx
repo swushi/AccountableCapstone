@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { Design, Colors, validateEmail } from "../config";
+import { Layout, Colors, validateEmail } from "../config";
 import * as Animatable from "react-native-animatable";
 
 export interface ProfileScreenProps {}
@@ -16,7 +16,6 @@ class ProfileScreen extends React.Component<
     super(props);
     this.state = {};
   }
-
 
   render() {
     return (
@@ -38,8 +37,8 @@ class ProfileScreen extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Design.padding,
-    paddingTop: Design.padding,
+    paddingHorizontal: Layout.padding,
+    paddingTop: Layout.padding,
     justifyContent: "space-around",
     backgroundColor: Colors.background
     //justifyContent: "center",
@@ -48,10 +47,10 @@ const styles = StyleSheet.create({
     //headerStyle:
   },
   headerText: {
-      fontSize: 20,
-      textAlign: "center",
-      margin: 10,
-      fontWeight: "bold"
+    fontSize: 20,
+    textAlign: "center",
+    margin: 10,
+    fontWeight: "bold"
   }
 });
 export default ProfileScreen;

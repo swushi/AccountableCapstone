@@ -9,7 +9,7 @@ import {
 import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
-import { Design, Colors, validateEmail } from "../config";
+import { Layout, Colors, validateEmail } from "../config";
 import { User } from "../types";
 
 type SignUpState = {
@@ -80,7 +80,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
    * slides the container up or down
    */
   slide = (direction: "up" | "down") => {
-    const slideAmount = Design.height * 0.3;
+    const slideAmount = Layout.height * 0.3;
     const translation = direction === "up" ? -1 * slideAmount : 0;
 
     this.containerRef.transitionTo({
@@ -286,8 +286,8 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Design.padding,
-    paddingTop: Design.padding,
+    paddingHorizontal: Layout.padding,
+    paddingTop: Layout.padding,
     justifyContent: "space-around",
     backgroundColor: Colors.background
   },
@@ -297,17 +297,17 @@ const styles = StyleSheet.create({
     color: Colors.primary
   },
   inputsContainer: {
-    paddingHorizontal: Design.padding,
+    paddingHorizontal: Layout.padding,
     backgroundColor: "#fff",
-    borderRadius: Design.roundness
+    borderRadius: Layout.roundness
   },
   loginContainer: {
-    height: Design.height * 0.06,
+    height: Layout.height * 0.06,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primary,
-    borderRadius: Design.roundness,
-    marginVertical: Design.height * 0.03
+    borderRadius: Layout.roundness,
+    marginVertical: Layout.height * 0.03
   },
   loginText: {
     color: "#fff",
