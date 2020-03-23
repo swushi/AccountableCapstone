@@ -26,8 +26,8 @@ class SignInScreen extends React.Component<
   constructor(props: SignInScreenProps) {
     super(props);
     this.state = {
-      email: "",
-      password: "",
+      email: "test@gmail.com",
+      password: "password",
       error: null,
       emailError: null,
       passwordError: null
