@@ -26,7 +26,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   };
   createRef = null;
   breakRef = null;
-  fabRef = null;
+  fabRef = null; // floating action button
 
   handleFab() {
     const { animated } = this.state;
