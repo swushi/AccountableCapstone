@@ -37,9 +37,12 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   slideInActions() {
     const { createWidth, breakWidth, createHeight, breakHeight } = this.state;
     this.setState({ animated: true });
-    this.fabRef.transitionTo({
-      rotate: "45deg"
-    });
+    this.fabRef.transitionTo(
+      {
+        rotate: "45deg"
+      },
+      500
+    );
     this.createRef.transitionTo({
       transform: [{ translateX: -createWidth * 1.2 }]
     });
@@ -55,9 +58,12 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   slideOutActions() {
     const { createWidth, breakWidth, createHeight, breakHeight } = this.state;
     this.setState({ animated: false });
-    this.fabRef.transitionTo({
-      rotate: "0deg"
-    });
+    this.fabRef.transitionTo(
+      {
+        rotate: "0deg"
+      },
+      500
+    );
     this.createRef.transitionTo({
       transform: [{ translateX: 0 }]
     });
