@@ -15,7 +15,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   render() {
     return (
       <View>
-        <Header />
+        <Header hideBack />
         <Text>HomeScreen Component</Text>
       </View>
     );

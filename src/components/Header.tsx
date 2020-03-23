@@ -1,17 +1,22 @@
 import * as React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { Layout, Colors } from "../config";
 
-export interface HeaderProps {}
+export interface HeaderProps {
+  hideBack?: Boolean;
+}
 
-class Header extends React.Component<HeaderProps, any> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.headerText}>Accountable</Text>
+function Header(props: HeaderProps) {
+  const navigation = useNavigation();
+  const { hideBack } = props;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.headerText}>Accountable</Text>
+      {!hideBack && (
         <View style={styles.backButton}>
-          <TouchableOpacity onPress={() => null}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons
               name="chevron-left"
               size={35}
@@ -19,9 +24,9 @@ class Header extends React.Component<HeaderProps, any> {
             />
           </TouchableOpacity>
         </View>
-      </View>
-    );
-  }
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
