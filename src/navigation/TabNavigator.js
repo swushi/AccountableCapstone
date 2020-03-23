@@ -34,7 +34,7 @@ export default function TabNavigator() {
       })}
       tabBarOptions={{
         activeTintColor: Colors.primary,
-        inactiveTintColor: Colors.textPrimary,
+        inactiveTintColor: Colors.inactive,
         showLabel: false
       }}
     >
