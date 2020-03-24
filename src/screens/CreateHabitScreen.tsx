@@ -65,7 +65,10 @@ class CreateHabitScreen extends React.Component<
   }
 
   handlePickerSubmit() {
-    setTimeout(() => this.setState({ showPicker: false }), 500);
+    setTimeout(
+      () => this.setState({ showPicker: false }, () => console.log("hidden")),
+      100
+    );
   }
 
   render() {
@@ -121,7 +124,7 @@ class CreateHabitScreen extends React.Component<
             })}
           </View>
           <TouchableOpacity onPress={() => this.showModal()}>
-            <View pointerEvents="none">
+            <View pointerEvents={"none"}>
               <TextField
                 ref={ref => (this.reminderRef = ref)}
                 label="Reminder"

@@ -131,7 +131,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       this.setState({ loading: false });
 
       // navigate to MainStack upon success
-      navigate("App");
+      navigate("App", { screen: "Home" });
     } catch (err) {
       const { code } = err;
 
