@@ -6,7 +6,7 @@ from 'react-native'
 export default SwitchExample = (props) => {
    return (
       <View style = {styles.container}>
-         <Switch onValueChange = {props.toggleHandle} value = {props.isOn}/>
+         <Switch value={props.isOn}/>
       </View>
    )
 }

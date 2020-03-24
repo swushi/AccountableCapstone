@@ -5,7 +5,7 @@ import { Header } from "../components";
 import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as firebase from "../firebase";
-import SwitchExample from '../navigation/toggle.js';
+import SwitchExample from '../components/toggle.js';
 import { User } from "../types";
 
 export interface ProfileScreenProps {
@@ -36,12 +36,12 @@ class ProfileScreen extends React.Component<
     this.props.navigation.navigate("SignIn");
   };
 
-  toggleHandle = (value: string) => {
+  toggleHandle = (value) => {
     this.setState({isOn: value})
       console.log('Switch 1 is: ' + value)
   }
   render() {
-    const {isOn} = this.props
+    const {isOn} = this.state
     return (
       <View style={{ flex: 1 }}>
         <Header hideBack/>
@@ -53,9 +53,9 @@ class ProfileScreen extends React.Component<
           <View style={styles.inputContainer}>
           <View style={styles.profileCircle}></View>
           <Text style={styles.userText}> User </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => this.toggleHandle(!isOn)}>
               <View style={styles.notifyContainer}>
-                <SwitchExample toggleHandle = {this.toggleHandle} isOn = {isOn}/>
+                <SwitchExample isOn={isOn}/>
                 <Text style={styles.notifyText}> Notifications </Text>
               </View>
             </TouchableOpacity>
