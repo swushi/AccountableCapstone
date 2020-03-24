@@ -28,6 +28,14 @@ export const signUp = (email: string, password: string) =>
 export const signIn = (email: string, password: string) =>
   firebase.auth().signInWithEmailAndPassword(email, password);
 
+/** Signs user out of the application */
+export const signOut = () =>
+  firebase.auth().signOut().then(function() {
+    //console.log('Signed Out');
+  }, function(error) {
+    //console.error('Sign Out Error', error);
+  });
+
 /**
  * Creates a new user in the database at location ref(`/users/${user.uid}`).
  * Returns a promise with snapshot if successful
