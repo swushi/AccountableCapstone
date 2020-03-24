@@ -3,9 +3,12 @@ import Constants from "expo-constants";
 const { height, width } = Dimensions.get("window");
 
 export const Colors = {
-  primary: "#8b67f0",
-  background: "#f1f1f1",
-  textPrimary: "#424242",
+  primary: "#45A29E",
+  secondary: "#084C61",
+  tertiary: "#595758",
+  background: "#EEE5E9",
+  textPrimary: "#0B0C10",
+  headerText: "#fff",
   inactive: "#424242",
   good: "green",
   bad: "red",
@@ -45,4 +48,12 @@ export const FirebaseConfig = {
 export const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
+};
+
+export const getTimeString = (time: Date) => {
+  const hours = time.getHours() % 12;
+  const minutes = time.getMinutes();
+  const pm = time.getHours() >= 12;
+
+  return `${hours}:${minutes} ${pm ? "PM" : "AM"}`;
 };

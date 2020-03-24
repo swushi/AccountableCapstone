@@ -20,7 +20,7 @@ function Header(props: HeaderProps) {
             <MaterialCommunityIcons
               name="chevron-left"
               size={35}
-              color="#fff"
+              color={Colors.headerText}
             />
           </TouchableOpacity>
         </View>
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontFamily: "Roboto-Bold",
-    color: "#fff",
+    color: Colors.headerText,
     fontSize: 30,
     alignSelf: "center"
   },

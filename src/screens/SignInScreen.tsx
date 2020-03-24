@@ -128,49 +128,47 @@ class SignInScreen extends React.Component<
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <Animatable.View
-          style={styles.container}
-          ref={ref => (this.containerRef = ref)}
-          useNativeDriver
-        >
-          <Text style={styles.logo}>Accountable</Text>
-          <View style={styles.inputContainer}>
-            <TextField
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
-              error={this.state.emailError}
-              label="email"
-              onChangeText={(text: string) => this.setState({ email: text })}
-              onFocus={() => this.handleOnFocus()}
-              onSubmitEditing={() => this.handleOnBlur()}
-            />
-            <TextField
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
-              error={this.state.passwordError}
-              secureTextEntry={true}
-              label="password"
-              onChangeText={(text: string) => this.setState({ password: text })}
-              onFocus={() => this.handleOnFocus()}
-              onSubmitEditing={() => this.handleOnBlur()}
-            />
-            <TouchableOpacity onPress={() => this.signInAsync()}>
-              <View style={styles.signInContainer}>
-                <Text style={styles.signInText}>Sign In</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.navToSignUp()}>
-              <Text style={styles.createAccount}>
-                New member? Create an account here!
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.navToPasswordReset()}>
-              <Text style={styles.Forgot}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
-        </Animatable.View>
-      </View>
+      <Animatable.View
+        style={styles.container}
+        ref={ref => (this.containerRef = ref)}
+        useNativeDriver
+      >
+        <Text style={styles.logo}>Accountable</Text>
+        <View style={styles.inputContainer}>
+          <TextField
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
+            error={this.state.emailError}
+            label="email"
+            onChangeText={(text: string) => this.setState({ email: text })}
+            onFocus={() => this.handleOnFocus()}
+            onSubmitEditing={() => this.handleOnBlur()}
+          />
+          <TextField
+            tintColor={Colors.primary}
+            textColor={Colors.textPrimary}
+            error={this.state.passwordError}
+            secureTextEntry={true}
+            label="password"
+            onChangeText={(text: string) => this.setState({ password: text })}
+            onFocus={() => this.handleOnFocus()}
+            onSubmitEditing={() => this.handleOnBlur()}
+          />
+          <TouchableOpacity onPress={() => this.signInAsync()}>
+            <View style={styles.signInContainer}>
+              <Text style={styles.signInText}>Sign In</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.navToSignUp()}>
+            <Text style={styles.createAccount}>
+              New member? Create an account here!
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.navToPasswordReset()}>
+            <Text style={styles.Forgot}>Forgot Password?</Text>
+          </TouchableOpacity>
+        </View>
+      </Animatable.View>
     );
   }
 }
@@ -193,7 +191,7 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
-    paddingHorizontal: Layout.padding,
+    padding: Layout.padding,
     backgroundColor: "#fff",
     borderRadius: Layout.roundness,
     marginBottom: 100
