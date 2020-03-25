@@ -160,7 +160,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
               borderColor: Colors.bad
             }}
           >
-            <MaterialCommunityIcons name="delete" color="#fff" size={25} />
+            <MaterialCommunityIcons name="close" color="#fff" size={25} />
             <Text style={styles.actionText}>Break Habit</Text>
           </AnimatableTouchable>
         </View>

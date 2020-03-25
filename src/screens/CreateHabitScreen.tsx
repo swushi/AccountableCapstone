@@ -6,11 +6,11 @@ import { Layout, Colors, getTimeString } from "../config";
 import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import * as firebase from "../firebase";
-import { User } from "../types";
+import { User, Habit, Reminder } from "../types";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
-const DAYS = [
+const REMINDERS: Array<Reminder> = [
   { name: "Sun", active: false },
   { name: "Mon", active: false },
   { name: "Tue", active: false },
@@ -20,8 +20,6 @@ const DAYS = [
   { name: "Sat", active: false }
 ];
 
-type Day = { name: String; active: Boolean };
-
 export interface CreateHabitScreenProps {
   user: User;
 }
@@ -29,7 +27,7 @@ export interface CreateHabitScreenProps {
 export interface CreateHabitScreenState {
   title: string;
   accountable: string;
-  days: Array<Day>;
+  reminders: Array<Reminder>;
   showPicker: Boolean;
   time: Date;
 }
@@ -41,7 +39,7 @@ class CreateHabitScreen extends React.Component<
   state = {
     title: "",
     accountable: "",
-    days: DAYS,
+    reminders: REMINDERS,
     showPicker: false,
     time: new Date()
   };
@@ -64,23 +62,39 @@ class CreateHabitScreen extends React.Component<
     }
   }
 
-  toggleDay(day: Day, index: number) {
-    const newDays = this.state.days;
-    newDays[index].active = !day.active;
+  toggleReminder(day: Reminder, index: number) {
+    const newReminders = this.state.reminders;
+    newReminders[index].active = !day.active;
 
-    this.setState({ days: newDays });
+    this.setState({ reminders: newReminders });
   }
 
   // TODO: get user id and save actual habit info
   async createHabit() {
+    // destructure
+    const { reminders, title, time } = this.state;
     const uid = firebase.uid();
-    console.log(this.props.user);
+
+    // create time string
+    const remindTime = `${time.getHours()}:${time.getMinutes()}`;
+
+    // add times to reminders
+    const newReminders = reminders;
+    newReminders.map(reminder => (reminder.time = remindTime));
+
+    // generate habit object
+    const habit: Habit = {
+      uid,
+      type: "create",
+      active: true,
+      title,
+      dateStart: new Date(),
+      reminders: newReminders
+    };
+
     try {
-      await firebase.createHabit({
-        test: "data",
-        anotherTest: "data2",
-        uid
-      });
+      // push habit to database
+      await firebase.createHabit(habit);
     } catch (error) {
       console.warn(error);
     }
@@ -94,7 +108,7 @@ class CreateHabitScreen extends React.Component<
   }
 
   render() {
-    const { days, showPicker, time } = this.state;
+    const { reminders, showPicker, time } = this.state;
     return (
       <View style={styles.container}>
         <Header />
@@ -111,8 +125,8 @@ class CreateHabitScreen extends React.Component<
             onSubmitEditing={() => this.handleBlur()}
           />
           <Text style={styles.dayLabel}>Remind Me On</Text>
-          <View style={styles.daysContainer}>
-            {days.map((day, index) => {
+          <View style={styles.remindersContainer}>
+            {reminders.map((day, index) => {
               const renderSeperator = index !== 6;
               return (
                 <AnimatableTouchable
@@ -129,7 +143,7 @@ class CreateHabitScreen extends React.Component<
                     transform: [{ scale: day.active ? 1.04 : 1 }],
                     zIndex: day.active ? 2 : 1
                   }}
-                  onPress={() => this.toggleDay(day, index)}
+                  onPress={() => this.toggleReminder(day, index)}
                 >
                   <Text
                     useNativeDriver
@@ -207,7 +221,7 @@ const styles = StyleSheet.create({
     marginTop: Layout.padding * 2,
     color: Colors.textPrimary
   },
-  daysContainer: {
+  remindersContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: Layout.padding,

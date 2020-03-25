@@ -154,8 +154,9 @@ class SignInScreen extends React.Component<
           <TextField
             tintColor={Colors.primary}
             textColor={Colors.textPrimary}
+            baseColor={Colors.primary}
             error={this.state.emailError}
-            label="email"
+            label="Email"
             onChangeText={(text: string) => this.setState({ email: text })}
             onFocus={() => this.handleOnFocus()}
             onSubmitEditing={() => this.handleOnBlur()}
@@ -163,9 +164,10 @@ class SignInScreen extends React.Component<
           <TextField
             tintColor={Colors.primary}
             textColor={Colors.textPrimary}
+            baseColor={Colors.primary}
             error={this.state.passwordError}
             secureTextEntry={true}
-            label="password"
+            label="Password"
             onChangeText={(text: string) => this.setState({ password: text })}
             onFocus={() => this.handleOnFocus()}
             onSubmitEditing={() => this.handleOnBlur()}
@@ -196,15 +198,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
     justifyContent: "space-around",
-    backgroundColor: Colors.background
+    backgroundColor: Colors.primary
     //justifyContent: "center",
   },
 
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: Colors.primary,
-    marginTop: 200
+    color: "#fff",
+    marginTop: 150
   },
 
   inputContainer: {
