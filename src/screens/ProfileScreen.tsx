@@ -60,7 +60,7 @@ class ProfileScreen extends React.Component<
             <View style={styles.profileCircle}></View>
             <Text style={styles.userText}> User </Text>
             <TouchableOpacity onPress={() => this.toggleHandle(!isOn)}>
-              <View style={styles.notifyContainer}>
+              <View style={styles.notifyContainer} pointerEvents="none">
                 <SwitchExample isOn={isOn} />
                 <Text style={styles.notifyText}> Notifications </Text>
               </View>

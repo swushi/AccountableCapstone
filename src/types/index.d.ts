@@ -21,9 +21,11 @@ export type User = {
  * 4a. Set habit to inactive when dateEnd is reached
  * 4b. User deletes habit.
  */
+
+// TODO: Make it reflect actual habit needs
 export type Habit = {
   id?: HabitID; // optional because when created on client, will not have id yet
-  type: "make" | "break";
+  type: "create" | "break";
   title: string;
   desc: string;
   active: Boolean; // if the habit is currently on-going

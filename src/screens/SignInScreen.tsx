@@ -173,6 +173,7 @@ class SignInScreen extends React.Component<
   }
 }
 
+// TODO: Restyle this screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,7 +1,7 @@
 import * as firebase from "firebase";
 import "firebase/firestore";
 import { FirebaseConfig } from "../config";
-import { User } from "../types";
+import { User, UserID } from "../types";
 
 /**
  * Creates and initializes a Firebase instance.
@@ -30,11 +30,17 @@ export const signIn = (email: string, password: string) =>
 
 /** Signs user out of the application */
 export const signOut = () =>
-  firebase.auth().signOut().then(function() {
-    //console.log('Signed Out');
-  }, function(error) {
-    //console.error('Sign Out Error', error);
-  });
+  firebase
+    .auth()
+    .signOut()
+    .then(
+      function() {
+        //console.log('Signed Out');
+      },
+      function(error) {
+        //console.error('Sign Out Error', error);
+      }
+    );
 
 /**
  * Creates a new user in the database at location ref(`/users/${user.uid}`).
@@ -48,7 +54,25 @@ export const createUser = (user: User) =>
     .doc(user.uid)
     .set(user);
 /**
- * Sends users a email to rest password 
+ * Sends users a email to rest password
  */
-export const passwordReset= (email:string) =>
+export const passwordReset = (email: string) =>
   firebase.auth().sendPasswordResetEmail(email);
+
+/**
+ *  Pushes a Created Habit to database at ref(`/users/${user.uid}/`)
+ * @param user
+ * @param habit
+ */
+export const createHabit = (habit: Habit) =>
+  firebase
+    .firestore()
+    .collection("habits")
+    .add(habit);
+
+export const getHabits = (uid: UserID) =>
+  firebase
+    .firestore()
+    .collection("habits")
+    .where("test", "==", uid)
+    .get();

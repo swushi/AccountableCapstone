@@ -54,12 +54,12 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
       500
     );
     this.createRef.transitionTo({
-      transform: [{ translateX: -createWidth * 1.2 }]
+      transform: [{ translateX: -createWidth * 2.2 }]
     });
     setTimeout(
       () =>
         this.breakRef.transitionTo({
-          transform: [{ translateX: -breakWidth * 1.2 }]
+          transform: [{ translateX: -breakWidth * 2.2 }]
         }),
       100
     );
@@ -123,9 +123,9 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
         </TouchableOpacity>
         <View
           style={{
-            ...styles.actionOptionsContainer,
+            right: -breakWidth * 2,
             bottom: 65,
-            right: -breakWidth
+            ...styles.actionOptionsContainer
           }}
         >
           <AnimatableTouchable

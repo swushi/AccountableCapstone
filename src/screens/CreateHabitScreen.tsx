@@ -4,6 +4,7 @@ import { TextField } from "react-native-material-textfield";
 import { Layout, Colors, getTimeString } from "../config";
 import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
+import * as firebase from "../firebase";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
@@ -64,6 +65,19 @@ class CreateHabitScreen extends React.Component<
     newDays[index].active = !day.active;
 
     this.setState({ days: newDays });
+  }
+
+  // TODO: get user id and save actual habit info
+  async createHabit() {
+    try {
+      await firebase.createHabit({
+        test: "data",
+        anotherTest: "data2",
+        uid: "234234234"
+      });
+    } catch (error) {
+      console.warn(error);
+    }
   }
 
   handlePickerSubmit() {
@@ -158,6 +172,10 @@ class CreateHabitScreen extends React.Component<
             onChange={(event, date) => this.handleTimeChange(event, date)}
           />
         ) : null}
+
+        <TouchableOpacity onPress={() => this.createHabit()}>
+          <Text>Create Habit</Text>
+        </TouchableOpacity>
       </View>
     );
   }
