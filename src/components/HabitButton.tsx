@@ -11,13 +11,14 @@ function HabitButton(props: HabitButtonProps) {
   const iconColor = "red";
   const { name, streak } = props.data;
   return (
-    <TouchableOpacity onPress={() => null}>
-      <View style={{ ...styles.container, borderBottomColor: "green" }}>
-        <Text style={styles.name}>{name}</Text>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.streak}>{streak}</Text>
-          <MaterialCommunityIcons name="fire" size={30} color={iconColor} />
-        </View>
+    <TouchableOpacity
+      onPress={() => null}
+      style={{ ...styles.container, borderBottomColor: "green" }}
+    >
+      <Text style={styles.name}>{name}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text style={styles.streak}>{streak}</Text>
+        <MaterialCommunityIcons name="fire" size={30} color={iconColor} />
       </View>
     </TouchableOpacity>
   );

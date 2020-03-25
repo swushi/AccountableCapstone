@@ -27,6 +27,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
     breakHeight: 0,
     animated: false
   };
+  contentRef = null;
   createRef = null;
   breakRef = null;
   fabRef = null; // floating action button
@@ -45,6 +46,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
   slideInActions() {
     const { createWidth, breakWidth, createHeight, breakHeight } = this.state;
     this.setState({ animated: true });
+    this.contentRef.transitionTo({ opacity: 0.5 }, 500);
     this.fabRef.transitionTo(
       {
         rotate: "45deg"
@@ -52,12 +54,12 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
       500
     );
     this.createRef.transitionTo({
-      transform: [{ translateX: -createWidth * 1.2 }]
+      transform: [{ translateX: -createWidth * 2.2 }]
     });
     setTimeout(
       () =>
         this.breakRef.transitionTo({
-          transform: [{ translateX: -breakWidth * 1.2 }]
+          transform: [{ translateX: -breakWidth * 2.2 }]
         }),
       100
     );
@@ -66,6 +68,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
   slideOutActions() {
     const { createWidth, breakWidth, createHeight, breakHeight } = this.state;
     this.setState({ animated: false });
+    this.contentRef.transitionTo({ opacity: 1 }, 500);
     this.fabRef.transitionTo(
       {
         rotate: "0deg"
@@ -85,12 +88,15 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
   }
 
   render() {
-    const { habits, breakWidth } = this.state;
-    const { navigation } = this.props;
+    const { habits, breakWidth, animated } = this.state;
     return (
       <View style={styles.container}>
-        <Header hideBack />
-        <View style={styles.contentContainer} pointerEvents="none">
+        <Animatable.View
+          ref={ref => (this.contentRef = ref)}
+          style={{ ...styles.contentContainer }}
+          pointerEvents={animated ? "none" : "auto"}
+        >
+          <Header hideBack />
           <View style={styles.progressCircleContainer}></View>
           <Text style={styles.currentHabitsText}>Current Habits</Text>
           <FlatList
@@ -98,7 +104,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
             keyExtractor={item => item.name}
             renderItem={({ item }) => <HabitButton data={item} />}
           />
-        </View>
+        </Animatable.View>
         <TouchableOpacity
           style={styles.floatingActionButtonContainer}
           onPress={() => this.handleFab()}
@@ -117,9 +123,9 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
         </TouchableOpacity>
         <View
           style={{
-            ...styles.actionOptionsContainer,
+            right: -breakWidth * 2,
             bottom: 65,
-            right: -breakWidth
+            ...styles.actionOptionsContainer
           }}
         >
           <AnimatableTouchable
@@ -137,6 +143,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
               borderColor: Colors.good
             }}
           >
+            <MaterialCommunityIcons name="check" color="#fff" size={25} />
             <Text style={styles.actionText}>Create Habit</Text>
           </AnimatableTouchable>
           <AnimatableTouchable
@@ -153,6 +160,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
               borderColor: Colors.bad
             }}
           >
+            <MaterialCommunityIcons name="close" color="#fff" size={25} />
             <Text style={styles.actionText}>Break Habit</Text>
           </AnimatableTouchable>
         </View>
@@ -194,17 +202,19 @@ const styles = StyleSheet.create({
     position: "absolute"
   },
   actionOptionContainer: {
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: Colors.primary,
     alignItems: "center",
-    padding: 5,
-    borderWidth: 1,
+    padding: 10,
     borderRadius: Layout.roundness,
-    backgroundColor: "#fff",
     marginBottom: 5
   },
   actionText: {
-    fontSize: 16,
-    fontFamily: "Roboto-Regular"
+    fontSize: 20,
+    paddingLeft: 5,
+    fontFamily: "Roboto-Regular",
+    color: "#fff"
   }
 });
 

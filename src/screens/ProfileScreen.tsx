@@ -1,20 +1,26 @@
 import * as React from "react";
-import { View, StyleSheet, Text, Switch, Animated, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Switch,
+  Animated,
+  TouchableOpacity
+} from "react-native";
 import { Layout, Colors, validateEmail } from "../config";
-import { Header } from "../components";
+import { Header, Toggle as SwitchExample } from "../components";
 import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as firebase from "../firebase";
-import SwitchExample from '../components/toggle.js';
 import { User } from "../types";
 
 export interface ProfileScreenProps {
-  isOn: any;
   navigation: any;
 }
 
-export interface ProfileScreenState {}
-
+export interface ProfileScreenState {
+  isOn: any;
+}
 
 class ProfileScreen extends React.Component<
   ProfileScreenProps,
@@ -24,44 +30,48 @@ class ProfileScreen extends React.Component<
   constructor(props: ProfileScreenProps) {
     super(props);
     this.state = {
-      isOn: false,
+      isOn: false
     };
   }
 
-  signOutAsync = async() => {
+  signOutAsync = async () => {
     const signIn = await firebase.signOut();
     this.navToSignIn();
-  }
+  };
   navToSignIn = () => {
     this.props.navigation.navigate("SignIn");
   };
 
-  toggleHandle = (value) => {
-    this.setState({isOn: value})
-      console.log('Switch 1 is: ' + value)
-  }
+  toggleHandle = value => {
+    this.setState({ isOn: value });
+    console.log("Switch 1 is: " + value);
+  };
   render() {
-    const {isOn} = this.state
+    const { isOn } = this.state;
     return (
       <View style={{ flex: 1 }}>
-        <Header hideBack/>
+        <Header hideBack />
         <Animatable.View
           style={styles.container}
           ref={ref => (this.containerRef = ref)}
           useNativeDriver
         >
           <View style={styles.inputContainer}>
-          <View style={styles.profileCircle}></View>
-          <Text style={styles.userText}> User </Text>
+            <View style={styles.profileCircle}></View>
+            <Text style={styles.userText}> User </Text>
             <TouchableOpacity onPress={() => this.toggleHandle(!isOn)}>
-              <View style={styles.notifyContainer}>
-                <SwitchExample isOn={isOn}/>
+              <View style={styles.notifyContainer} pointerEvents="none">
+                <SwitchExample isOn={isOn} />
                 <Text style={styles.notifyText}> Notifications </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.signOutAsync()}>
               <View style={styles.signOutContainer}>
-                <MaterialCommunityIcons style={styles.exitSign} name="exit-to-app" size={30}/>
+                <MaterialCommunityIcons
+                  style={styles.exitSign}
+                  name="exit-to-app"
+                  size={30}
+                />
                 <Text style={styles.signOutText}> Sign Out </Text>
               </View>
             </TouchableOpacity>
@@ -74,7 +84,7 @@ class ProfileScreen extends React.Component<
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   inputContainer: {
     paddingHorizontal: Layout.padding,
@@ -98,7 +108,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     alignSelf: "center",
     color: Colors.textPrimary,
-    marginBottom: 20,
+    marginBottom: 20
   },
   notifyContainer: {
     justifyContent: "center",
@@ -116,7 +126,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     alignSelf: "flex-start",
     color: Colors.textPrimary,
-    padding: Layout.padding,
+    padding: Layout.padding
   },
   signOutContainer: {
     justifyContent: "center",
@@ -139,7 +149,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-end",
     marginRight: 30,
-    marginBottom: -30,
-  },
+    marginBottom: -30
+  }
 });
 export default ProfileScreen;

@@ -1,13 +1,22 @@
 import * as React from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import * as firebase from "../firebase";
-import { TextField } from "react-native-material-textfield";
-import { Layout, Colors, validateEmail } from "../config";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ActionSheetIOS
+} from "react-native";
+import { connect } from "react-redux";
 import * as Animatable from "react-native-animatable";
+import { TextField } from "react-native-material-textfield";
+import * as firebase from "../firebase";
+import { Layout, Colors, validateEmail } from "../config";
+import * as actions from "../redux/actions";
 import { User } from "../types";
 
 type SignInScreenProps = {
   navigation: any;
+  storeUser: any;
 };
 
 type SignInScreenState = {
@@ -34,6 +43,9 @@ class SignInScreen extends React.Component<
     };
     this.signInAsync = this.signInAsync.bind(this);
     this.containerRef = null;
+  }
+  componentDidMount() {
+    console.log(this.props);
   }
 
   handleOnFocus = () => {
@@ -76,6 +88,7 @@ class SignInScreen extends React.Component<
   signInAsync = async () => {
     // deref
     const { navigate } = this.props.navigation;
+    const { storeUser } = this.props;
     const { email, password, error } = this.state;
 
     if (!this.validateInput()) {
@@ -83,13 +96,16 @@ class SignInScreen extends React.Component<
     }
     try {
       // Sign in user
-
       const signIn = await firebase.signIn(email, password);
-      // wait for async signIn and createUser to finish
-      await Promise.all([signIn]);
+
+      // retrieve users data from database
+      const userData = await firebase.getUser(firebase.uid());
+
+      storeUser(userData.data());
+
       this.props.navigation.navigate("App");
     } catch (error) {
-      //alert(err);
+      alert(error);
       const { code } = error;
       if (code === "auth/user-not-found") {
         this.setState({ emailError: "Please enter a valid email" });
@@ -138,8 +154,9 @@ class SignInScreen extends React.Component<
           <TextField
             tintColor={Colors.primary}
             textColor={Colors.textPrimary}
+            baseColor={Colors.primary}
             error={this.state.emailError}
-            label="email"
+            label="Email"
             onChangeText={(text: string) => this.setState({ email: text })}
             onFocus={() => this.handleOnFocus()}
             onSubmitEditing={() => this.handleOnBlur()}
@@ -147,9 +164,10 @@ class SignInScreen extends React.Component<
           <TextField
             tintColor={Colors.primary}
             textColor={Colors.textPrimary}
+            baseColor={Colors.primary}
             error={this.state.passwordError}
             secureTextEntry={true}
-            label="password"
+            label="Password"
             onChangeText={(text: string) => this.setState({ password: text })}
             onFocus={() => this.handleOnFocus()}
             onSubmitEditing={() => this.handleOnBlur()}
@@ -173,21 +191,22 @@ class SignInScreen extends React.Component<
   }
 }
 
+// TODO: Restyle this screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
     justifyContent: "space-around",
-    backgroundColor: Colors.background
+    backgroundColor: Colors.primary
     //justifyContent: "center",
   },
 
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: Colors.primary,
-    marginTop: 200
+    color: "#fff",
+    marginTop: 150
   },
 
   inputContainer: {
@@ -223,4 +242,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   }
 });
-export default SignInScreen;
+
+export default connect(null, actions)(SignInScreen);
