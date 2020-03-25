@@ -1,9 +1,12 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import AppContainer from "./src/navigation";
 import * as firebase from "./src/firebase";
+import Reducers from "./src/redux/reducers";
 
 firebase.init();
 
@@ -35,7 +38,11 @@ class App extends React.Component {
       );
     }
 
-    return <AppContainer />;
+    return (
+      <Provider store={createStore(Reducers)}>
+        <AppContainer />
+      </Provider>
+    );
   }
 }
 

@@ -1,7 +1,7 @@
 import * as firebase from "firebase";
 import "firebase/firestore";
 import { FirebaseConfig } from "../config";
-import { User, UserID } from "../types";
+import { User, UserID, Habit } from "../types";
 
 /**
  * Creates and initializes a Firebase instance.
@@ -29,18 +29,12 @@ export const signIn = (email: string, password: string) =>
   firebase.auth().signInWithEmailAndPassword(email, password);
 
 /** Signs user out of the application */
-export const signOut = () =>
-  firebase
-    .auth()
-    .signOut()
-    .then(
-      function() {
-        //console.log('Signed Out');
-      },
-      function(error) {
-        //console.error('Sign Out Error', error);
-      }
-    );
+export const signOut = () => firebase.auth().signOut();
+
+/**
+ * Get users id
+ */
+export const uid = () => firebase.auth().currentUser.uid;
 
 /**
  * Creates a new user in the database at location ref(`/users/${user.uid}`).
@@ -53,6 +47,18 @@ export const createUser = (user: User) =>
     .collection("users")
     .doc(user.uid)
     .set(user);
+
+/**
+ * Returns the user from the database
+ * @param uid
+ */
+export const getUser = (uid: UserID) =>
+  firebase
+    .firestore()
+    .collection("users")
+    .doc(uid)
+    .get();
+
 /**
  * Sends users a email to rest password
  */

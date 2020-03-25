@@ -1,10 +1,12 @@
 import * as React from "react";
 import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { TextField } from "react-native-material-textfield";
+import { connect } from "react-redux";
 import { Layout, Colors, getTimeString } from "../config";
 import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import * as firebase from "../firebase";
+import { User } from "../types";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
@@ -20,7 +22,9 @@ const DAYS = [
 
 type Day = { name: String; active: Boolean };
 
-export interface CreateHabitScreenProps {}
+export interface CreateHabitScreenProps {
+  user: User;
+}
 
 export interface CreateHabitScreenState {
   title: string;
@@ -69,11 +73,13 @@ class CreateHabitScreen extends React.Component<
 
   // TODO: get user id and save actual habit info
   async createHabit() {
+    const uid = firebase.uid();
+    console.log(this.props.user);
     try {
       await firebase.createHabit({
         test: "data",
         anotherTest: "data2",
-        uid: "234234234"
+        uid
       });
     } catch (error) {
       console.warn(error);
@@ -224,4 +230,6 @@ const styles = StyleSheet.create({
   }
 });
 
-export default CreateHabitScreen;
+const mapStateToProps = state => ({ user: state.user });
+
+export default connect(mapStateToProps)(CreateHabitScreen);
