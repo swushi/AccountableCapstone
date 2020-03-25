@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { TextField } from "react-native-material-textfield";
 import { Layout, Colors, getTimeString } from "../config";
 import { Header, DateTimePickerModal } from "../components";
@@ -52,9 +52,11 @@ class CreateHabitScreen extends React.Component<
     this.reminderRef.setValue(getTimeString(time));
   }
 
-  handleTimeChange(date: Date) {
-    this.setState({ time: date });
+  handleTimeChange(event: any, date: Date) {
     this.reminderRef.setValue(getTimeString(date));
+    if (Platform.OS === "android") {
+      this.setState({ showPicker: false });
+    }
   }
 
   toggleDay(day: Day, index: number) {
@@ -149,10 +151,11 @@ class CreateHabitScreen extends React.Component<
         </View>
         {showPicker ? (
           <DateTimePickerModal
+            display="default"
             value={time}
             onSubmit={() => this.handlePickerSubmit()}
             mode="time"
-            onChange={(event, date) => this.handleTimeChange(date)}
+            onChange={(event, date) => this.handleTimeChange(event, date)}
           />
         ) : null}
       </View>

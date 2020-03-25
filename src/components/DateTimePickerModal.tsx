@@ -15,7 +15,7 @@ class DateTimePickerModal extends PureComponent<DateTimePickerModalProps, any> {
   };
   modal = null;
 
-  slide = direction => {
+  slide = (direction: "up" | "down", submit: Boolean = true) => {
     const { modalHeight } = this.state;
     const dir = direction == "up" ? -1 : 1;
 
@@ -23,7 +23,7 @@ class DateTimePickerModal extends PureComponent<DateTimePickerModalProps, any> {
       { transform: [{ translateY: modalHeight * dir }] },
       500
     );
-    setTimeout(() => this.props.onSubmit(), 500);
+    if (submit === true) setTimeout(() => this.props.onSubmit(), 500);
   };
 
   render() {
@@ -46,13 +46,10 @@ class DateTimePickerModal extends PureComponent<DateTimePickerModalProps, any> {
               height: Layout.height * 0.05,
               padding: Layout.padding,
               flexDirection: "row",
-              justifyContent: "space-between",
+              justifyContent: "flex-end",
               backgroundColor: Colors.primary
             }}
           >
-            <TouchableOpacity>
-              <Text style={{ color: "#fff" }}>Cancel</Text>
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => this.slide("down")}>
               <Text style={{ color: "#fff" }}>Done</Text>
             </TouchableOpacity>

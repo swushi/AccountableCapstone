@@ -51,8 +51,11 @@ export const validateEmail = email => {
 };
 
 export const getTimeString = (time: Date) => {
-  const hours = time.getHours() % 12;
-  const minutes = time.getMinutes();
+  let hours = time.getHours() % 12;
+  let minutes = time.getMinutes();
+  // @ts-ignore
+  if (minutes < 10) minutes = "0" + minutes;
+  if (hours === 0) hours = 12;
   const pm = time.getHours() >= 12;
 
   return `${hours}:${minutes} ${pm ? "PM" : "AM"}`;
