@@ -10,6 +10,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as firebase from "../firebase";
 import { Layout, Colors, validateEmail } from "../config";
 import { User } from "../types";
@@ -227,6 +228,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       lastNameErr,
       loading
     } = this.state;
+    const { navigation } = this.props;
     return (
       <LinearGradient
         colors={[Colors.primary, Colors.secondary]}
@@ -238,6 +240,16 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
           ref={ref => (this.containerRef = ref)}
           useNativeDriver
         >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={35}
+              color={Colors.headerText}
+            />
+          </TouchableOpacity>
           <Text style={styles.logo}>Accountable</Text>
           <View style={styles.inputsContainer}>
             <TextField
@@ -320,6 +332,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
     justifyContent: "space-around"
+  },
+  backButton: {
+    position: "absolute",
+    top: 30,
+    left: 15
   },
   logo: {
     fontSize: 50,
