@@ -8,7 +8,7 @@ import {
   TouchableOpacity
 } from "react-native";
 import { Layout, Colors, validateEmail } from "../config";
-import { Header, Toggle as SwitchExample } from "../components";
+import { Header, ToggleButton as SwitchExample } from "../components";
 import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as firebase from "../firebase";
