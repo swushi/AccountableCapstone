@@ -1,6 +1,7 @@
 import { Dimensions } from "react-native";
 import Constants from "expo-constants";
 const { height, width } = Dimensions.get("window");
+import { Day } from "../types";
 
 export const Colors = {
   primary: "#45A29E",
@@ -59,4 +60,44 @@ export const getTimeString = (time: Date) => {
   const pm = time.getHours() >= 12;
 
   return `${hours}:${minutes} ${pm ? "PM" : "AM"}`;
+};
+
+export const getRemindTime = (time: Date, day: Day) => {
+  const timeNum = time.getTime();
+  let dayNum;
+
+  switch (day) {
+    case "Sun":
+      dayNum = 0;
+      break;
+    case "Mon":
+      dayNum = 1;
+      break;
+    case "Tue":
+      dayNum = 2;
+      break;
+    case "Wed":
+      dayNum = 3;
+      break;
+    case "Thu":
+      dayNum = 4;
+      break;
+    case "Fri":
+      dayNum = 5;
+      break;
+    case "Sat":
+      dayNum = 6;
+      break;
+    default:
+      break;
+  }
+
+  let resultDate = new Date(timeNum);
+
+  resultDate.setDate(time.getDate() + ((7 + dayNum - time.getDay()) % 7));
+  if (resultDate.getTime() < new Date().getTime()) {
+    resultDate.setDate(resultDate.getDate() + 7);
+  }
+
+  return resultDate;
 };

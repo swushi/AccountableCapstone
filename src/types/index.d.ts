@@ -2,7 +2,6 @@ export type UserID = string;
 export type ReminderID = string;
 export type HabitID = string;
 export type ExpoPushToken = string;
-export type ExpoNotification = Object;
 
 export type User = {
   uid?: UserID;
@@ -10,13 +9,34 @@ export type User = {
   lastName: string;
   email: string;
   pushToken?: ExpoPushToken;
+  notify?: boolean;
   accountables?: Array<User>;
 };
 
+export type ExpoLocalNotificationOptions = {
+  title: string;
+  body: string;
+  data?: Object;
+  categoryId?: string;
+};
+
+export type ExpoRepeatOptions = {
+  time: Date;
+  repeat?: "minute" | "hour" | "day" | "week" | "month" | "year";
+};
+
+export type ExpoLocalNotification = {
+  notification: ExpoLocalNotificationOptions;
+  repeat?: ExpoRepeatOptions;
+};
+
+export type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+
 export type Reminder = {
-  name: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  day: Day;
   active: Boolean;
   time?: String; // 00:30 or 15:50
+  localId?: String; // local notification id used for cancelling notification
 };
 
 /**

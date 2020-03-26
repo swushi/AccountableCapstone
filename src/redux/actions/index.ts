@@ -6,3 +6,10 @@ export const storeUser = (user: User) => {
     payload: user
   };
 };
+
+export const canNotify = (notify: Boolean) => {
+  return {
+    type: "canNotify",
+    payload: notify
+  };
+};

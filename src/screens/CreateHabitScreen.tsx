@@ -2,22 +2,23 @@ import * as React from "react";
 import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { TextField } from "react-native-material-textfield";
 import { connect } from "react-redux";
-import { Layout, Colors, getTimeString } from "../config";
+import { Notifications } from "expo";
+import { Layout, Colors, getTimeString, getRemindTime } from "../config";
 import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import * as firebase from "../firebase";
-import { User, Habit, Reminder } from "../types";
+import { User, Habit, Reminder, ExpoLocalNotification } from "../types";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
 const REMINDERS: Array<Reminder> = [
-  { name: "Sun", active: false },
-  { name: "Mon", active: false },
-  { name: "Tue", active: false },
-  { name: "Wed", active: false },
-  { name: "Thu", active: false },
-  { name: "Fri", active: false },
-  { name: "Sat", active: false }
+  { day: "Sun", active: false },
+  { day: "Mon", active: false },
+  { day: "Tue", active: false },
+  { day: "Wed", active: false },
+  { day: "Thu", active: false },
+  { day: "Fri", active: false },
+  { day: "Sat", active: false }
 ];
 
 export interface CreateHabitScreenProps {
@@ -29,7 +30,7 @@ export interface CreateHabitScreenState {
   accountable: string;
   reminders: Array<Reminder>;
   showPicker: Boolean;
-  time: Date;
+  chosenTime: Date | null;
 }
 
 class CreateHabitScreen extends React.Component<
@@ -41,7 +42,7 @@ class CreateHabitScreen extends React.Component<
     accountable: "",
     reminders: REMINDERS,
     showPicker: false,
-    time: new Date()
+    chosenTime: new Date()
   };
   reminderRef = null;
 
@@ -50,16 +51,17 @@ class CreateHabitScreen extends React.Component<
   handleBlur() {}
 
   showModal() {
-    const { time } = this.state;
+    const { chosenTime } = this.state;
     this.setState({ showPicker: true });
-    this.reminderRef.setValue(getTimeString(time));
+    this.reminderRef.setValue(getTimeString(chosenTime));
   }
 
   handleTimeChange(event: any, date: Date) {
-    this.reminderRef.setValue(getTimeString(date));
     if (Platform.OS === "android") {
       this.setState({ showPicker: false });
     }
+    this.reminderRef.setValue(getTimeString(date));
+    this.setState({ chosenTime: date });
   }
 
   toggleReminder(day: Reminder, index: number) {
@@ -72,20 +74,72 @@ class CreateHabitScreen extends React.Component<
   // TODO: get user id and save actual habit info
   async createHabit() {
     // destructure
-    const { reminders, title, time } = this.state;
+    const { reminders, title, chosenTime } = this.state;
+
     const uid = firebase.uid();
 
+    // TODO: pass type param to screen through navigation
+    const type = "create";
+    const isCreate = type === "create";
+
     // create time string
-    const remindTime = `${time.getHours()}:${time.getMinutes()}`;
+    const remindTime = getTimeString(chosenTime);
 
     // add times to reminders
     const newReminders = reminders;
     newReminders.map(reminder => (reminder.time = remindTime));
 
+    // create local notifications
+    const notificationTitle = `Did you finish ${title} today?`;
+    const notificationBody = `Go into the app and continue your streak!`;
+    const localNotifications: ExpoLocalNotification[] = [];
+    newReminders.map((reminder, index) => {
+      if (reminder.active) {
+        const remindTime = getRemindTime(chosenTime, reminder.day);
+
+        const localNotification: ExpoLocalNotification = {
+          notification: {
+            title: notificationTitle,
+            body: notificationBody
+          },
+          repeat: {
+            time: remindTime,
+            repeat: "week"
+          }
+        };
+
+        localNotifications.push(localNotification);
+      }
+    });
+
+    let notificationIds = [];
+
+    localNotifications.forEach(({ notification, repeat }) => {
+      const prom = Notifications.scheduleLocalNotificationAsync(
+        notification,
+        repeat
+      );
+      notificationIds.push(prom);
+    });
+
+    // get ids
+    notificationIds = await Promise.all(notificationIds);
+
+    // store ids in reminder array
+    let idIter = 0;
+    newReminders.forEach(reminder => {
+      if (reminder.active) {
+        reminder.localId = notificationIds[idIter];
+        idIter++;
+      }
+    });
+
+    await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
+
     // generate habit object
     const habit: Habit = {
       uid,
-      type: "create",
+      type,
       active: true,
       title,
       dateStart: new Date(),
@@ -108,7 +162,7 @@ class CreateHabitScreen extends React.Component<
   }
 
   render() {
-    const { reminders, showPicker, time } = this.state;
+    const { reminders, showPicker, chosenTime } = this.state;
     return (
       <View style={styles.container}>
         <Header />
@@ -153,7 +207,7 @@ class CreateHabitScreen extends React.Component<
                       fontFamily: "Roboto-Regular"
                     }}
                   >
-                    {day.name}
+                    {day.day}
                   </Text>
                 </AnimatableTouchable>
               );
@@ -163,7 +217,7 @@ class CreateHabitScreen extends React.Component<
             <View pointerEvents={"none"}>
               <TextField
                 ref={ref => (this.reminderRef = ref)}
-                label="Reminder"
+                label="Time"
                 onChangeText={text => this.setState({ title: text })}
                 baseColor={Colors.tertiary}
                 lineWidth={2}
@@ -174,7 +228,6 @@ class CreateHabitScreen extends React.Component<
           </TouchableOpacity>
           <TextField
             label="Add An Accountable"
-            onChangeText={text => this.setState({ title: text })}
             tintColor={Colors.tertiary}
             baseColor={Colors.tertiary}
             lineWidth={2}
@@ -186,7 +239,7 @@ class CreateHabitScreen extends React.Component<
         {showPicker ? (
           <DateTimePickerModal
             display="default"
-            value={time}
+            value={chosenTime}
             onSubmit={() => this.handlePickerSubmit()}
             mode="time"
             onChange={(event, date) => this.handleTimeChange(event, date)}
