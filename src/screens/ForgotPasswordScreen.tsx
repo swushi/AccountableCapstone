@@ -4,8 +4,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Keyboard
 } from "react-native";
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Layout, Colors, validateEmail } from "../config";
 import * as firebase from "../firebase";
 import * as Animatable from "react-native-animatable";
@@ -26,6 +29,7 @@ class ForgotPasswordScreen extends React.Component<
   ForgotPasswordScreenProps,
   ForgotPasswordScreenState
 > {
+  keyboardDidHideListener: any;
   containerRef: any;
   constructor(props: ForgotPasswordScreenProps) {
     super(props);
@@ -80,6 +84,7 @@ class ForgotPasswordScreen extends React.Component<
 
   handleBlur = () => {
     this.slide("down");
+    Keyboard.dismiss();
   };
 
   PasswordResetAsync = async () => {
@@ -122,15 +127,42 @@ class ForgotPasswordScreen extends React.Component<
     }
   };
 
+  componentDidMount() {
+    this.keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      this._keyboardDidHide.bind(this)
+    );
+  }
+
+  _keyboardDidHide() {
+    this.handleBlur();
+  }
+
   render() {
     const { email, emailError, loading } = this.state;
+    const { navigation } = this.props;
     return (
+      <LinearGradient
+        colors={[Colors.primary, Colors.secondary]}
+        style={{ flex: 1 }}
+      >
       <View style={{ flex: 1 }}>
         <Animatable.View
+          animation="zoomIn"
           style={styles.container}
           ref={ref => (this.containerRef = ref)}
           useNativeDriver
         >
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <MaterialCommunityIcons
+              name="chevron-left"
+              size={35}
+              color={Colors.headerText}
+            />
+          </TouchableOpacity>
           <Text style={styles.logo}>Accountable</Text>
           <View style={styles.inputContainer}>
             <TextField
@@ -139,8 +171,9 @@ class ForgotPasswordScreen extends React.Component<
               value={email}
               error={emailError}
               onChangeText={text => this.setState({ email: text })}
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
+              baseColor={Colors.background}
+              tintColor={Colors.background}
+              textColor={Colors.background}
               onFocus={() => this.handleFocus()}
               onSubmitEditing={() => this.handleBlur()}
             />
@@ -157,6 +190,7 @@ class ForgotPasswordScreen extends React.Component<
           </View>
         </Animatable.View>
       </View>
+      </LinearGradient>
     );
   }
 }
@@ -165,21 +199,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
-    justifyContent: "space-around",
-    backgroundColor: Colors.background
-    //justifyContent: "center",
+    justifyContent: 'flex-start'
   },
 
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: Colors.primary,
+    color: Colors.background,
     marginTop: 200
   },
-
+  backButton: {
+    position: "absolute",
+    top: 30,
+    left: 15
+  },
   inputContainer: {
     paddingHorizontal: Layout.padding,
-    backgroundColor: "#fff",
     borderRadius: Layout.roundness,
     marginBottom: 100
   },
