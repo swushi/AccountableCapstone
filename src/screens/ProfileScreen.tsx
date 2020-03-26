@@ -8,18 +8,21 @@ import {
   TouchableOpacity
 } from "react-native";
 import { Layout, Colors, validateEmail } from "../config";
-import { Header, ToggleButton as SwitchExample } from "../components";
+import { Header, ToggleButton } from "../components";
 import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { connect } from "react-redux";
 import * as firebase from "../firebase";
+import * as actions from "../redux/actions";
 import { User } from "../types";
 
 export interface ProfileScreenProps {
   navigation: any;
+  canNotify: Function;
 }
 
 export interface ProfileScreenState {
-  isOn: any;
+  notify: any;
 }
 
 class ProfileScreen extends React.Component<
@@ -30,8 +33,17 @@ class ProfileScreen extends React.Component<
   constructor(props: ProfileScreenProps) {
     super(props);
     this.state = {
-      isOn: false
+      notify: true
     };
+  }
+
+  componentWillMount() {
+    // TODO: pull notify from database for user
+    // update state
+  }
+
+  componentDidMount() {
+    console.log(this.props);
   }
 
   signOutAsync = async () => {
@@ -43,11 +55,13 @@ class ProfileScreen extends React.Component<
   };
 
   toggleHandle = value => {
-    this.setState({ isOn: value });
-    console.log("Switch 1 is: " + value);
+    this.setState({ notify: value });
+    // update redux value
+    this.props.canNotify("test");
   };
+
   render() {
-    const { isOn } = this.state;
+    const { notify } = this.state;
     return (
       <View style={{ flex: 1 }}>
         <Header hideBack />
@@ -59,9 +73,9 @@ class ProfileScreen extends React.Component<
           <View style={styles.inputContainer}>
             <View style={styles.profileCircle}></View>
             <Text style={styles.userText}> User </Text>
-            <TouchableOpacity onPress={() => this.toggleHandle(!isOn)}>
+            <TouchableOpacity onPress={() => this.toggleHandle(!notify)}>
               <View style={styles.notifyContainer} pointerEvents="none">
-                <SwitchExample isOn={isOn} />
+                <ToggleButton isOn={notify} />
                 <Text style={styles.notifyText}> Notifications </Text>
               </View>
             </TouchableOpacity>
@@ -152,4 +166,7 @@ const styles = StyleSheet.create({
     marginBottom: -30
   }
 });
-export default ProfileScreen;
+
+const mapStateToProps = state => ({ notify: state.notify });
+
+export default connect(mapStateToProps, actions)(ProfileScreen);

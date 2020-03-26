@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, YellowBox } from "react-native";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { AppLoading } from "expo";
@@ -9,6 +9,11 @@ import * as firebase from "./src/firebase";
 import Reducers from "./src/redux/reducers";
 
 firebase.init();
+
+YellowBox.ignoreWarnings([
+  "Ability to schedule an automatically",
+  "Provided value for"
+]);
 
 class App extends React.Component {
   state = {

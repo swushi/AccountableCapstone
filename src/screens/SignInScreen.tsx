@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   Keyboard,
-  Platform
+  ActivityIndicator
 } from "react-native";
 import { connect } from "react-redux";
 import { LinearGradient } from "expo-linear-gradient";
@@ -27,7 +27,8 @@ type SignInScreenState = {
   error: boolean;
   emailError: any;
   passwordError: any;
-  animated: Boolean;
+  animated: boolean;
+  loading: boolean;
 };
 
 class SignInScreen extends React.Component<
@@ -46,7 +47,8 @@ class SignInScreen extends React.Component<
       password: "password",
       error: null,
       emailError: null,
-      passwordError: null
+      passwordError: null,
+      loading: false
     };
     this.signInAsync = this.signInAsync.bind(this);
     this.containerRef = null;
@@ -123,6 +125,7 @@ class SignInScreen extends React.Component<
       return;
     }
     try {
+      this.setState({ loading: true });
       // Sign in user
       const signIn = await firebase.signIn(email, password);
 
@@ -131,8 +134,10 @@ class SignInScreen extends React.Component<
 
       storeUser(userData.data());
 
+      this.setState({ loading: false });
       this.props.navigation.navigate("App");
     } catch (error) {
+      this.setState({ loading: false });
       const { code } = error;
       if (code === "auth/user-not-found") {
         this.setState({ emailError: "Please enter a valid email" });
@@ -140,8 +145,6 @@ class SignInScreen extends React.Component<
       if (code === "auth/wrong-password") {
         this.setState({ passwordError: "Please enter a valid password" });
       }
-      // set error in state
-      //this.setState({ emailError: error });
     }
   };
 
@@ -170,6 +173,7 @@ class SignInScreen extends React.Component<
   };
 
   render() {
+    const { loading } = this.state;
     return (
       <LinearGradient
         colors={[Colors.primary, Colors.secondary]}
@@ -214,7 +218,11 @@ class SignInScreen extends React.Component<
             </View>
             <TouchableOpacity onPress={() => this.signInAsync()}>
               <View style={styles.signInContainer}>
-                <Text style={styles.signInText}>Login</Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.signInText}>Login</Text>
+                )}
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.navToPasswordReset()}>
