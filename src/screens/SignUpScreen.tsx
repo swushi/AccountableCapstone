@@ -4,8 +4,10 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  Keyboard
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
@@ -25,6 +27,7 @@ type SignUpState = {
   emailErr: any;
   passwordErr: any;
   confirmErr: any;
+  animated: Boolean;
 };
 
 type SignUpProps = {
@@ -33,6 +36,9 @@ type SignUpProps = {
 
 class SignUpScreen extends Component<SignUpProps, SignUpState> {
   containerRef: any;
+  keyboardDidHideListener: any;
+  emailRef: any;
+  passwordRef: any;
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +48,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       firstName: "",
       lastName: "",
       loading: false,
-
+      animated: false,
       // error handlers
       err: null,
       firstNameErr: null,
@@ -55,12 +61,27 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
     this.containerRef = null;
   }
 
+  componentDidMount() {
+    this.keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      this._keyboardDidHide.bind(this)
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidHideListener.remove();
+  }
+
+  _keyboardDidHide() {
+    this.handleBlur();
+  }
+
   /**
    * Function that is called when any of the inputs are focused
    */
   handleFocus = () => {
     // animate card
-    this.slide("up");
+    this.state.animated ? null : this.slide("up");
 
     // reset error states
     this.setState({
@@ -74,6 +95,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
 
   handleBlur = () => {
     this.slide("down");
+    Keyboard.dismiss();
   };
 
   /**
@@ -206,8 +228,12 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       loading
     } = this.state;
     return (
-      <View style={{ flex: 1 }}>
+      <LinearGradient
+        colors={[Colors.primary, Colors.secondary]}
+        style={{ flex: 1 }}
+      >
         <Animatable.View
+          animation="zoomIn"
           style={styles.container}
           ref={ref => (this.containerRef = ref)}
           useNativeDriver
@@ -219,8 +245,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               value={firstName}
               error={firstNameErr}
               onChangeText={text => this.setState({ firstName: text })}
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
+              baseColor={Colors.background}
+              tintColor={Colors.background}
+              textColor={Colors.background}
               onFocus={() => this.handleFocus()}
               onSubmitEditing={() => this.handleBlur()}
             />
@@ -229,8 +256,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               value={lastName}
               error={lastNameErr}
               onChangeText={text => this.setState({ lastName: text })}
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
+              baseColor={Colors.background}
+              tintColor={Colors.background}
+              textColor={Colors.background}
               onFocus={() => this.handleFocus()}
               onSubmitEditing={() => this.handleBlur()}
             />
@@ -240,8 +268,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               value={email}
               error={emailErr}
               onChangeText={text => this.setState({ email: text })}
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
+              baseColor={Colors.background}
+              tintColor={Colors.background}
+              textColor={Colors.background}
               onFocus={() => this.handleFocus()}
               onSubmitEditing={() => this.handleBlur()}
             />
@@ -250,8 +279,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               value={password}
               error={passwordErr}
               onChangeText={text => this.setState({ password: text })}
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
+              baseColor={Colors.background}
+              tintColor={Colors.background}
+              textColor={Colors.background}
               onFocus={() => this.handleFocus()}
               secureTextEntry
               onSubmitEditing={() => this.handleBlur()}
@@ -261,8 +291,9 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               value={confirm}
               error={confirmErr}
               onChangeText={text => this.setState({ confirm: text })}
-              tintColor={Colors.primary}
-              textColor={Colors.textPrimary}
+              baseColor={Colors.background}
+              tintColor={Colors.background}
+              textColor={Colors.background}
               onFocus={() => this.handleFocus()}
               secureTextEntry
               onSubmitEditing={() => this.handleBlur()}
@@ -278,7 +309,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
             </TouchableOpacity>
           </View>
         </Animatable.View>
-      </View>
+      </LinearGradient>
     );
   }
 }
@@ -288,17 +319,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
-    justifyContent: "space-around",
-    backgroundColor: Colors.background
+    justifyContent: "space-around"
   },
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: Colors.primary
+    color: Colors.background
   },
   inputsContainer: {
     paddingHorizontal: Layout.padding,
-    backgroundColor: "#fff",
     borderRadius: Layout.roundness
   },
   loginContainer: {
