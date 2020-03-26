@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  Platform
 } from "react-native";
 import { connect } from "react-redux";
 import { LinearGradient } from "expo-linear-gradient";
@@ -35,6 +36,8 @@ class SignInScreen extends React.Component<
 > {
   containerRef: any;
   emailRef: any;
+  keyboardDidHideListener: any;
+  passwordRef: any;
   constructor(props: SignInScreenProps) {
     super(props);
     this.state = {
@@ -48,14 +51,28 @@ class SignInScreen extends React.Component<
     this.signInAsync = this.signInAsync.bind(this);
     this.containerRef = null;
     this.emailRef = null;
+    this.passwordRef = null;
   }
 
   componentDidMount() {
+    this.keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      this._keyboardDidHide.bind(this)
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidHideListener.remove();
+  }
+
+  _keyboardDidHide() {
     this.emailRef.blur();
+    this.passwordRef.blur();
+    this.handleOnBlur();
   }
 
   handleOnFocus = () => {
-    !this.state.animated ? this.slideUp() : null;
+    !this.state.animated ? this.slide("up") : null;
     this.setState({
       emailError: null,
       passwordError: null
@@ -63,32 +80,18 @@ class SignInScreen extends React.Component<
   };
 
   handleOnBlur = () => {
-    console.log("slide");
-    this.slideDown();
+    this.slide("down");
   };
 
-  slideDown() {
-    this.setState({ animated: false });
+  slide = (direction: "up" | "down") => {
+    this.setState({ animated: direction === "up" ? true : false });
+
     const slideAmount = Layout.height * 0.3;
-    const translation = slideAmount * 0;
+    const translation = direction === "up" ? -1 * slideAmount : 0;
     this.containerRef.transitionTo({
       transform: [{ translateY: translation }]
     });
-  }
-
-  slideUp() {
-    if (this.state.animated) return;
-    this.setState({ animated: true });
-    const slideAmount = Layout.height * 0.3;
-    const translation = slideAmount * -1;
-    this.containerRef.transitionTo(
-      {
-        transform: [{ translateY: translation }]
-      },
-      500
-    );
-    setTimeout(() => this.emailRef.focus(), 100);
-  }
+  };
 
   navToSignUp = () => {
     this.props.navigation.navigate("SignUp");
@@ -128,7 +131,6 @@ class SignInScreen extends React.Component<
 
       this.props.navigation.navigate("App");
     } catch (error) {
-      alert(error);
       const { code } = error;
       if (code === "auth/user-not-found") {
         this.setState({ emailError: "Please enter a valid email" });
@@ -173,6 +175,7 @@ class SignInScreen extends React.Component<
       >
         <View>
           <Animatable.View
+            animation="zoomIn"
             style={styles.inputContainer}
             ref={ref => (this.containerRef = ref)}
             useNativeDriver
@@ -204,6 +207,7 @@ class SignInScreen extends React.Component<
                 }
                 onFocus={() => this.handleOnFocus()}
                 onSubmitEditing={() => this.handleOnBlur()}
+                ref={ref => (this.passwordRef = ref)}
               />
             </View>
             <TouchableOpacity onPress={() => this.signInAsync()}>
@@ -216,11 +220,17 @@ class SignInScreen extends React.Component<
             </TouchableOpacity>
           </Animatable.View>
         </View>
-        <TouchableOpacity onPress={() => this.navToSignUp()}>
-          <Text style={styles.createAccount}>
-            New member? Create an account here!
-          </Text>
-        </TouchableOpacity>
+        <Animatable.View
+          animation="slideInUp"
+          useNativeDriver
+          style={{ position: "absolute", bottom: 15, alignSelf: "center" }}
+        >
+          <TouchableOpacity onPress={() => this.navToSignUp()}>
+            <Text style={styles.createAccount}>
+              New member? Create an account here!
+            </Text>
+          </TouchableOpacity>
+        </Animatable.View>
       </LinearGradient>
     );
   }
@@ -264,18 +274,19 @@ const styles = StyleSheet.create({
   },
 
   createAccount: {
-    position: "absolute",
-    bottom: 30,
     alignSelf: "center",
     textAlign: "center",
     textDecorationLine: "underline",
-    color: Colors.background
+    color: Colors.background,
+    margin: 25
   },
   Forgot: {
     textAlign: "center",
     color: Colors.background,
     fontStyle: "italic",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    margin: 25,
+    marginTop: 0
   }
 });
 
