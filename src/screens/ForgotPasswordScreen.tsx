@@ -7,8 +7,8 @@ import {
   ActivityIndicator,
   Keyboard
 } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Layout, Colors, validateEmail } from "../config";
 import * as firebase from "../firebase";
 import * as Animatable from "react-native-animatable";
@@ -23,6 +23,7 @@ type ForgotPasswordScreenState = {
   error: boolean;
   loading: boolean;
   emailError: any;
+  animated: boolean;
 };
 
 class ForgotPasswordScreen extends React.Component<
@@ -37,7 +38,8 @@ class ForgotPasswordScreen extends React.Component<
       email: "",
       error: null,
       emailError: null,
-      loading: false
+      loading: false,
+      animated: false
     };
     this.PasswordResetAsync = this.PasswordResetAsync.bind(this);
     this.containerRef = null;
@@ -64,6 +66,8 @@ class ForgotPasswordScreen extends React.Component<
    * slides the container up or down
    */
   slide = (direction: "up" | "down") => {
+    this.setState({ animated: direction === "up" ? true : false });
+
     const slideAmount = Layout.height * 0.3;
     const translation = direction === "up" ? -1 * slideAmount : 0;
 
@@ -74,7 +78,7 @@ class ForgotPasswordScreen extends React.Component<
 
   handleFocus = () => {
     // animate card
-    this.slide("up");
+    !this.state.animated ? this.slide("up") : null;
 
     // reset error states
     this.setState({
@@ -130,12 +134,15 @@ class ForgotPasswordScreen extends React.Component<
   componentDidMount() {
     this.keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
-      this._keyboardDidHide.bind(this)
+      this.keyboardDidHide.bind(this)
     );
   }
 
-  _keyboardDidHide() {
-    this.handleBlur();
+  keyboardDidHide() {
+    if (this.state.animated) {
+      Keyboard.dismiss();
+      this.handleBlur();
+    }
   }
 
   render() {
@@ -146,50 +153,50 @@ class ForgotPasswordScreen extends React.Component<
         colors={[Colors.primary, Colors.secondary]}
         style={{ flex: 1 }}
       >
-      <View style={{ flex: 1 }}>
-        <Animatable.View
-          animation="zoomIn"
-          style={styles.container}
-          ref={ref => (this.containerRef = ref)}
-          useNativeDriver
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
+        <View style={{ flex: 1 }}>
+          <Animatable.View
+            animation="zoomIn"
+            style={styles.container}
+            ref={ref => (this.containerRef = ref)}
+            useNativeDriver
           >
-            <MaterialCommunityIcons
-              name="chevron-left"
-              size={35}
-              color={Colors.headerText}
-            />
-          </TouchableOpacity>
-          <Text style={styles.logo}>Accountable</Text>
-          <View style={styles.inputContainer}>
-            <TextField
-              label="E-mail"
-              keyboardType="email-address"
-              value={email}
-              error={emailError}
-              onChangeText={text => this.setState({ email: text })}
-              baseColor={Colors.background}
-              tintColor={Colors.background}
-              textColor={Colors.background}
-              onFocus={() => this.handleFocus()}
-              onSubmitEditing={() => this.handleBlur()}
-            />
-
-            <TouchableOpacity onPress={() => this.PasswordResetAsync()}>
-              <View style={styles.SendEmailContainer}>
-                {loading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Text style={styles.sendEmailtext}>Send Email</Text>
-                )}
-              </View>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
+              <MaterialCommunityIcons
+                name="chevron-left"
+                size={35}
+                color={Colors.headerText}
+              />
             </TouchableOpacity>
-          </View>
-        </Animatable.View>
-      </View>
+            <Text style={styles.logo}>Accountable</Text>
+            <View style={styles.inputContainer}>
+              <TextField
+                label="E-mail"
+                keyboardType="email-address"
+                value={email}
+                error={emailError}
+                onChangeText={text => this.setState({ email: text })}
+                baseColor={Colors.background}
+                tintColor={Colors.background}
+                textColor={Colors.background}
+                onFocus={() => this.handleFocus()}
+                onSubmitEditing={() => this.handleBlur()}
+              />
+
+              <TouchableOpacity onPress={() => this.PasswordResetAsync()}>
+                <View style={styles.SendEmailContainer}>
+                  {loading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.sendEmailtext}>Send Email</Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </View>
+          </Animatable.View>
+        </View>
       </LinearGradient>
     );
   }
@@ -199,14 +206,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
-    justifyContent: 'flex-start'
+    justifyContent: "flex-start"
   },
 
   logo: {
     fontSize: 50,
     alignSelf: "center",
     color: Colors.background,
-    marginTop: 200
+    marginTop: 300
   },
   backButton: {
     position: "absolute",

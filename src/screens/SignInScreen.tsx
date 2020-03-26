@@ -66,9 +66,11 @@ class SignInScreen extends React.Component<
   }
 
   _keyboardDidHide() {
-    this.emailRef.blur();
-    this.passwordRef.blur();
-    this.handleOnBlur();
+    if (this.state.animated) {
+      this.emailRef.blur();
+      this.passwordRef.blur();
+      this.handleOnBlur();
+    }
   }
 
   handleOnFocus = () => {
