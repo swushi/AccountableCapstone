@@ -29,7 +29,7 @@ export const Layout = {
   padding: 12,
   height,
   width,
-  roundness: 12,
+  roundness: 3,
   headerHeight: height * 0.1,
   statusBarHeight: Constants.statusBarHeight
 };

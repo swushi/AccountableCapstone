@@ -4,9 +4,10 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  ActionSheetIOS
+  Keyboard
 } from "react-native";
 import { connect } from "react-redux";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { TextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
@@ -25,6 +26,7 @@ type SignInScreenState = {
   error: boolean;
   emailError: any;
   passwordError: any;
+  animated: Boolean;
 };
 
 class SignInScreen extends React.Component<
@@ -32,9 +34,11 @@ class SignInScreen extends React.Component<
   SignInScreenState
 > {
   containerRef: any;
+  emailRef: any;
   constructor(props: SignInScreenProps) {
     super(props);
     this.state = {
+      animated: false,
       email: "test@gmail.com",
       password: "password",
       error: null,
@@ -43,13 +47,15 @@ class SignInScreen extends React.Component<
     };
     this.signInAsync = this.signInAsync.bind(this);
     this.containerRef = null;
+    this.emailRef = null;
   }
+
   componentDidMount() {
-    console.log(this.props);
+    this.emailRef.blur();
   }
 
   handleOnFocus = () => {
-    this.slide("up");
+    !this.state.animated ? this.slideUp() : null;
     this.setState({
       emailError: null,
       passwordError: null
@@ -57,15 +63,32 @@ class SignInScreen extends React.Component<
   };
 
   handleOnBlur = () => {
-    this.slide("down");
+    console.log("slide");
+    this.slideDown();
   };
-  slide = (direction: "up" | "down") => {
+
+  slideDown() {
+    this.setState({ animated: false });
     const slideAmount = Layout.height * 0.3;
-    const translation = direction === "up" ? -1 * slideAmount : 0;
+    const translation = slideAmount * 0;
     this.containerRef.transitionTo({
       transform: [{ translateY: translation }]
     });
-  };
+  }
+
+  slideUp() {
+    if (this.state.animated) return;
+    this.setState({ animated: true });
+    const slideAmount = Layout.height * 0.3;
+    const translation = slideAmount * -1;
+    this.containerRef.transitionTo(
+      {
+        transform: [{ translateY: translation }]
+      },
+      500
+    );
+    setTimeout(() => this.emailRef.focus(), 100);
+  }
 
   navToSignUp = () => {
     this.props.navigation.navigate("SignUp");
@@ -144,49 +167,61 @@ class SignInScreen extends React.Component<
 
   render() {
     return (
-      <Animatable.View
-        style={styles.container}
-        ref={ref => (this.containerRef = ref)}
-        useNativeDriver
+      <LinearGradient
+        colors={[Colors.primary, Colors.secondary]}
+        style={{ flex: 1 }}
       >
-        <Text style={styles.logo}>Accountable</Text>
-        <View style={styles.inputContainer}>
-          <TextField
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-            baseColor={Colors.primary}
-            error={this.state.emailError}
-            label="Email"
-            onChangeText={(text: string) => this.setState({ email: text })}
-            onFocus={() => this.handleOnFocus()}
-            onSubmitEditing={() => this.handleOnBlur()}
-          />
-          <TextField
-            tintColor={Colors.primary}
-            textColor={Colors.textPrimary}
-            baseColor={Colors.primary}
-            error={this.state.passwordError}
-            secureTextEntry={true}
-            label="Password"
-            onChangeText={(text: string) => this.setState({ password: text })}
-            onFocus={() => this.handleOnFocus()}
-            onSubmitEditing={() => this.handleOnBlur()}
-          />
-          <TouchableOpacity onPress={() => this.signInAsync()}>
-            <View style={styles.signInContainer}>
-              <Text style={styles.signInText}>Sign In</Text>
+        <View>
+          <Animatable.View
+            style={styles.inputContainer}
+            ref={ref => (this.containerRef = ref)}
+            useNativeDriver
+          >
+            <Text style={styles.logo}>Accountable</Text>
+            <View>
+              <TextField
+                tintColor={Colors.background}
+                textColor={Colors.background}
+                baseColor={Colors.background}
+                error={this.state.emailError}
+                label="Email"
+                onChangeText={(text: string) => this.setState({ email: text })}
+                onFocus={() => this.handleOnFocus()}
+                onSubmitEditing={() => this.handleOnBlur()}
+                ref={ref => (this.emailRef = ref)}
+              />
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.navToSignUp()}>
-            <Text style={styles.createAccount}>
-              New member? Create an account here!
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.navToPasswordReset()}>
-            <Text style={styles.Forgot}>Forgot Password?</Text>
-          </TouchableOpacity>
+            <View>
+              <TextField
+                tintColor={Colors.background}
+                textColor={Colors.background}
+                baseColor={Colors.background}
+                error={this.state.passwordError}
+                secureTextEntry={true}
+                label="Password"
+                onChangeText={(text: string) =>
+                  this.setState({ password: text })
+                }
+                onFocus={() => this.handleOnFocus()}
+                onSubmitEditing={() => this.handleOnBlur()}
+              />
+            </View>
+            <TouchableOpacity onPress={() => this.signInAsync()}>
+              <View style={styles.signInContainer}>
+                <Text style={styles.signInText}>Login</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.navToPasswordReset()}>
+              <Text style={styles.Forgot}>Forgot Password?</Text>
+            </TouchableOpacity>
+          </Animatable.View>
         </View>
-      </Animatable.View>
+        <TouchableOpacity onPress={() => this.navToSignUp()}>
+          <Text style={styles.createAccount}>
+            New member? Create an account here!
+          </Text>
+        </TouchableOpacity>
+      </LinearGradient>
     );
   }
 }
@@ -195,23 +230,21 @@ class SignInScreen extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Layout.padding,
-    paddingTop: Layout.padding,
-    justifyContent: "space-around",
-    backgroundColor: Colors.primary
+    padding: Layout.padding,
+    justifyContent: "space-around"
     //justifyContent: "center",
   },
 
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: "#fff",
-    marginTop: 150
+    color: Colors.background,
+    marginTop: 150,
+    marginBottom: 100
   },
 
   inputContainer: {
     padding: Layout.padding,
-    backgroundColor: "#fff",
     borderRadius: Layout.roundness,
     marginBottom: 100
   },
@@ -231,13 +264,16 @@ const styles = StyleSheet.create({
   },
 
   createAccount: {
-    alignItems: "center",
+    position: "absolute",
+    bottom: 30,
+    alignSelf: "center",
     textAlign: "center",
-    textDecorationLine: "underline"
+    textDecorationLine: "underline",
+    color: Colors.background
   },
   Forgot: {
     textAlign: "center",
-    color: Colors.primary,
+    color: Colors.background,
     fontStyle: "italic",
     fontWeight: "bold"
   }
