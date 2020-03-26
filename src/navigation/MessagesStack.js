@@ -8,7 +8,7 @@ const Stack = createStackNavigator();
 
 export default function MessagesStack() {
   return (
-    <Stack.Navigator initialRouteName="Messages" headerMode="none">
+    <Stack.Navigator initialRouteName="PresetHabit" headerMode="none">
       <Stack.Screen name="Messages" component={MessagesScreen} />
     </Stack.Navigator>
   );

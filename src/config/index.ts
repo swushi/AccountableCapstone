@@ -1,17 +1,37 @@
 import { Dimensions } from "react-native";
+import Constants from "expo-constants";
 const { height, width } = Dimensions.get("window");
 
 export const Colors = {
-  primary: "#8b67f0",
-  background: "#f1f1f1",
-  textPrimary: "#424242"
+  primary: "#45A29E",
+  secondary: "#084C61",
+  tertiary: "#595758",
+  background: "#EEE5E9",
+  textPrimary: "#0B0C10",
+  headerText: "#fff",
+  inactive: "#424242",
+  good: "green",
+  bad: "red",
+  shadow: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
+
+    elevation: 9
+  }
 };
 
-export const Design = {
+export const Layout = {
   padding: 12,
   height,
   width,
-  roundness: 12
+  roundness: 3,
+  headerHeight: height * 0.1,
+  statusBarHeight: Constants.statusBarHeight
 };
 
 export const FirebaseConfig = {
@@ -28,4 +48,15 @@ export const FirebaseConfig = {
 export const validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
+};
+
+export const getTimeString = (time: Date) => {
+  let hours = time.getHours() % 12;
+  let minutes = time.getMinutes();
+  // @ts-ignore
+  if (minutes < 10) minutes = "0" + minutes;
+  if (hours === 0) hours = 12;
+  const pm = time.getHours() >= 12;
+
+  return `${hours}:${minutes} ${pm ? "PM" : "AM"}`;
 };

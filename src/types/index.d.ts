@@ -13,6 +13,12 @@ export type User = {
   accountables?: Array<User>;
 };
 
+export type Reminder = {
+  name: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  active: Boolean;
+  time?: String; // 00:30 or 15:50
+};
+
 /**
  * Lifecylce of habits:
  * 1. User generates habit(without HabitID)
@@ -21,31 +27,19 @@ export type User = {
  * 4a. Set habit to inactive when dateEnd is reached
  * 4b. User deletes habit.
  */
-export type Habit = {
-  id?: HabitID; // optional because when created on client, will not have id yet
-  type: "make" | "break";
-  title: string;
-  desc: string;
-  active: Boolean; // if the habit is currently on-going
-  dateStart: string;
-  dateEnd: string;
-  stats: Stats;
-  reminders: Array<ReminderID>;
-  accountable: User;
-};
 
-/**
- * Going to store individual reminders for a user. These will go in their own document in
- * firebase, and on each day, Firebase Functions will go through and send notifictations
- * based on what Reminders show up for that day.
- */
-export type Reminder = {
-  rid: ReminderID;
+// TODO: Make it reflect actual habit needs
+export type Habit = {
   uid: UserID;
-  day: string;
-  time: string;
-  pushToken: ExpoPushToken;
-  notification: ExpoNotification;
+  type: "create" | "break";
+  title: string;
+  active: Boolean; // if the habit is currently on-going
+  dateStart: Date;
+  reminders: Array<Reminder>;
+  desc?: string;
+  stats?: Stats;
+  id?: HabitID; // optional because when created on client, will not have id yet
+  accountable?: User;
 };
 
 /**
