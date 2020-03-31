@@ -3,9 +3,8 @@ import {
   View,
   StyleSheet,
   Text,
-  Switch,
-  Animated,
-  TouchableOpacity
+  TouchableOpacity,
+  Image
 } from "react-native";
 import { Layout, Colors, validateEmail } from "../config";
 import { Header, ToggleButton } from "../components";
@@ -13,16 +12,22 @@ import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
 import * as firebase from "../firebase";
+import * as firebase1 from "firebase";
 import * as actions from "../redux/actions";
-import { User } from "../types";
+import {Avatar, Icon} from 'react-native-elements';
+import * as ImagePicker from 'expo-image-picker';
+import Constants from 'expo-constants';
+import * as Permissions from 'expo-permissions';
 
 export interface ProfileScreenProps {
   navigation: any;
   canNotify: Function;
+ 
 }
 
 export interface ProfileScreenState {
   notify: any;
+  avatar:any;
 }
 
 class ProfileScreen extends React.Component<
@@ -33,7 +38,8 @@ class ProfileScreen extends React.Component<
   constructor(props: ProfileScreenProps) {
     super(props);
     this.state = {
-      notify: true
+      notify: true,
+      avatar: null
     };
   }
 
@@ -58,8 +64,53 @@ class ProfileScreen extends React.Component<
     this.setState({ notify: value });
     // update redux value
     this.props.canNotify("test");
+  
   };
 
+ 
+  getCameraPermission = async()=>{
+    let permissionResult= await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+  if (Constants.platform.ios||Constants.platform.android)
+    {
+       if (permissionResult.granted===false)
+        {
+          alert("We need permission to use your camera roll");
+        }
+    }        
+      let result= await ImagePicker.launchImageLibraryAsync(
+               {
+                 
+               mediaTypes:ImagePicker.MediaTypeOptions.Images,
+               allowsEditing: true,
+               aspect: [3,3]
+        
+               } )   
+
+    if (result.cancelled===false){
+       this.setState({...this.state, avatar:result.uri});
+       this.uploadImage(result.uri,"test-image")
+       .then(()=>{
+        console.log(this.state.avatar);
+       })
+       .catch((error) =>{
+        console.log(error)
+       });
+      }
+   
+ }   
+
+uploadImage=async (uri,imageName)=>{
+ const response= await fetch (uri);
+const blob= await response.blob();
+
+
+var ref= firebase1.storage().ref().child("profilePictures/"+ imageName);
+ref.getDownloadURL();
+
+return ref.put(blob);
+}
+  
   render() {
     const { notify } = this.state;
     return (
@@ -71,8 +122,21 @@ class ProfileScreen extends React.Component<
           useNativeDriver
         >
           <View style={styles.inputContainer}>
-            <View style={styles.profileCircle}></View>
+            <View style={styles.profileCircle}>
+            <Avatar
+            size='xlarge'
+            activeOpacity={0.7}
+            onPress={this.getCameraPermission}
+            rounded
+            overlayContainerStyle={{backgroundColor:'white'}}
+            source= {this.state.avatar ?{uri:(this.state.avatar) }: require('../assets/tempAvatar.png')}
+            imageProps={{resizeMode:'contain'}}
+            containerStyle={{flex: 1,  marginVertical:1, marginHorizontal:1.75}}
+            />
+            </View>
             <Text style={styles.userText}> User </Text>
+
+                
             <TouchableOpacity onPress={() => this.toggleHandle(!notify)}>
               <View style={styles.notifyContainer} pointerEvents="none">
                 <ToggleButton isOn={notify} />
@@ -113,7 +177,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     margin: Layout.padding,
     backgroundColor: "#FFFFFF",
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.primary,
     marginBottom: 40
   },
