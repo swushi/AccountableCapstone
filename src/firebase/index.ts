@@ -60,6 +60,11 @@ export const getUser = (uid: UserID) =>
     .get();
 
 /**
+ * Should return all data from the database
+ */
+export const getAllUsers = () => firebase.database().ref('/')
+
+/**
  * Sends users a email to rest password
  */
 export const passwordReset = (email: string) =>
