@@ -12,16 +12,16 @@ import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
 import * as firebase from "../firebase";
-import * as firebase1 from "firebase";
 import * as actions from "../redux/actions";
-import {Avatar, Icon} from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
+import { User } from "../types";
 
 export interface ProfileScreenProps {
   navigation: any;
   canNotify: Function;
+  user: User;
  
 }
 
@@ -43,13 +43,16 @@ class ProfileScreen extends React.Component<
     };
   }
 
-  componentWillMount() {
-    // TODO: pull notify from database for user
-    // update state
-  }
-
   componentDidMount() {
     console.log(this.props);
+    this.checkForAvatar()
+  }
+
+  checkForAvatar() {
+    const { avatar } = this.props.user;
+    if(avatar) {
+      this.setState({avatar});
+    }
   }
 
   signOutAsync = async () => {
@@ -88,8 +91,8 @@ class ProfileScreen extends React.Component<
                } )   
 
     if (result.cancelled===false){
-       this.setState({...this.state, avatar:result.uri});
-       this.uploadImage(result.uri,"test-image")
+       this.setState({avatar:result.uri});
+       this.uploadImage(result.uri)
        .then(()=>{
         console.log(this.state.avatar);
        })
@@ -100,16 +103,20 @@ class ProfileScreen extends React.Component<
    
  }   
 
-uploadImage=async (uri,imageName)=>{
- const response= await fetch (uri);
-const blob= await response.blob();
-
-
-var ref= firebase1.storage().ref().child("profilePictures/"+ imageName);
-ref.getDownloadURL();
-
-return ref.put(blob);
-}
+  uploadImage= async (uri)=>{
+    try {
+      const response= await fetch (uri);
+      const blob= await response.blob();
+  
+      await firebase.storeUserAvatarInStorage(blob);
+      const url = await firebase.getAvatarURL();
+      await firebase.storeUserAvatarInDB(url);
+  
+    } catch (error) {
+      console.log('upload err', error)
+    }
+    
+  }
   
   render() {
     const { notify } = this.state;
@@ -122,18 +129,17 @@ return ref.put(blob);
           useNativeDriver
         >
           <View style={styles.inputContainer}>
-            <View style={styles.profileCircle}>
-            <Avatar
-            size='xlarge'
-            activeOpacity={0.7}
-            onPress={this.getCameraPermission}
-            rounded
-            overlayContainerStyle={{backgroundColor:'white'}}
-            source= {this.state.avatar ?{uri:(this.state.avatar) }: require('../assets/tempAvatar.png')}
-            imageProps={{resizeMode:'contain'}}
-            containerStyle={{flex: 1,  marginVertical:1, marginHorizontal:1.75}}
-            />
-            </View>
+
+          <TouchableOpacity onPress={this.getCameraPermission}> 
+          <Image
+                   
+          source= {this.state.avatar ? {uri:(this.state.avatar) }: require('../assets/tempAvatar.png')}
+          style={styles.profileCircle}
+
+          />
+        </TouchableOpacity>
+
+           
             <Text style={styles.userText}> User </Text>
 
                 
@@ -231,6 +237,6 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = state => ({ notify: state.notify });
+const mapStateToProps = state => ({ user: state.user, notify: state.notify });
 
 export default connect(mapStateToProps, actions)(ProfileScreen);

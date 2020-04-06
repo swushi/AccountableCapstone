@@ -10,37 +10,44 @@ import { Header, ToggleButton } from "../components";
 import { SearchBar, ListItem } from "react-native-elements";
 import * as firebase from "../firebase";
 import * as Animatable from "react-native-animatable";
+import { User } from '../types'
 
 export interface MessagesScreenProps {}
 
-export interface MessagesScreenState {}
+export interface MessagesScreenState {
+  searchResults: User[];
+  data: User[];
+  value: string;
+  loading: boolean;
+  searching: boolean;
+  error: any;
+}
 
 class MessagesScreen extends React.Component<
   MessagesScreenProps,
   MessagesScreenState
 > {
-  containerRef: any;
-  arrayholder: any[];
   constructor(props: MessagesScreenProps) {
     super(props);
     this.state = {
       loading: false,
+      value: '',
       data: [],
       error: null,
+      searching: false,
+      searchResults: []
     };
-    this.arrayholder = [];
   }
 
   componentDidMount() {
-    this.displayAllUsers();
+    this.fetchAllUsers();
   }
 
-  async displayAllUsers() {
+  async fetchAllUsers() {
     let dataArray = [];
     try {
       const allUsers = await firebase.getAllUsers();
       allUsers.forEach((doc) => {
-        console.log(doc.data());
         dataArray.push(doc.data());
       });
 
@@ -63,22 +70,34 @@ class MessagesScreen extends React.Component<
     );
   };
 
-  searchFilterFunction = (text) => {
+  searchFilterFunction = async (text: string) => {
     this.setState({
       value: text,
+      searching: true
     });
 
-    const newData = this.arrayholder.filter((item) => {
-      const itemData = `${item.name.title.toUpperCase()} ${item.name.first.toUpperCase()} ${item.name.last.toUpperCase()}`;
-      const textData = text.toUpperCase();
+    // if there is no space in the search
+    //  search firstName and lastName
+    //  push both values to array
+    // else there is a space
+    //  search fullName
 
-      return itemData.indexOf(textData) > -1;
-    });
-
-    console.log(newData);
-    this.setState({
-      data: newData,
-    });
+    try {
+      let tempSearchResults = []
+      const firstNameResults = await firebase.searchUsers(text)
+      firstNameResults.forEach(doc => {
+        tempSearchResults.push(doc.data())
+      })
+      const lastNameResults = await firebase.searchUsers(text)
+      lastNameResults.forEach(doc => {
+        tempSearchResults.push(doc.data())
+      })
+      console.log(tempSearchResults);
+      this.setState({searchResults: tempSearchResults})
+    } catch (error) {
+      console.log('serach err', error)
+    }
+    
   };
 
   renderHeader = () => {
@@ -109,7 +128,7 @@ class MessagesScreen extends React.Component<
       <View style={{ flex: 1 }}>
         <Header hideBack />
         <FlatList
-          data={this.state.data}
+          data={this.state.searching ? this.state.searchResults : this.state.data}
           renderItem={({ item }) => (
             <Text>{item.email}</Text>
             // <ListItem

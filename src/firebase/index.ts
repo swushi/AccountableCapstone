@@ -42,41 +42,30 @@ export const uid = () => firebase.auth().currentUser.uid;
  * @param user
  */
 export const createUser = (user: User) =>
-  firebase
-    .firestore()
-    .collection("users")
-    .doc(user.uid)
-    .set(user);
+  firebase.firestore().collection("users").doc(user.uid).set(user);
 
 /**
  * Returns the user from the database
  * @param uid
  */
 export const getUser = (uid: UserID) =>
-  firebase
-    .firestore()
-    .collection("users")
-    .doc(uid)
-    .get();
+  firebase.firestore().collection("users").doc(uid).get();
 
 /**
  * Should return all data from the database
  */
-export const getAllUsers = () =>
-  firebase
-    .firestore()
-    .collection("users")
-    .get();
+export const getAllUsers = () => firebase.firestore().collection("users").get();
 
 /**
  * Triggered when text is entered in messages search bar
- * @param input 
+ * @param input
  */
-export const searchUsers = (input: string) => 
+export const searchUsers = (input: string) =>
   firebase
     .firestore()
     .collection("users")
-    .where('fullName', '>=', input).where('fullName', '<=', input+ '\uf8ff') // string that starts with sequence
+    .where("fullName", ">=", input)
+    .where("fullName", "<=", input + "\uf8ff") // string that starts with sequence
     .get();
 
 /**
@@ -91,14 +80,17 @@ export const passwordReset = (email: string) =>
  * @param habit
  */
 export const createHabit = (habit: Habit) =>
-  firebase
-    .firestore()
-    .collection("habits")
-    .add(habit);
+  firebase.firestore().collection("habits").add(habit);
 
 export const getHabits = (uid: UserID) =>
-  firebase
-    .firestore()
-    .collection("habits")
-    .where("test", "==", uid)
-    .get();
+  firebase.firestore().collection("habits").where("test", "==", uid).get();
+
+export const getAvatarURL = () => 
+  firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL()
+
+export const storeUserAvatarInStorage = (blob: Blob) => 
+  firebase.storage().ref().child(`profilePictures/${uid()}`).put(blob);
+
+
+export const storeUserAvatarInDB = (url: string) =>
+  firebase.firestore().collection("users").doc(uid()).update({ avatar: url });
