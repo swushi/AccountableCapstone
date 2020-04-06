@@ -60,12 +60,12 @@ export const getAllUsers = () => firebase.firestore().collection("users").get();
  * Triggered when text is entered in messages search bar
  * @param input
  */
-export const searchUsers = (input: string) =>
+export const searchUsers = (input: string, index: string) =>
   firebase
     .firestore()
     .collection("users")
-    .where("fullName", ">=", input)
-    .where("fullName", "<=", input + "\uf8ff") // string that starts with sequence
+    .where(index, ">=", input)
+    .where(index, "<=", input + "\uf8ff") // string that starts with sequence
     .get();
 
 /**
@@ -85,10 +85,10 @@ export const createHabit = (habit: Habit) =>
 export const getHabits = (uid: UserID) =>
   firebase.firestore().collection("habits").where("test", "==", uid).get();
 
-export const getAvatarURL = () => 
-  firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL()
+export const getAvatarURL = () =>
+  firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();
 
-export const storeUserAvatarInStorage = (blob: Blob) => 
+export const storeUserAvatarInStorage = (blob: Blob) =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).put(blob);
 
 export const storeUserAvatarInDB = (url: string) =>

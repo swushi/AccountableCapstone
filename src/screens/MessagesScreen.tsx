@@ -8,9 +8,10 @@ import {
 } from "react-native";
 import { Header, ToggleButton } from "../components";
 import { SearchBar, ListItem } from "react-native-elements";
+import { FilledTextField } from "react-native-material-textfield";
 import * as firebase from "../firebase";
 import * as Animatable from "react-native-animatable";
-import { User } from '../types'
+import { User } from "../types";
 
 export interface MessagesScreenProps {}
 
@@ -31,11 +32,11 @@ class MessagesScreen extends React.Component<
     super(props);
     this.state = {
       loading: false,
-      value: '',
+      value: "",
       data: [],
       error: null,
       searching: false,
-      searchResults: []
+      searchResults: [],
     };
   }
 
@@ -52,8 +53,8 @@ class MessagesScreen extends React.Component<
       });
 
       this.setState({ data: dataArray });
-    } catch(err) {
-      console.log(err)
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -71,9 +72,17 @@ class MessagesScreen extends React.Component<
   };
 
   searchFilterFunction = async (text: string) => {
+    text = text.trim();
+    const words = [];
+    text.split(" ").forEach((word) => {
+      words.push(word.charAt(0).toUpperCase() + word.slice(1));
+    });
+
+    text = words.join(" ");
+
     this.setState({
       value: text,
-      searching: true
+      searching: true,
     });
 
     // if there is no space in the search
@@ -83,26 +92,38 @@ class MessagesScreen extends React.Component<
     //  search fullName
 
     try {
-      let tempSearchResults = []
-      const firstNameResults = await firebase.searchUsers(text)
-      firstNameResults.forEach(doc => {
-        tempSearchResults.push(doc.data())
-      })
-      const lastNameResults = await firebase.searchUsers(text)
-      lastNameResults.forEach(doc => {
-        tempSearchResults.push(doc.data())
-      })
-      console.log(tempSearchResults);
-      this.setState({searchResults: tempSearchResults})
+      let tempSearchResults = [];
+      if (text != "") {
+        if (text.split(" ").length == 1) {
+          const firstNameResults = await firebase.searchUsers(
+            text,
+            "firstName"
+          );
+          firstNameResults.forEach((doc) => {
+            tempSearchResults.push(doc.data());
+          });
+          const lastNameResults = await firebase.searchUsers(text, "lastName");
+          lastNameResults.forEach((doc) => {
+            tempSearchResults.push(doc.data());
+          });
+        } else if (text.split(" ").length == 2) {
+          const fullNameResults = await firebase.searchUsers(text, "fullName");
+          fullNameResults.forEach((doc) => {
+            tempSearchResults.push(doc.data());
+          });
+        }
+      } else if (text === "") {
+        this.setState({ searching: false });
+      }
+      this.setState({ searchResults: tempSearchResults });
     } catch (error) {
-      console.log('serach err', error)
+      console.log("serach err", error);
     }
-    
   };
 
   renderHeader = () => {
     return (
-      <SearchBar
+      <FilledTextField
         placeholder="Search..."
         lightTheme
         round
@@ -128,7 +149,9 @@ class MessagesScreen extends React.Component<
       <View style={{ flex: 1 }}>
         <Header hideBack />
         <FlatList
-          data={this.state.searching ? this.state.searchResults : this.state.data}
+          data={
+            this.state.searching ? this.state.searchResults : this.state.data
+          }
           renderItem={({ item }) => (
             <Text>{item.email}</Text>
             // <ListItem
@@ -137,7 +160,7 @@ class MessagesScreen extends React.Component<
             //   subtitle={item.email}
             // />
           )}
-          keyExtractor={(item) => item.email}
+          keyExtractor={(item) => item.uid}
           ItemSeparatorComponent={this.renderSeparator}
           ListHeaderComponent={this.renderHeader}
         />

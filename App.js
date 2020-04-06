@@ -12,12 +12,15 @@ firebase.init();
 
 YellowBox.ignoreWarnings([
   "Ability to schedule an automatically",
-  "Provided value for"
+  "Provided value for",
+  "Setting a timer",
 ]);
+
+console.warn = function () {};
 
 class App extends React.Component {
   state = {
-    isReady: false
+    isReady: false,
   };
 
   /**
@@ -26,7 +29,7 @@ class App extends React.Component {
   async _cacheResourcesAsync() {
     const fonts = Font.loadAsync({
       "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
-      "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf")
+      "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
     });
 
     return Promise.all([fonts]);
@@ -56,8 +59,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center"
-  }
+    justifyContent: "center",
+  },
 });
 
 export default App;

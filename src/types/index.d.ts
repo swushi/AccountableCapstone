@@ -8,7 +8,7 @@ export type User = {
   firstName: string;
   lastName: string;
   fullName: string;
-  avatar?:string; //optional -not all users may want to upload an image
+  avatar?: string;
   email: string;
   pushToken?: ExpoPushToken;
   notify?: boolean;
