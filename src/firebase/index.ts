@@ -91,6 +91,5 @@ export const getAvatarURL = () =>
 export const storeUserAvatarInStorage = (blob: Blob) => 
   firebase.storage().ref().child(`profilePictures/${uid()}`).put(blob);
 
-
 export const storeUserAvatarInDB = (url: string) =>
   firebase.firestore().collection("users").doc(uid()).update({ avatar: url });
