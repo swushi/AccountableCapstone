@@ -7,6 +7,8 @@ export type User = {
   uid?: UserID;
   firstName: string;
   lastName: string;
+  fullName: string;
+  avatar?: string;
   email: string;
   pushToken?: ExpoPushToken;
   notify?: boolean;

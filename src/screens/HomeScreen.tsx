@@ -32,7 +32,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
   breakRef = null;
   fabRef = null; // floating action button
 
-  handleAction(screen: "CreateHabit" | "BreakHabit") {
+  handleAction(screen: "CreateHabit" | "PresetHabit") {
     this.slideOutActions();
     this.props.navigation.navigate(screen);
   }
@@ -144,9 +144,10 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
             }}
           >
             <MaterialCommunityIcons name="check" color="#fff" size={25} />
-            <Text style={styles.actionText}>Create Habit</Text>
+            <Text style={styles.actionText}>Custom Habit</Text>
           </AnimatableTouchable>
           <AnimatableTouchable
+            onPress={() => this.handleAction('PresetHabit')}
             useNativeDriver
             onLayout={({ nativeEvent }) =>
               this.setState({
@@ -161,7 +162,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
             }}
           >
             <MaterialCommunityIcons name="close" color="#fff" size={25} />
-            <Text style={styles.actionText}>Break Habit</Text>
+            <Text style={styles.actionText}>Preset Habit</Text>
           </AnimatableTouchable>
         </View>
       </View>

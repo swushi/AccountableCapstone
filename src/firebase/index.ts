@@ -42,21 +42,39 @@ export const uid = () => firebase.auth().currentUser.uid;
  * @param user
  */
 export const createUser = (user: User) =>
-  firebase
-    .firestore()
-    .collection("users")
-    .doc(user.uid)
-    .set(user);
+  firebase.firestore().collection("users").doc(user.uid).set(user);
+
+/**
+ * Init following for user so values can be
+ */
+export const createUserFollowing = () =>
+  firebase.firestore().collection("following").doc(uid()).set({});
+
+export const createUserFollowers = () =>
+  firebase.firestore().collection("followers").doc(uid()).set({});
 
 /**
  * Returns the user from the database
  * @param uid
  */
 export const getUser = (uid: UserID) =>
+  firebase.firestore().collection("users").doc(uid).get();
+
+/**
+ * Should return all data from the database
+ */
+export const getAllUsers = () => firebase.firestore().collection("users").get();
+
+/**
+ * Triggered when text is entered in messages search bar
+ * @param input
+ */
+export const searchUsers = (input: string, index: string) =>
   firebase
     .firestore()
     .collection("users")
-    .doc(uid)
+    .where(index, ">=", input)
+    .where(index, "<=", input + "\uf8ff") // string that starts with sequence
     .get();
 
 /**
@@ -65,20 +83,40 @@ export const getUser = (uid: UserID) =>
 export const passwordReset = (email: string) =>
   firebase.auth().sendPasswordResetEmail(email);
 
+export const follow = (followID: UserID) =>
+  firebase
+    .firestore()
+    .collection("following")
+    .doc(uid())
+    .update({ [followID]: true });
+
+export const addFollower = (followID: UserID) =>
+  firebase
+    .firestore()
+    .collection("followers")
+    .doc(followID)
+    .update({ [uid()]: true });
+
 /**
  *  Pushes a Created Habit to database at ref(`/users/${user.uid}/`)
  * @param user
  * @param habit
  */
 export const createHabit = (habit: Habit) =>
-  firebase
-    .firestore()
-    .collection("habits")
-    .add(habit);
+  firebase.firestore().collection("habits").add(habit);
 
+/**
+ * Get users habits
+ * @param uid
+ */
 export const getHabits = (uid: UserID) =>
-  firebase
-    .firestore()
-    .collection("habits")
-    .where("test", "==", uid)
-    .get();
+  firebase.firestore().collection("habits").where("test", "==", uid).get();
+
+export const getAvatarURL = () =>
+  firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();
+
+export const storeUserAvatarInStorage = (blob: Blob) =>
+  firebase.storage().ref().child(`profilePictures/${uid()}`).put(blob);
+
+export const storeUserAvatarInDB = (url: string) =>
+  firebase.firestore().collection("users").doc(uid()).update({ avatar: url });

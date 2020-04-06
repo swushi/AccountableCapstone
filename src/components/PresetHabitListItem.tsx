@@ -15,10 +15,10 @@ export default (props: PresetHabitListItemProps) => {
   const { icon, name, desc } = props;
   const [descHeight, setDescHeight] = useState(0);
   const hiddenRef = useRef();
-  // console.warn("Render", name);
+  console.log("reRender", name);
 
   const showDesc = () => {
-    console.log("show desc asdf", descHeight);
+    // @ts-ignore
     hiddenRef.current.transitionTo({ height: descHeight });
   };
 
@@ -63,13 +63,14 @@ export default (props: PresetHabitListItemProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: Layout.padding
+    padding: Layout.padding,
   },
   shownContainer: {
     padding: Layout.padding,
     flexDirection: "row",
     flex: 1,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    backgroundColor: '#fff',
   },
   leftSideShownContainer: {
     flexDirection: "row",
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
   },
   hiddenContainer: {
     borderWidth: 1,
-    marginHorizontal: Layout.padding * 3
+    marginHorizontal: Layout.padding * 3,
+    transform: [{translateY: -10}]
   }
 });
