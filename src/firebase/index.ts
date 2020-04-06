@@ -94,8 +94,8 @@ export const addFollower = (followID: UserID) =>
   firebase
     .firestore()
     .collection("followers")
-    .doc(uid())
-    .set({ [followID]: true });
+    .doc(followID)
+    .set({ [uid()]: true });
 
 /**
  *  Pushes a Created Habit to database at ref(`/users/${user.uid}/`)
