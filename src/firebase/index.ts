@@ -62,7 +62,22 @@ export const getUser = (uid: UserID) =>
 /**
  * Should return all data from the database
  */
-export const getAllUsers = () => firebase.database().ref('/')
+export const getAllUsers = () =>
+  firebase
+    .firestore()
+    .collection("users")
+    .get();
+
+/**
+ * 
+ * @param input 
+ */
+export const searchUsers = input => 
+  firebase
+    .firestore()
+    .collection("users")
+    .where("firstName", "==", input)
+    .get();
 
 /**
  * Sends users a email to rest password
