@@ -59,6 +59,9 @@ export const getUser = (uid: UserID) =>
     .doc(uid)
     .get();
 
+export const getUsers = () => 
+  firebase.firestore().collection("users").get();
+
 /**
  * Sends users a email to rest password
  */
