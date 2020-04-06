@@ -59,6 +59,9 @@ export const getUser = (uid: UserID) =>
     .doc(uid)
     .get();
 
+export const getUsers = () => 
+  firebase.firestore().collection("users").get();
+
 /**
  * Should return all data from the database
  */
