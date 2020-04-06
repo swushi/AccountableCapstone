@@ -6,12 +6,12 @@ import {
   Text,
   ActivityIndicator,
 } from "react-native";
-import { Header, ToggleButton } from "../components";
-import { SearchBar, ListItem } from "react-native-elements";
-import { FilledTextField } from "react-native-material-textfield";
+import DelayInput from "react-native-debounce-input";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Header, SearchItem } from "../components";
 import * as firebase from "../firebase";
-import * as Animatable from "react-native-animatable";
-import { User } from "../types";
+import { User, UserID } from "../types";
+import { Layout, Colors } from "../config";
 
 export interface MessagesScreenProps {}
 
@@ -57,19 +57,6 @@ class MessagesScreen extends React.Component<
       console.log(err);
     }
   }
-
-  renderSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "86%",
-          backgroundColor: "#CED0CE",
-          marginLeft: "14%",
-        }}
-      />
-    );
-  };
 
   searchFilterFunction = async (text: string) => {
     text = text.trim();
@@ -122,17 +109,35 @@ class MessagesScreen extends React.Component<
   };
 
   renderHeader = () => {
+    const { value } = this.state;
     return (
-      <FilledTextField
-        placeholder="Search..."
-        lightTheme
-        round
-        onChangeText={(text) => this.searchFilterFunction(text)}
-        autoCorrect={false}
-        value={this.state.value}
-      />
+      <View style={styles.inputContainer}>
+        <DelayInput
+          delayTimeout={300}
+          style={{ flex: 1, fontSize: 17 }}
+          placeholder="Search..."
+          onChangeText={(text: string) => this.searchFilterFunction(text)}
+          autoCorrect={false}
+          value={this.state.value}
+        />
+
+        <MaterialCommunityIcons
+          name={value.length >= 1 ? "close" : "magnify"}
+          size={20}
+          color={Colors.primary}
+        />
+      </View>
     );
   };
+
+  async addFriend(followID: UserID) {
+    try {
+      await firebase.follow(followID);
+      await firebase.addFollower(followID);
+    } catch (error) {
+      console.log("follow err", error);
+    }
+  }
 
   render() {
     if (this.state.loading) {
@@ -149,20 +154,15 @@ class MessagesScreen extends React.Component<
       <View style={{ flex: 1 }}>
         <Header hideBack />
         <FlatList
+          style={{ paddingHorizontal: Layout.padding }}
           data={
             this.state.searching ? this.state.searchResults : this.state.data
           }
           renderItem={({ item }) => (
-            <Text>{item.email}</Text>
-            // <ListItem
-            //   leftAvatar={{ source: { uri: item.picture.thumbnail } }}
-            //   title={`${item.name.first} ${item.name.last}`}
-            //   subtitle={item.email}
-            // />
+            <SearchItem user={item} onPress={() => this.addFriend(item.uid)} />
           )}
-          keyExtractor={(item) => item.uid}
-          ItemSeparatorComponent={this.renderSeparator}
           ListHeaderComponent={this.renderHeader}
+          keyExtractor={(item) => item.uid}
         />
       </View>
     );
@@ -171,6 +171,19 @@ class MessagesScreen extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  inputContainer: {
+    paddingVertical: Layout.padding / 2,
+    paddingHorizontal: Layout.padding,
+    marginTop: Layout.padding,
+    marginBottom: 0,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 100,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
 export default MessagesScreen;

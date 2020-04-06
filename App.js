@@ -27,12 +27,18 @@ class App extends React.Component {
    * Cache all fonts and images before rendering application
    */
   async _cacheResourcesAsync() {
+    const images = [
+      require("./assets/tempAvatar.png"),
+      require("./assets/icon.png"),
+      require("./assets/splash.png"),
+    ];
+
     const fonts = Font.loadAsync({
       "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
       "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
     });
 
-    return Promise.all([fonts]);
+    return Promise.all([...images, fonts]);
   }
 
   render() {

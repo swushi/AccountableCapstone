@@ -45,6 +45,15 @@ export const createUser = (user: User) =>
   firebase.firestore().collection("users").doc(user.uid).set(user);
 
 /**
+ * Init following for user so values can be
+ */
+export const createUserFollowing = () =>
+  firebase.firestore().collection("following").doc(uid()).set({});
+
+export const createUserFollowers = () =>
+  firebase.firestore().collection("followers").doc(uid()).set({});
+
+/**
  * Returns the user from the database
  * @param uid
  */
@@ -74,6 +83,20 @@ export const searchUsers = (input: string, index: string) =>
 export const passwordReset = (email: string) =>
   firebase.auth().sendPasswordResetEmail(email);
 
+export const follow = (followID: UserID) =>
+  firebase
+    .firestore()
+    .collection("following")
+    .doc(uid())
+    .set({ [followID]: true });
+
+export const addFollower = (followID: UserID) =>
+  firebase
+    .firestore()
+    .collection("followers")
+    .doc(uid())
+    .set({ [followID]: true });
+
 /**
  *  Pushes a Created Habit to database at ref(`/users/${user.uid}/`)
  * @param user
@@ -82,6 +105,10 @@ export const passwordReset = (email: string) =>
 export const createHabit = (habit: Habit) =>
   firebase.firestore().collection("habits").add(habit);
 
+/**
+ * Get users habits
+ * @param uid
+ */
 export const getHabits = (uid: UserID) =>
   firebase.firestore().collection("habits").where("test", "==", uid).get();
 

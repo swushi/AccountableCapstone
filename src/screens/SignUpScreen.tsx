@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Keyboard
+  Keyboard,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
@@ -56,7 +57,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       lastNameErr: null,
       emailErr: null,
       passwordErr: null,
-      confirmErr: null
+      confirmErr: null,
     };
     this.signUpAsync = this.signUpAsync.bind(this);
     this.containerRef = null;
@@ -90,7 +91,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       lastNameErr: null,
       emailErr: null,
       passwordErr: null,
-      confirmErr: null
+      confirmErr: null,
     });
   };
 
@@ -103,11 +104,12 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
    * slides the container up or down
    */
   slide = (direction: "up" | "down") => {
-    const slideAmount = Layout.height * 0.3;
+    const slideAmount =
+      Platform.OS === "ios" ? Layout.height * 0.3 : Layout.height * 0.05;
     const translation = direction === "up" ? -1 * slideAmount : 0;
 
     this.containerRef.transitionTo({
-      transform: [{ translateY: translation }]
+      transform: [{ translateY: translation }],
     });
   };
 
@@ -140,11 +142,15 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
         email,
         firstName,
         lastName,
-        fullName
+        fullName,
       };
 
       // Initialize user in database
-      const createUser = firebase.createUser(User);
+      const createUser = [
+        firebase.createUser(User),
+        firebase.createUserFollowing(),
+        firebase.createUserFollowers(),
+      ];
 
       // Store user globally in Redux
       // storeUser(User);
@@ -181,33 +187,33 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
 
     if (firstName === "") {
       this.setState({
-        firstNameErr: "Please enter valid First Name"
+        firstNameErr: "Please enter valid First Name",
       });
       err = true;
     }
 
     if (lastName === "") {
       this.setState({
-        lastNameErr: "Please enter valid Last Name"
+        lastNameErr: "Please enter valid Last Name",
       });
       err = true;
     }
     if (!validateEmail(email)) {
       this.setState({
-        emailErr: "Please enter valid Email Address"
+        emailErr: "Please enter valid Email Address",
       });
       err = true;
     }
     if (password !== confirm) {
       this.setState({
         passwordErr: "These passwords must match",
-        confirmErr: "These passwords must match"
+        confirmErr: "These passwords must match",
       });
       err = true;
     }
     if (password.length <= 6) {
       this.setState({
-        passwordErr: "Password must be greater than 6 characters"
+        passwordErr: "Password must be greater than 6 characters",
       });
       err = true;
     }
@@ -228,7 +234,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
       confirmErr,
       firstNameErr,
       lastNameErr,
-      loading
+      loading,
     } = this.state;
     const { navigation } = this.props;
     return (
@@ -239,7 +245,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
         <Animatable.View
           animation="zoomIn"
           style={styles.container}
-          ref={ref => (this.containerRef = ref)}
+          ref={(ref) => (this.containerRef = ref)}
           useNativeDriver
         >
           <TouchableOpacity
@@ -258,7 +264,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               label="First Name"
               value={firstName}
               error={firstNameErr}
-              onChangeText={text => this.setState({ firstName: text })}
+              onChangeText={(text) => this.setState({ firstName: text })}
               baseColor={Colors.background}
               tintColor={Colors.background}
               textColor={Colors.background}
@@ -269,7 +275,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               label="Last Name"
               value={lastName}
               error={lastNameErr}
-              onChangeText={text => this.setState({ lastName: text })}
+              onChangeText={(text) => this.setState({ lastName: text })}
               baseColor={Colors.background}
               tintColor={Colors.background}
               textColor={Colors.background}
@@ -281,7 +287,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               keyboardType="email-address"
               value={email}
               error={emailErr}
-              onChangeText={text => this.setState({ email: text })}
+              onChangeText={(text) => this.setState({ email: text })}
               baseColor={Colors.background}
               tintColor={Colors.background}
               textColor={Colors.background}
@@ -292,7 +298,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               label="Password"
               value={password}
               error={passwordErr}
-              onChangeText={text => this.setState({ password: text })}
+              onChangeText={(text) => this.setState({ password: text })}
               baseColor={Colors.background}
               tintColor={Colors.background}
               textColor={Colors.background}
@@ -304,7 +310,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
               label="Confirm Password"
               value={confirm}
               error={confirmErr}
-              onChangeText={text => this.setState({ confirm: text })}
+              onChangeText={(text) => this.setState({ confirm: text })}
               baseColor={Colors.background}
               tintColor={Colors.background}
               textColor={Colors.background}
@@ -333,21 +339,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Layout.padding,
     paddingTop: Layout.padding,
-    justifyContent: "space-around"
+    justifyContent: "space-around",
   },
   backButton: {
     position: "absolute",
     top: 30,
-    left: 15
+    left: 15,
   },
   logo: {
     fontSize: 50,
     alignSelf: "center",
-    color: Colors.background
+    color: Colors.background,
   },
   inputsContainer: {
     paddingHorizontal: Layout.padding,
-    borderRadius: Layout.roundness
+    borderRadius: Layout.roundness,
   },
   loginContainer: {
     height: Layout.height * 0.06,
@@ -355,12 +361,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: Colors.primary,
     borderRadius: Layout.roundness,
-    marginVertical: Layout.height * 0.03
+    marginVertical: Layout.height * 0.03,
   },
   loginText: {
     color: "#fff",
-    fontSize: 23
-  }
+    fontSize: 23,
+  },
 });
 
 export default SignUpScreen;

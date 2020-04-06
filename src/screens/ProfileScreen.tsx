@@ -118,7 +118,7 @@ class ProfileScreen extends React.Component<
                 source={
                   this.state.avatar
                     ? { uri: this.state.avatar }
-                    : require("../assets/tempAvatar.png")
+                    : require("../../assets/tempAvatar.png")
                 }
                 style={styles.profileCircle}
               />
@@ -187,12 +187,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: Layout.padding,
-    borderWidth: 1,
-    borderBottomWidth: 2,
     borderRadius: Layout.roundness,
     backgroundColor: "#fff",
     marginTop: 20,
     marginBottom: 20,
+    ...Colors.shadow,
   },
   notifyButton: {
     alignItems: "center",
@@ -208,11 +207,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: Layout.padding,
-    borderWidth: 1,
-    borderBottomWidth: 2,
     borderRadius: Layout.roundness,
     backgroundColor: "#fff",
     marginBottom: 5,
+    ...Colors.shadow,
   },
   signOutText: {
     fontSize: 20,
