@@ -59,9 +59,6 @@ export const getUser = (uid: UserID) =>
     .doc(uid)
     .get();
 
-export const getUsers = () => 
-  firebase.firestore().collection("users").get();
-
 /**
  * Should return all data from the database
  */
@@ -72,14 +69,14 @@ export const getAllUsers = () =>
     .get();
 
 /**
- * 
+ * Triggered when text is entered in messages search bar
  * @param input 
  */
-export const searchUsers = input => 
+export const searchUsers = (input: string) => 
   firebase
     .firestore()
     .collection("users")
-    .where("firstName", "==", input)
+    .where('fullName', '>=', input).where('fullName', '<=', input+ '\uf8ff') // string that starts with sequence
     .get();
 
 /**

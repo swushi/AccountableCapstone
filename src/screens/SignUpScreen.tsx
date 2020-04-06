@@ -121,6 +121,7 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
     // deref
     const { navigate } = this.props.navigation;
     const { firstName, lastName, email, password } = this.state;
+    const fullName = `${firstName} ${lastName}`;
 
     try {
       // set in loading state
@@ -138,7 +139,8 @@ class SignUpScreen extends Component<SignUpProps, SignUpState> {
         uid,
         email,
         firstName,
-        lastName
+        lastName,
+        fullName
       };
 
       // Initialize user in database
