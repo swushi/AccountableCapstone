@@ -1,8 +1,9 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Layout, Colors } from "../config";
+import * as firebase from "../firebase";
 
 export interface HeaderProps {
   hideBack?: Boolean;
@@ -35,19 +36,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     paddingTop: Layout.statusBarHeight,
     paddingBottom: 5,
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
   },
   headerText: {
     fontFamily: "Roboto-Bold",
     color: Colors.headerText,
     fontSize: 30,
-    alignSelf: "center"
+    alignSelf: "center",
   },
   backButton: {
     position: "absolute",
     top: Layout.statusBarHeight,
-    left: 5
-  }
+    left: 5,
+  },
 });
 
 export default Header;

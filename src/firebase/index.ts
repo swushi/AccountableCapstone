@@ -66,16 +66,66 @@ export const getUser = (uid: UserID) =>
 export const getAllUsers = () => firebase.firestore().collection("users").get();
 
 /**
- * Triggered when text is entered in messages search bar
- * @param input
+ * Should return all data from the database
  */
-export const searchUsers = (input: string, index: string) =>
+export const getFollowing = () =>
   firebase
+    .firestore()
+    .collection("following")
+    .doc(uid())
+    .collection("user-following")
+    .get();
+
+/**
+ * Should return all data from the database
+ */
+export const getFollowers = () =>
+  firebase
+    .firestore()
+    .collection("followers")
+    .doc(uid())
+    .collection("user-followers")
+    .get();
+
+/**
+ * Search all users in database, optional 3rd argument that allows you to
+ * search followers or following
+ * @param input
+ * @param index
+ * @param type
+ */
+export const searchUsers = (
+  input: string,
+  index: string,
+  type: "following" | "followers" | "discover" = "discover"
+) => {
+  if (type === "following") {
+    return firebase
+      .firestore()
+      .collection("following")
+      .doc(uid())
+      .collection("user-following")
+      .where(index, ">=", input)
+      .where(index, "<=", input + "\uf8ff") // string that starts with sequence
+      .get();
+  } else if (type === "followers") {
+    return firebase
+      .firestore()
+      .collection("followers")
+      .doc(uid())
+      .collection("user-followers")
+      .where(index, ">=", input)
+      .where(index, "<=", input + "\uf8ff") // string that starts with sequence
+      .get();
+  }
+
+  return firebase
     .firestore()
     .collection("users")
     .where(index, ">=", input)
     .where(index, "<=", input + "\uf8ff") // string that starts with sequence
     .get();
+};
 
 /**
  * Sends users a email to rest password
@@ -87,23 +137,31 @@ export const passwordReset = (email: string) =>
  * Adds a user to the current users following
  * @param followID
  */
-export const follow = (followID: UserID) =>
+export const follow = async (followID: UserID) => {
+  const user = await getUser(followID);
   firebase
     .firestore()
     .collection("following")
     .doc(uid())
-    .update({ [followID]: true });
+    .collection("user-following")
+    .doc(followID)
+    .set(user.data());
+};
 
 /**
  * Add a follower to a user
  * @param followID
  */
-export const addFollower = (followID: UserID) =>
+export const addFollower = async (followID: UserID) => {
+  const user = await getUser(uid());
   firebase
     .firestore()
     .collection("followers")
     .doc(followID)
-    .update({ [uid()]: true });
+    .collection("user-followers")
+    .doc(uid())
+    .set(user.data());
+};
 
 /**
  *  Pushes a Created Habit to database at ref(`/users/${user.uid}/`)

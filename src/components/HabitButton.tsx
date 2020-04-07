@@ -13,7 +13,11 @@ function HabitButton(props: HabitButtonProps) {
   return (
     <TouchableOpacity
       onPress={() => null}
-      style={{ ...styles.container, borderBottomColor: "green" }}
+      style={{
+        ...styles.container,
+        borderBottomColor: "green",
+        borderRadius: 3,
+      }}
     >
       <Text style={styles.name}>{name}</Text>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -34,16 +38,16 @@ const styles = StyleSheet.create({
     marginHorizontal: Layout.padding,
     marginBottom: Layout.padding,
     padding: Layout.padding,
-    ...Colors.shadow
+    ...Colors.shadow,
   },
   name: {
     fontSize: 20,
-    fontFamily: "Roboto-Regular"
+    fontFamily: "Roboto-Regular",
   },
   streak: {
     fontSize: 20,
-    fontFamily: "Roboto-Regular"
-  }
+    fontFamily: "Roboto-Regular",
+  },
 });
 
 export default HabitButton;

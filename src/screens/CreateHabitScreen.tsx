@@ -18,7 +18,7 @@ const REMINDERS: Array<Reminder> = [
   { day: "Wed", active: false },
   { day: "Thu", active: false },
   { day: "Fri", active: false },
-  { day: "Sat", active: false }
+  { day: "Sat", active: false },
 ];
 
 export interface CreateHabitScreenProps {
@@ -31,6 +31,7 @@ export interface CreateHabitScreenState {
   reminders: Array<Reminder>;
   showPicker: Boolean;
   chosenTime: Date | null;
+  habitType: string;
 }
 
 class CreateHabitScreen extends React.Component<
@@ -42,7 +43,8 @@ class CreateHabitScreen extends React.Component<
     accountable: "",
     reminders: REMINDERS,
     showPicker: false,
-    chosenTime: new Date()
+    chosenTime: new Date(),
+    habitType: "create",
   };
   reminderRef = null;
 
@@ -87,7 +89,7 @@ class CreateHabitScreen extends React.Component<
 
     // add times to reminders
     const newReminders = reminders;
-    newReminders.map(reminder => (reminder.time = remindTime));
+    newReminders.map((reminder) => (reminder.time = remindTime));
 
     // create local notifications
     const notificationTitle = `Did you finish ${title} today?`;
@@ -100,12 +102,12 @@ class CreateHabitScreen extends React.Component<
         const localNotification: ExpoLocalNotification = {
           notification: {
             title: notificationTitle,
-            body: notificationBody
+            body: notificationBody,
           },
           repeat: {
             time: remindTime,
-            repeat: "week"
-          }
+            repeat: "week",
+          },
         };
 
         localNotifications.push(localNotification);
@@ -127,7 +129,7 @@ class CreateHabitScreen extends React.Component<
 
     // store ids in reminder array
     let idIter = 0;
-    newReminders.forEach(reminder => {
+    newReminders.forEach((reminder) => {
       if (reminder.active) {
         reminder.localId = notificationIds[idIter];
         idIter++;
@@ -143,7 +145,7 @@ class CreateHabitScreen extends React.Component<
       active: true,
       title,
       dateStart: new Date(),
-      reminders: newReminders
+      reminders: newReminders,
     };
 
     try {
@@ -162,7 +164,7 @@ class CreateHabitScreen extends React.Component<
   }
 
   render() {
-    const { reminders, showPicker, chosenTime } = this.state;
+    const { reminders, showPicker, chosenTime, habitType } = this.state;
     return (
       <View style={styles.container}>
         <Header />
@@ -170,14 +172,59 @@ class CreateHabitScreen extends React.Component<
           <Text style={styles.label}>Create Your Own Habit</Text>
           <TextField
             label="Title"
-            onChangeText={text => this.setState({ title: text })}
-            tintColor={Colors.tertiary}
-            baseColor={Colors.tertiary}
+            onChangeText={(text) => this.setState({ title: text })}
+            tintColor={Colors.secondary}
+            baseColor={Colors.secondary}
             lineWidth={2}
             textColor={Colors.textPrimary}
             onFocus={() => this.handleFocus()}
             onSubmitEditing={() => this.handleBlur()}
           />
+          <Text style={styles.dayLabel}>Habit Type</Text>
+          <View style={styles.createOrBreakContainer}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => this.setState({ habitType: "create" })}
+              style={{
+                ...styles.createOrBreakButton,
+                backgroundColor:
+                  habitType === "create" ? Colors.secondary : "#fff",
+                borderTopStartRadius: Layout.roundness,
+                zIndex: habitType === "create" ? 2 : 1,
+              }}
+            >
+              <Text
+                style={{
+                  color: habitType === "create" ? "#fff" : Colors.secondary,
+                  transform: [{ scale: habitType === "create" ? 1.2 : 1 }],
+                  fontFamily: "Roboto-Regular",
+                }}
+              >
+                Create
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => this.setState({ habitType: "break" })}
+              style={{
+                ...styles.createOrBreakButton,
+                backgroundColor:
+                  habitType === "break" ? Colors.secondary : "#fff",
+                borderTopStartRadius: Layout.roundness,
+                zIndex: habitType === "break" ? 2 : 1,
+              }}
+            >
+              <Text
+                style={{
+                  color: habitType === "break" ? "#fff" : Colors.secondary,
+                  transform: [{ scale: habitType === "break" ? 1.2 : 1 }],
+                  fontFamily: "Roboto-Regular",
+                }}
+              >
+                Break
+              </Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.dayLabel}>Remind Me On</Text>
           <View style={styles.remindersContainer}>
             {reminders.map((day, index) => {
@@ -195,7 +242,7 @@ class CreateHabitScreen extends React.Component<
                     // borderBottomEndRadius: index === 6 ? Layout.roundness : 0,
                     backgroundColor: day.active ? Colors.secondary : "#fff",
                     transform: [{ scale: day.active ? 1.04 : 1 }],
-                    zIndex: day.active ? 2 : 1
+                    zIndex: day.active ? 2 : 1,
                   }}
                   onPress={() => this.toggleReminder(day, index)}
                 >
@@ -204,7 +251,7 @@ class CreateHabitScreen extends React.Component<
                     style={{
                       color: day.active ? "#fff" : Colors.secondary,
                       transform: [{ scale: day.active ? 1.2 : 1 }],
-                      fontFamily: "Roboto-Regular"
+                      fontFamily: "Roboto-Regular",
                     }}
                   >
                     {day.day}
@@ -216,20 +263,20 @@ class CreateHabitScreen extends React.Component<
           <TouchableOpacity onPress={() => this.showModal()}>
             <View pointerEvents={"none"}>
               <TextField
-                ref={ref => (this.reminderRef = ref)}
+                ref={(ref) => (this.reminderRef = ref)}
                 label="Time"
-                onChangeText={text => this.setState({ title: text })}
-                baseColor={Colors.tertiary}
+                onChangeText={(text) => this.setState({ title: text })}
+                baseColor={Colors.secondary}
                 lineWidth={2}
-                tintColor={Colors.tertiary}
+                tintColor={Colors.secondary}
                 textColor={Colors.textPrimary}
               />
             </View>
           </TouchableOpacity>
           <TextField
             label="Add An Accountable"
-            tintColor={Colors.tertiary}
-            baseColor={Colors.tertiary}
+            tintColor={Colors.secondary}
+            baseColor={Colors.secondary}
             lineWidth={2}
             textColor={Colors.textPrimary}
             onFocus={() => this.handleFocus()}
@@ -256,23 +303,23 @@ class CreateHabitScreen extends React.Component<
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   contentContainer: {
     flex: 1,
-    padding: Layout.padding
+    padding: Layout.padding,
   },
   label: {
     fontSize: 30,
     alignSelf: "center",
     fontFamily: "Roboto-Regular",
-    color: Colors.textPrimary
+    color: Colors.textPrimary,
   },
   repeatText: {
     fontSize: 25,
     fontFamily: "Roboto-Regular",
     marginTop: Layout.padding * 2,
-    color: Colors.textPrimary
+    color: Colors.textPrimary,
   },
   remindersContainer: {
     flexDirection: "row",
@@ -280,23 +327,44 @@ const styles = StyleSheet.create({
     marginBottom: Layout.padding,
     borderBottomWidth: 2,
     marginTop: Layout.padding * 0.9,
-    borderBottomColor: Colors.tertiary
+    borderBottomColor: Colors.secondary,
+  },
+  createOrBreakContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: Layout.padding,
+    borderBottomWidth: 2,
+    marginTop: Layout.padding * 0.9,
+    borderBottomColor: Colors.secondary,
+  },
+  createOrBreakButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+    height: Layout.height * 0.07,
+    backgroundColor: "#fff",
+  },
+  createOrBreakText: {
+    fontSize: 12,
+    fontFamily: "Roboto-Regular",
+    marginTop: Layout.padding * 3,
+    color: Colors.secondary,
   },
   dayContainer: {
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
     height: Layout.height * 0.07,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   dayLabel: {
     fontSize: 12,
     fontFamily: "Roboto-Regular",
     marginTop: Layout.padding * 3,
-    color: Colors.tertiary
-  }
+    color: Colors.secondary,
+  },
 });
 
-const mapStateToProps = state => ({ user: state.user });
+const mapStateToProps = (state) => ({ user: state.user });
 
 export default connect(mapStateToProps)(CreateHabitScreen);
