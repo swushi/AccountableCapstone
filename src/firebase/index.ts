@@ -83,6 +83,10 @@ export const searchUsers = (input: string, index: string) =>
 export const passwordReset = (email: string) =>
   firebase.auth().sendPasswordResetEmail(email);
 
+/**
+ * Adds a user to the current users following
+ * @param followID
+ */
 export const follow = (followID: UserID) =>
   firebase
     .firestore()
@@ -90,6 +94,10 @@ export const follow = (followID: UserID) =>
     .doc(uid())
     .update({ [followID]: true });
 
+/**
+ * Add a follower to a user
+ * @param followID
+ */
 export const addFollower = (followID: UserID) =>
   firebase
     .firestore()
