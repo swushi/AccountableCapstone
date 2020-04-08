@@ -224,6 +224,7 @@ class MessagesScreen extends React.Component<
   };
 
   async addFriend(userToFollow: User) {
+    this.setState({ following: [...this.state.following, userToFollow] });
     try {
       await firebase.follow(userToFollow.uid);
       await firebase.addFollower(userToFollow.uid);

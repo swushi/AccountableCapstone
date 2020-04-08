@@ -182,15 +182,15 @@ class CreateHabitScreen extends React.Component<
           />
           <Text style={styles.dayLabel}>Habit Type</Text>
           <View style={styles.createOrBreakContainer}>
-            <TouchableOpacity
+            <AnimatableTouchable
               activeOpacity={0.9}
               onPress={() => this.setState({ habitType: "create" })}
               style={{
                 ...styles.createOrBreakButton,
                 backgroundColor:
-                  habitType === "create" ? Colors.secondary : "#fff",
+                  habitType === "create" ? Colors.secondary : "transparent",
                 borderTopStartRadius: Layout.roundness,
-                zIndex: habitType === "create" ? 2 : 1,
+                transform: [{ scaleY: habitType === "create" ? 1.02 : 1 }],
               }}
             >
               <Text
@@ -202,16 +202,16 @@ class CreateHabitScreen extends React.Component<
               >
                 Create
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </AnimatableTouchable>
+            <AnimatableTouchable
               activeOpacity={0.9}
               onPress={() => this.setState({ habitType: "break" })}
               style={{
                 ...styles.createOrBreakButton,
                 backgroundColor:
-                  habitType === "break" ? Colors.secondary : "#fff",
-                borderTopStartRadius: Layout.roundness,
-                zIndex: habitType === "break" ? 2 : 1,
+                  habitType === "break" ? Colors.secondary : "transparent",
+                borderTopEndRadius: Layout.roundness,
+                transform: [{ scaleY: habitType === "break" ? 1.02 : 1 }],
               }}
             >
               <Text
@@ -223,7 +223,7 @@ class CreateHabitScreen extends React.Component<
               >
                 Break
               </Text>
-            </TouchableOpacity>
+            </AnimatableTouchable>
           </View>
           <Text style={styles.dayLabel}>Remind Me On</Text>
           <View style={styles.remindersContainer}>
@@ -336,13 +336,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     marginTop: Layout.padding * 0.9,
     borderBottomColor: Colors.secondary,
+    backgroundColor: "#fff",
   },
   createOrBreakButton: {
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
     height: Layout.height * 0.07,
-    backgroundColor: "#fff",
   },
   createOrBreakText: {
     fontSize: 12,
