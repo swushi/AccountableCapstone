@@ -146,7 +146,7 @@ class MessagesScreen extends React.Component<
   };
 
   renderHeader = () => {
-    const { value, filter } = this.state;
+    const { value, filter, following, followers } = this.state;
     return (
       <View>
         <View style={styles.filtersContainer}>
@@ -164,8 +164,11 @@ class MessagesScreen extends React.Component<
                 color: filter === "following" ? "#fff" : Colors.textPrimary,
               }}
             >
-              {`Following - ${this.state.following.length}`}
+              Following
             </Text>
+            <View style={styles.countContainer}>
+              <Text style={styles.count}>{following.length}</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => this.changeFilter("followers")}
@@ -181,8 +184,11 @@ class MessagesScreen extends React.Component<
                 color: filter === "followers" ? "#fff" : Colors.textPrimary,
               }}
             >
-              {`Followers - ${this.state.followers.length}`}
+              Followers
             </Text>
+            <View style={styles.countContainer}>
+              <Text style={styles.count}>{followers.length}</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => this.changeFilter("discover")}
@@ -313,12 +319,28 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingHorizontal: Layout.padding,
     paddingVertical: Layout.padding / 2,
+    flexDirection: "row",
+    alignItems: "center",
     ...Colors.shadow,
   },
   filterText: {
     color: Colors.textPrimary,
     fontFamily: "Roboto-Regular",
     fontSize: 16,
+  },
+  countContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 16,
+    width: 16,
+    borderRadius: 100,
+    backgroundColor: "lightgrey",
+    marginLeft: 5,
+  },
+  count: {
+    fontSize: 13,
+    color: Colors.textPrimary,
+    fontFamily: "Roboto-Regular",
   },
 });
 export default MessagesScreen;
