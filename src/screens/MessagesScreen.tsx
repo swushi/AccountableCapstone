@@ -164,7 +164,7 @@ class MessagesScreen extends React.Component<
                 color: filter === "following" ? "#fff" : Colors.textPrimary,
               }}
             >
-              Following
+              {`Following - ${this.state.following.length}`}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -181,7 +181,7 @@ class MessagesScreen extends React.Component<
                 color: filter === "followers" ? "#fff" : Colors.textPrimary,
               }}
             >
-              Followers
+              {`Followers - ${this.state.followers.length}`}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
