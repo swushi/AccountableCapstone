@@ -44,7 +44,7 @@ class CreateHabitScreen extends React.Component<
     reminders: REMINDERS,
     showPicker: false,
     chosenTime: new Date(),
-    habitType: "create",
+    habitType: "Create",
   };
   reminderRef = null;
 
@@ -81,8 +81,8 @@ class CreateHabitScreen extends React.Component<
     const uid = firebase.uid();
 
     // TODO: pass type param to screen through navigation
-    const type = "create";
-    const isCreate = type === "create";
+    const type = "Create";
+    const isCreate = type === "Create";
 
     // create time string
     const remindTime = getTimeString(chosenTime);
@@ -169,13 +169,13 @@ class CreateHabitScreen extends React.Component<
       <View style={styles.container}>
         <Header />
         <View style={styles.contentContainer}>
-          <Text style={styles.label}>Create Your Own Habit</Text>
+          <Text style={styles.label}>Setup Your Habit</Text>
           <TextField
             label="Title"
             onChangeText={(text) => this.setState({ title: text })}
             tintColor={Colors.secondary}
             baseColor={Colors.secondary}
-            lineWidth={2}
+            lineWidth={1}
             textColor={Colors.textPrimary}
             onFocus={() => this.handleFocus()}
             onSubmitEditing={() => this.handleBlur()}
@@ -184,19 +184,18 @@ class CreateHabitScreen extends React.Component<
           <View style={styles.createOrBreakContainer}>
             <AnimatableTouchable
               activeOpacity={0.9}
-              onPress={() => this.setState({ habitType: "create" })}
+              onPress={() => this.setState({ habitType: "Create" })}
               style={{
                 ...styles.createOrBreakButton,
                 backgroundColor:
-                  habitType === "create" ? Colors.secondary : "transparent",
-                borderTopStartRadius: Layout.roundness,
-                transform: [{ scaleY: habitType === "create" ? 1.02 : 1 }],
+                  habitType === "Create" ? Colors.secondary : "transparent",
+                transform: [{ scaleY: habitType === "Create" ? 1.02 : 1 }],
               }}
             >
               <Text
                 style={{
-                  color: habitType === "create" ? "#fff" : Colors.secondary,
-                  transform: [{ scale: habitType === "create" ? 1.2 : 1 }],
+                  color: habitType === "Create" ? "#fff" : Colors.secondary,
+                  transform: [{ scale: habitType === "Create" ? 1.2 : 1 }],
                   fontFamily: "Roboto-Regular",
                 }}
               >
@@ -205,19 +204,18 @@ class CreateHabitScreen extends React.Component<
             </AnimatableTouchable>
             <AnimatableTouchable
               activeOpacity={0.9}
-              onPress={() => this.setState({ habitType: "break" })}
+              onPress={() => this.setState({ habitType: "Break" })}
               style={{
                 ...styles.createOrBreakButton,
                 backgroundColor:
-                  habitType === "break" ? Colors.secondary : "transparent",
-                borderTopEndRadius: Layout.roundness,
-                transform: [{ scaleY: habitType === "break" ? 1.02 : 1 }],
+                  habitType === "Break" ? Colors.secondary : "transparent",
+                transform: [{ scaleY: habitType === "Break" ? 1.02 : 1 }],
               }}
             >
               <Text
                 style={{
-                  color: habitType === "break" ? "#fff" : Colors.secondary,
-                  transform: [{ scale: habitType === "break" ? 1.2 : 1 }],
+                  color: habitType === "Break" ? "#fff" : Colors.secondary,
+                  transform: [{ scale: habitType === "Break" ? 1.2 : 1 }],
                   fontFamily: "Roboto-Regular",
                 }}
               >
@@ -236,10 +234,12 @@ class CreateHabitScreen extends React.Component<
                   activeOpacity={1}
                   style={{
                     ...styles.dayContainer,
+                    borderLeftColor: Colors.secondary,
+                    borderLeftWidth: index !== 0 ? 1 : 0,
                     borderTopStartRadius: index === 0 ? Layout.roundness : 0,
-                    // borderBottomStartRadius: index === 0 ? Layout.roundness : 0,
+                    borderBottomStartRadius: index === 0 ? Layout.roundness : 0,
+                    borderBottomEndRadius: index === 6 ? Layout.roundness : 0,
                     borderTopEndRadius: index === 6 ? Layout.roundness : 0,
-                    // borderBottomEndRadius: index === 6 ? Layout.roundness : 0,
                     backgroundColor: day.active ? Colors.secondary : "#fff",
                     transform: [{ scale: day.active ? 1.04 : 1 }],
                     zIndex: day.active ? 2 : 1,
@@ -267,17 +267,17 @@ class CreateHabitScreen extends React.Component<
                 label="Time"
                 onChangeText={(text) => this.setState({ title: text })}
                 baseColor={Colors.secondary}
-                lineWidth={2}
+                lineWidth={1}
                 tintColor={Colors.secondary}
                 textColor={Colors.textPrimary}
               />
             </View>
           </TouchableOpacity>
           <TextField
-            label="Add An Accountable"
+            label="Add An Accountable (Optional)"
             tintColor={Colors.secondary}
             baseColor={Colors.secondary}
-            lineWidth={2}
+            lineWidth={1}
             textColor={Colors.textPrimary}
             onFocus={() => this.handleFocus()}
             onSubmitEditing={() => this.handleBlur()}
@@ -292,9 +292,11 @@ class CreateHabitScreen extends React.Component<
             onChange={(event, date) => this.handleTimeChange(event, date)}
           />
         ) : null}
-
-        <TouchableOpacity onPress={() => this.createHabit()}>
-          <Text>Create Habit</Text>
+        <TouchableOpacity
+          onPress={() => this.createHabit()}
+          style={styles.createHabitButton}
+        >
+          <Text style={styles.buttonText}>{`${habitType} habit`}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -304,6 +306,7 @@ class CreateHabitScreen extends React.Component<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
   contentContainer: {
     flex: 1,
@@ -325,17 +328,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: Layout.padding,
-    borderBottomWidth: 2,
+    borderRadius: Layout.roundness,
+    borderWidth: 1,
     marginTop: Layout.padding * 0.9,
-    borderBottomColor: Colors.secondary,
+    borderColor: Colors.secondary,
   },
   createOrBreakContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: Layout.padding,
-    borderBottomWidth: 2,
+    borderWidth: 1,
+    borderRadius: Layout.roundness,
     marginTop: Layout.padding * 0.9,
-    borderBottomColor: Colors.secondary,
+    borderColor: Colors.secondary,
     backgroundColor: "#fff",
   },
   createOrBreakButton: {
@@ -362,6 +367,22 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     marginTop: Layout.padding * 3,
     color: Colors.secondary,
+  },
+  createHabitButton: {
+    position: "absolute",
+    top: Layout.height * 0.83,
+    padding: Layout.padding,
+    paddingHorizontal: Layout.padding * 2,
+    borderColor: Colors.secondary,
+    alignSelf: "center",
+    borderRadius: Layout.roundness,
+    borderWidth: 1,
+    alignItems: "center",
+    marginTop: Layout.padding,
+  },
+  buttonText: {
+    color: Colors.secondary,
+    fontSize: 20,
   },
 });
 

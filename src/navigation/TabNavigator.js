@@ -30,12 +30,12 @@ export default function TabNavigator() {
           return (
             <MaterialCommunityIcons name={iconName} size={size} color={color} />
           );
-        }
+        },
       })}
       tabBarOptions={{
         activeTintColor: Colors.primary,
         inactiveTintColor: Colors.inactive,
-        showLabel: false
+        showLabel: false,
       }}
     >
       <Tab.Screen name="Main" component={MainStack} />
