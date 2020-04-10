@@ -6,7 +6,8 @@ import { Layout, Colors } from "../config";
 
 export interface SearchItemProps {
   user: User;
-  isFriend: boolean;
+  isFollowing: boolean;
+  selecting: boolean;
   onPress: Function;
 }
 
@@ -20,7 +21,7 @@ class SearchItem extends Component<SearchItemProps, any> {
 
   render() {
     const { fullName, avatar } = this.props.user;
-    const { isFriend, onPress } = this.props;
+    const { isFollowing, onPress, selecting } = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.leftSideContainer}>
@@ -36,9 +37,28 @@ class SearchItem extends Component<SearchItemProps, any> {
           </View>
           <Text style={styles.name}>{fullName}</Text>
         </View>
-        {isFriend ? (
-          <Text>friends</Text>
-        ) : (
+        {isFollowing ? (
+          <TouchableOpacity
+            style={styles.rightSideContainer}
+            onPress={() => onPress()}
+          >
+            <MaterialCommunityIcons
+              name={"message"}
+              size={18}
+              color={Colors.secondary}
+            />
+            <Text style={styles.addFriendText}>Chat</Text>
+          </TouchableOpacity>
+        ) : null}
+        {selecting ? (
+          <TouchableOpacity
+            style={styles.rightSideContainer}
+            onPress={() => onPress()}
+          >
+            <Text style={styles.addFriendText}>Select</Text>
+          </TouchableOpacity>
+        ) : null}
+        {!selecting && !isFollowing ? (
           <TouchableOpacity
             style={styles.rightSideContainer}
             onPress={() => onPress()}
@@ -50,7 +70,7 @@ class SearchItem extends Component<SearchItemProps, any> {
             />
             <Text style={styles.addFriendText}>Follow</Text>
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
     );
   }

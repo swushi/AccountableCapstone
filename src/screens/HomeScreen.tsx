@@ -6,11 +6,13 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import * as firebase from "../firebase";
 import * as Animatable from "react-native-animatable";
 import { Header, HabitButton } from "../components";
 import { Layout, Colors } from "../config";
 import { ProgressCircle } from "react-native-svg-charts";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Habit } from "../types";
 const AnimatableTouchable = Animatable.createAnimatableComponent(
   TouchableOpacity
 );
@@ -19,9 +21,18 @@ export interface HomeScreenProps {
   navigation: any;
 }
 
-class HomeScreen extends React.Component<HomeScreenProps, any> {
+export interface HomeScreenState {
+  habits: Habit[];
+  createWidth: number;
+  breakWidth: number;
+  createHeight: number;
+  breakHeight: number;
+  animated: boolean;
+}
+
+class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   state = {
-    habits: HABITS,
+    habits: [],
     createWidth: 0,
     breakWidth: 100,
     createHeight: 0,
@@ -88,8 +99,23 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
     );
   }
 
+  async getHabitList() {
+    let habitsArray = [];
+    const habits = await firebase.getHabits(firebase.uid());
+    habits.forEach((habit) => {
+      habitsArray.push({ ...habit.data(), habitId: habit.id });
+    });
+
+    this.setState({ habits: habitsArray });
+  }
+
+  componentDidMount() {
+    this.getHabitList();
+  }
+
   render() {
     const { habits, breakWidth, animated } = this.state;
+    const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
         <Animatable.View
@@ -116,8 +142,13 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
           <Text style={styles.currentHabitsText}>Current Habits</Text>
           <FlatList
             data={habits}
-            keyExtractor={(item) => item.name}
-            renderItem={({ item }) => <HabitButton data={item} />}
+            keyExtractor={(item) => item.habitId}
+            renderItem={({ item }) => (
+              <HabitButton
+                data={item}
+                onPress={() => navigate("Habit", item)}
+              />
+            )}
           />
         </Animatable.View>
         <TouchableOpacity

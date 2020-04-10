@@ -5,23 +5,27 @@ import { Colors, Layout } from "../config";
 
 export interface HabitButtonProps {
   data: any; // will need to be typed later when we have accurate data
+  navigation: any;
+  onPress: Function;
 }
 
 function HabitButton(props: HabitButtonProps) {
   const iconColor = "red";
-  const { name, streak } = props.data;
+  const { data, onPress } = props;
+  const { title, type } = data;
+  let underlineColor = type === "Create" ? "green" : "red";
   return (
     <TouchableOpacity
-      onPress={() => null}
+      onPress={() => onPress()}
       style={{
         ...styles.container,
-        borderBottomColor: "green",
+        borderBottomColor: underlineColor,
         borderRadius: 3,
       }}
     >
-      <Text style={styles.name}>{name}</Text>
+      <Text style={styles.name}>{title}</Text>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={styles.streak}>{streak}</Text>
+        <Text style={styles.streak}>{30}</Text>
         <MaterialCommunityIcons name="fire" size={30} color={iconColor} />
       </View>
     </TouchableOpacity>

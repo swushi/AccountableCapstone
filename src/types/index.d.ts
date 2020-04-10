@@ -60,7 +60,7 @@ export type Habit = {
   reminders: Array<Reminder>;
   desc?: string;
   stats?: Stats;
-  id?: HabitID; // optional because when created on client, will not have id yet
+  habitId?: HabitID; // optional because when created on client, will not have id yet
   accountable?: User;
 };
 

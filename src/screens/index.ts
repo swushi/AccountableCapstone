@@ -7,3 +7,5 @@ export { default as ProfileScreen } from "./ProfileScreen";
 export { default as CreateHabitScreen } from "./CreateHabitScreen";
 export { default as PresetHabitScreen } from "./PresetHabitScreen";
 export { default as SelectAccountableScreen } from "./SelectAccountableScreen";
+export { default as HabitScreen } from "./HabitScreen";
+export { default as ChatScreen } from "./ChatScreen";

@@ -176,7 +176,7 @@ export const createHabit = (habit: Habit) =>
  * @param uid
  */
 export const getHabits = (uid: UserID) =>
-  firebase.firestore().collection("habits").where("test", "==", uid).get();
+  firebase.firestore().collection("habits").where("uid", "==", uid).get();
 
 export const getAvatarURL = () =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();

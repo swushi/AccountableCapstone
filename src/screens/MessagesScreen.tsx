@@ -229,7 +229,18 @@ class MessagesScreen extends React.Component<
     );
   };
 
-  async addFriend(userToFollow: User) {
+  handleSearchItemIconPress(user: User) {
+    const { filter } = this.state;
+
+    // follow or chat with user
+    if (filter !== "following") {
+      this.addFriendAsync(user);
+    } else {
+      // navigate to chat screen
+    }
+  }
+
+  async addFriendAsync(userToFollow: User) {
     this.setState({ following: [...this.state.following, userToFollow] });
     try {
       await firebase.follow(userToFollow.uid);
@@ -281,7 +292,11 @@ class MessagesScreen extends React.Component<
           style={{ paddingHorizontal: Layout.padding }}
           data={searching ? searchResults : displayData}
           renderItem={({ item }) => (
-            <SearchItem user={item} onPress={() => this.addFriend(item)} />
+            <SearchItem
+              user={item}
+              onPress={() => this.handleSearchItemIconPress(item)}
+              isFollowing={filter === "following" ? true : false}
+            />
           )}
           ListHeaderComponent={this.renderHeader}
           keyExtractor={(item) => item.uid}
