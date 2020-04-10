@@ -53,7 +53,7 @@ export type Reminder = {
 // TODO: Make it reflect actual habit needs
 export type Habit = {
   uid: UserID;
-  type: "create" | "break";
+  type: "Create" | "Break";
   title: string;
   active: Boolean; // if the habit is currently on-going
   dateStart: Date;

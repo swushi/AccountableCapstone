@@ -23,6 +23,7 @@ const REMINDERS: Array<Reminder> = [
 
 export interface CreateHabitScreenProps {
   user: User;
+  navigation: any;
 }
 
 export interface CreateHabitScreenState {
@@ -157,10 +158,12 @@ class CreateHabitScreen extends React.Component<
   }
 
   handlePickerSubmit() {
-    setTimeout(
-      () => this.setState({ showPicker: false }, () => console.log("hidden")),
-      100
-    );
+    setTimeout(() => this.setState({ showPicker: false }, () => null), 100);
+  }
+
+  getAccountable() {
+    const { navigate } = this.props.navigation;
+    navigate("SelectAccountable");
   }
 
   render() {
@@ -273,15 +276,19 @@ class CreateHabitScreen extends React.Component<
               />
             </View>
           </TouchableOpacity>
-          <TextField
-            label="Add An Accountable (Optional)"
-            tintColor={Colors.secondary}
-            baseColor={Colors.secondary}
-            lineWidth={1}
-            textColor={Colors.textPrimary}
-            onFocus={() => this.handleFocus()}
-            onSubmitEditing={() => this.handleBlur()}
-          />
+          <TouchableOpacity onPress={() => this.getAccountable()}>
+            <View pointerEvents={"none"}>
+              <TextField
+                label="Add An Accountable (Optional)"
+                tintColor={Colors.secondary}
+                baseColor={Colors.secondary}
+                lineWidth={1}
+                textColor={Colors.textPrimary}
+                onFocus={() => this.handleFocus()}
+                onSubmitEditing={() => this.handleBlur()}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
         {showPicker ? (
           <DateTimePickerModal
