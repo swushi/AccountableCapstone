@@ -20,10 +20,10 @@ class HabitScreen extends Component<Props, State> {
   render() {
     const data = [
       { value: 1, label: "Sun" },
-      { value: 0, label: "Mon" },
+      { value: 0.1, label: "Mon", svg: {fill: 'red'} },
       { value: 1, label: "Tue" },
       { value: 1, label: "Wed" },
-      { value: 0, label: "Thu" },
+      { value: 0.1, label: "Thu", svg: {fill: 'red'} },
       { value: 1, label: "Fri" },
       { value: 1, label: "Sat" },
     ];
@@ -32,7 +32,7 @@ class HabitScreen extends Component<Props, State> {
       <View style={styles.container}>
         <Header />
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Completion</Text>
+          <Text style={styles.chartTitle}>This Week's Completion</Text>
           <View style={{ flex: 1 }}>
             <BarChart
               style={styles.chart}
@@ -41,9 +41,9 @@ class HabitScreen extends Component<Props, State> {
               contentInset={contentInset}
               spacingInner={0}
               svg={{
-                fill: Colors.secondary,
-                fillOpacity: "0.1",
-                stroke: Colors.secondary,
+                fill: 'green',
+                fillOpacity: "0.15",
+                
               }}
             ></BarChart>
             <XAxis
@@ -51,7 +51,7 @@ class HabitScreen extends Component<Props, State> {
               data={data}
               contentInset={{ left: 10, right: 10 }}
               formatLabel={(value, index) => data[index].label}
-              svg={{ fontSize: 10, fill: "grey" }}
+              svg={{ fontSize: 12, fill: "grey" }}
             />
           </View>
         </View>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   chartContainer: {
     marginTop: 25,
     padding: 15,
-    height: Layout.height * 0.3,
+    height: Layout.height * 0.25,
     width: Layout.width * 0.9,
     alignSelf: "center",
     backgroundColor: Colors.background,
