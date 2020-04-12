@@ -14,7 +14,9 @@ import * as firebase from "../firebase";
 import { User, UserID } from "../types";
 import { Layout, Colors } from "../config";
 
-export interface MessagesScreenProps {}
+export interface MessagesScreenProps {
+  navigation: any;
+}
 
 export interface MessagesScreenState {
   searchResults: User[];
@@ -231,12 +233,14 @@ class MessagesScreen extends React.Component<
 
   handleSearchItemIconPress(user: User) {
     const { filter } = this.state;
+    const { navigation } = this.props;
 
     // follow or chat with user
     if (filter !== "following") {
       this.addFriendAsync(user);
     } else {
       // navigate to chat screen
+      navigation.navigate("Chat", { user });
     }
   }
 

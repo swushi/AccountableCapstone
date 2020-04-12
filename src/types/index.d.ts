@@ -71,3 +71,9 @@ export type Stats = {
   streak: number;
   timesBroken: number;
 };
+
+export type Chat = {
+  content: string;
+  uid: UserID;
+  createdAt: Date;
+};

@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { BarChart, YAxis, XAxis, Grid } from "react-native-svg-charts";
 import { Header } from "../components";
 import { Layout, Colors } from "../config";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface Props {
   navigation: any;
@@ -19,13 +20,13 @@ class HabitScreen extends Component<Props, State> {
 
   render() {
     const data = [
-      { value: 1, label: "Sun" },
-      { value: 0.1, label: "Mon", svg: {fill: 'red'} },
-      { value: 1, label: "Tue" },
-      { value: 1, label: "Wed" },
-      { value: 0.1, label: "Thu", svg: {fill: 'red'} },
-      { value: 1, label: "Fri" },
-      { value: 1, label: "Sat" },
+      { value: 1, label: "Sun", svg: { fill: "green", stroke: "green" } },
+      { value: 1, label: "Mon", svg: { fill: "green", stroke: "green" } },
+      { value: 0.1, label: "Tue", svg: { fill: "red", stroke: "red" } },
+      { value: 0.1, label: "Wed", svg: { fill: "red", stroke: "red" } },
+      { value: 0.1, label: "Thu", svg: { fill: "red", stroke: "red" } },
+      { value: 0.1, label: "Fri", svg: { fill: "red", stroke: "red" } },
+      { value: 0.1, label: "Sat", svg: { fill: "red", stroke: "red" } },
     ];
     const contentInset = { top: 10, bottom: 10 };
     return (
@@ -41,19 +42,25 @@ class HabitScreen extends Component<Props, State> {
               contentInset={contentInset}
               spacingInner={0}
               svg={{
-                fill: 'green',
                 fillOpacity: "0.15",
-                
+                strokeDasharray: "18.9%, 150%",
               }}
             ></BarChart>
             <XAxis
-              style={{ marginTop: 2, marginHorizontal: 13 }}
+              style={{ marginTop: 5, marginHorizontal: 13 }}
               data={data}
               contentInset={{ left: 10, right: 10 }}
               formatLabel={(value, index) => data[index].label}
               svg={{ fontSize: 12, fill: "grey" }}
             />
           </View>
+        </View>
+        <View style={styles.completedContainer}>
+          <Text>Has This Been Completed Today?</Text>
+          <TouchableOpacity style={styles.completedButton}>
+            <Text style={{ color: "green" }}>Yes</Text>
+            <MaterialCommunityIcons name="check" color="green" />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -72,7 +79,7 @@ const styles = StyleSheet.create({
     width: Layout.width * 0.9,
     alignSelf: "center",
     backgroundColor: Colors.background,
-    borderRadius: 3,
+    borderRadius: Layout.roundness,
     ...Colors.shadow,
   },
   chartTitle: {
@@ -80,6 +87,28 @@ const styles = StyleSheet.create({
   },
   chart: {
     flex: 1,
+  },
+  completedContainer: {
+    height: Layout.height * 0.05,
+    width: Layout.width * 0.9,
+    paddingHorizontal: Layout.padding,
+    flexDirection: "row",
+    marginTop: 10,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "space-between",
+    backgroundColor: Colors.background,
+    borderRadius: Layout.roundness,
+    ...Colors.shadow,
+  },
+  completedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "green",
+    borderRadius: Layout.roundness,
+    paddingVertical: 1,
+    paddingHorizontal: 5,
   },
 });
 

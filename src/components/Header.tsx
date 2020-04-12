@@ -7,14 +7,17 @@ import * as firebase from "../firebase";
 
 export interface HeaderProps {
   hideBack?: Boolean;
+  chatHeader?: String;
 }
 
 function Header(props: HeaderProps) {
   const navigation = useNavigation();
-  const { hideBack } = props;
+  const { hideBack, chatHeader } = props;
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Accountable</Text>
+      <Text style={styles.headerText}>
+        {chatHeader ? chatHeader : "Accountable"}
+      </Text>
       {!hideBack && (
         <View style={styles.backButton}>
           <TouchableOpacity onPress={() => navigation.goBack()}>

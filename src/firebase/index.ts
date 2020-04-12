@@ -186,3 +186,19 @@ export const storeUserAvatarInStorage = (blob: Blob) =>
 
 export const storeUserAvatarInDB = (url: string) =>
   firebase.firestore().collection("users").doc(uid()).update({ avatar: url });
+
+/**
+ * Will get the chat between the two users
+ * @param user current user obj
+ * @param friend other user obj
+ */
+export const getChat = (userId: UserID, friendId: UserID) => {
+  let chatId;
+  if (userId < friendId) {
+    chatId = userId + friendId;
+  } else {
+    chatId = friendId + userId;
+  }
+
+  return firebase.firestore().collection("chats").doc(chatId);
+};
