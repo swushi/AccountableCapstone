@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, ImageBackground } from "react-native";
 import { Header, PresetHabitListItem } from "../components";
 import { Layout, Colors } from "../config";
 export interface PresetHabitScreenProps {}
@@ -13,7 +13,7 @@ export default (props: PresetHabitScreenProps) => {
         <FlatList
           data={habits}
           keyExtractor={item => item.name}
-          renderItem={({ item }) => (
+          renderItem={({ item }) =>  (
             <PresetHabitListItem
               icon={item.icon}
               name={item.name}
@@ -28,11 +28,11 @@ export default (props: PresetHabitScreenProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   contentContainer: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
 const presetItems = [

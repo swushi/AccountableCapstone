@@ -19,7 +19,9 @@ export default (props: PresetHabitListItemProps) => {
 
   const showDesc = () => {
     // @ts-ignore
+    
     hiddenRef.current.transitionTo({ height: descHeight });
+    
   };
 
   return (
@@ -46,6 +48,9 @@ export default (props: PresetHabitListItemProps) => {
         style={{ ...styles.hiddenContainer, height: 0, overflow: "hidden" }}
       >
         <Text style={styles.desc}>{desc}</Text>
+        <TouchableOpacity>
+          <Text style={styles.preset}> Select Preset</Text>
+        </TouchableOpacity>
       </Animatable.View>
 
       {/**
@@ -56,6 +61,7 @@ export default (props: PresetHabitListItemProps) => {
         onLayout={e => setDescHeight(e.nativeEvent.layout.height)}
       >
         {desc}
+        
       </Text>
     </View>
   );
@@ -71,17 +77,47 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    borderRadius: Layout.roundness * 5,
   },
   leftSideShownContainer: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   name: {
-    paddingLeft: Layout.padding
+    paddingLeft: Layout.padding,
+    fontSize: 18,
   },
   hiddenContainer: {
-    borderWidth: 1,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderLeftWidth: 0.3,
+    borderRightWidth:0.3,
+    borderBottomWidth: 1,
+    borderRadius: Layout.roundness * 5,
+    padding: Layout.padding,
+    backgroundColor: '#fff',
+    marginTop: 11,
+    overflow: 'hidden',
     marginHorizontal: Layout.padding * 3,
     transform: [{translateY: -10}]
-  }
+  },
+  preset: {
+    backgroundColor: Colors.primary,
+    borderRadius: Layout.roundness * 3,
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+    width: 125,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    textAlign:'center',
+  },
 });
