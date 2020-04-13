@@ -63,68 +63,61 @@ export const getUser = (uid: UserID) =>
 /**
  * Should return all data from the database
  */
-export const getAllUsers = () => firebase.firestore().collection("users").get();
+export const getAllUsers = async () => {
+  const users = [];
+  const snap = await firebase.firestore().collection("users").get();
+
+  snap.forEach((user) => {
+    users.push(user.data());
+  });
+
+  return users;
+};
 
 /**
  * Should return all data from the database
  */
-export const getFollowing = () =>
-  firebase
-    .firestore()
+export const getFollowing = async () => {
+  const db = firebase.firestore();
+  const usersRef = db.collection("users");
+  const followingIds = await db
     .collection("following")
     .doc(uid())
     .collection("user-following")
     .get();
 
+  const users = [];
+
+  followingIds.forEach(async (snap) => {
+    const uid = snap.data().uid;
+    const user = await usersRef.doc(uid).get();
+    users.push(user.data());
+  });
+
+  return users;
+};
+
 /**
  * Should return all data from the database
  */
-export const getFollowers = () =>
-  firebase
-    .firestore()
+export const getFollowers = async () => {
+  const db = firebase.firestore();
+  const usersRef = db.collection("users");
+  const followersIds = await db
     .collection("followers")
     .doc(uid())
     .collection("user-followers")
     .get();
 
-/**
- * Search all users in database, optional 3rd argument that allows you to
- * search followers or following
- * @param input
- * @param index
- * @param type
- */
-export const searchUsers = (
-  input: string,
-  index: string,
-  type: "following" | "followers" | "discover" = "discover"
-) => {
-  if (type === "following") {
-    return firebase
-      .firestore()
-      .collection("following")
-      .doc(uid())
-      .collection("user-following")
-      .where(index, ">=", input)
-      .where(index, "<=", input + "\uf8ff") // string that starts with sequence
-      .get();
-  } else if (type === "followers") {
-    return firebase
-      .firestore()
-      .collection("followers")
-      .doc(uid())
-      .collection("user-followers")
-      .where(index, ">=", input)
-      .where(index, "<=", input + "\uf8ff") // string that starts with sequence
-      .get();
-  }
+  const users = [];
 
-  return firebase
-    .firestore()
-    .collection("users")
-    .where(index, ">=", input)
-    .where(index, "<=", input + "\uf8ff") // string that starts with sequence
-    .get();
+  followersIds.forEach(async (snap) => {
+    const uid = snap.data().uid;
+    const user = await usersRef.doc(uid).get();
+    users.push(user.data());
+  });
+
+  return users;
 };
 
 /**
@@ -137,31 +130,28 @@ export const passwordReset = (email: string) =>
  * Adds a user to the current users following
  * @param followID
  */
-export const follow = async (followID: UserID) => {
-  const user = await getUser(followID);
+export const follow = (followID: UserID) => {
   firebase
     .firestore()
     .collection("following")
     .doc(uid())
     .collection("user-following")
     .doc(followID)
-    .set(user.data());
+    .set({ uid: followID });
 };
 
 /**
  * Add a follower to a user
  * @param followID
  */
-export const addFollower = async (followID: UserID) => {
-  const user = await getUser(uid());
+export const addFollower = (followID: UserID) =>
   firebase
     .firestore()
     .collection("followers")
     .doc(followID)
     .collection("user-followers")
     .doc(uid())
-    .set(user.data());
-};
+    .set({ uid: uid() });
 
 /**
  *  Pushes a Created Habit to database at ref(`/users/${user.uid}/`)

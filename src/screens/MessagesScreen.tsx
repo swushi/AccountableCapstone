@@ -56,95 +56,53 @@ class MessagesScreen extends React.Component<
 
   async fetchAllUsers() {
     this.setState({ loading: true });
-    const followingArray = [];
-    const followersArray = [];
-    const usersArray = [];
     try {
       const allUsers = await firebase.getAllUsers();
-      allUsers.forEach((user) => {
-        usersArray.push(user.data());
-      });
 
       const followers = await firebase.getFollowers();
-      followers.forEach((user) => {
-        followersArray.push(user.data());
-      });
 
       const following = await firebase.getFollowing();
-      following.forEach((user) => {
-        followingArray.push(user.data());
-      });
 
-      this.setState({
-        allUsers: usersArray,
-        followers: followersArray,
-        following: followingArray,
-        loading: false,
-      });
+      this.setState(
+        {
+          allUsers,
+          followers,
+          following,
+        },
+        () => this.setState({ loading: false })
+      );
     } catch (err) {
       console.log(err);
     }
   }
 
   searchFilterFunction = async (text: string) => {
+    this.setState({ searching: text.length < 3 ? false : true });
     const { filter, allUsers, following, followers } = this.state;
 
-    text = text.trim();
-    const words = [];
-    text.split(" ").forEach((word) => {
-      words.push(word.charAt(0).toUpperCase() + word.slice(1));
-    });
+    let newData: User[];
 
-    text = words.join(" ");
-
-    this.setState({
-      value: text,
-      searching: true,
-    });
-
-    // if there is no space in the search
-    //  search firstName and lastName
-    //  push both values to array
-    // else there is a space
-    //  search fullName
-
-    try {
-      let tempSearchResults = [];
-      if (text != "") {
-        if (text.split(" ").length == 1) {
-          const firstNameResults = await firebase.searchUsers(
-            text,
-            "firstName",
-            filter
-          );
-          firstNameResults.forEach((doc) => {
-            tempSearchResults.push(doc.data());
-          });
-          const lastNameResults = await firebase.searchUsers(
-            text,
-            "lastName",
-            filter
-          );
-          lastNameResults.forEach((doc) => {
-            tempSearchResults.push(doc.data());
-          });
-        } else if (text.split(" ").length == 2) {
-          const fullNameResults = await firebase.searchUsers(
-            text,
-            "fullName",
-            filter
-          );
-          fullNameResults.forEach((doc) => {
-            tempSearchResults.push(doc.data());
-          });
-        }
-      } else if (text === "") {
-        this.setState({ searching: false });
-      }
-      this.setState({ searchResults: tempSearchResults });
-    } catch (error) {
-      console.log("serach err", error);
+    if (filter == "discover") {
+      newData = allUsers.filter((user) => {
+        const userData = `${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`;
+        const textData = text.toUpperCase();
+        return userData.indexOf(textData) > -1;
+      });
+    } else if (filter == "followers") {
+      newData = followers.filter((user) => {
+        const userData = `${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`;
+        const textData = text.toUpperCase();
+        return userData.indexOf(textData) > -1;
+      });
+    } else if (filter == "following") {
+      newData = following.filter((user) => {
+        const userData = `${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`;
+        const textData = text.toUpperCase();
+        return userData.indexOf(textData) > -1;
+      });
     }
+
+    this.setState({ searchResults: newData });
   };
 
   renderHeader = () => {
