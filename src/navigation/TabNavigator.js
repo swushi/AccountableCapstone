@@ -21,21 +21,21 @@ export default function TabNavigator() {
           if (route.name === "Main") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Messages") {
-            iconName = focused ? "message" : "message-outline";
+            iconName = focused ? "account-group" : "account-group-outline";
           } else if (route.name === "Profile") {
-            iconName = focused ? "account" : "account-outline";
+            iconName = focused ? "settings" : "settings-outline";
           }
 
           // You can return any component that you like here!
           return (
             <MaterialCommunityIcons name={iconName} size={size} color={color} />
           );
-        }
+        },
       })}
       tabBarOptions={{
         activeTintColor: Colors.primary,
         inactiveTintColor: Colors.inactive,
-        showLabel: false
+        showLabel: false,
       }}
     >
       <Tab.Screen name="Main" component={MainStack} />

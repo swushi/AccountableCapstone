@@ -11,7 +11,7 @@ export interface DateTimePickerModalProps {
 
 class DateTimePickerModal extends PureComponent<DateTimePickerModalProps, any> {
   state = {
-    modalHeight: 0
+    modalHeight: 0,
   };
   modal = null;
 
@@ -32,12 +32,19 @@ class DateTimePickerModal extends PureComponent<DateTimePickerModalProps, any> {
         <Animatable.View
           animation="fadeInUpBig"
           duration={500}
-          style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
+          style={{
+            zIndex: 1,
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: Colors.background,
+          }}
           useNativeDriver={true}
-          ref={ref => (this.modal = ref)}
-          onLayout={e =>
+          ref={(ref) => (this.modal = ref)}
+          onLayout={(e) =>
             this.setState({
-              modalHeight: e.nativeEvent.layout.y
+              modalHeight: e.nativeEvent.layout.y,
             })
           }
         >
@@ -47,7 +54,7 @@ class DateTimePickerModal extends PureComponent<DateTimePickerModalProps, any> {
               padding: Layout.padding,
               flexDirection: "row",
               justifyContent: "flex-end",
-              backgroundColor: Colors.primary
+              backgroundColor: Colors.primary,
             }}
           >
             <TouchableOpacity onPress={() => this.slide("down")}>

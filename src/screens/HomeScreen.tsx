@@ -4,12 +4,15 @@ import {
   StyleSheet,
   Text,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
+import * as firebase from "../firebase";
 import * as Animatable from "react-native-animatable";
 import { Header, HabitButton } from "../components";
 import { Layout, Colors } from "../config";
+import { ProgressCircle } from "react-native-svg-charts";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Habit } from "../types";
 const AnimatableTouchable = Animatable.createAnimatableComponent(
   TouchableOpacity
 );
@@ -18,14 +21,23 @@ export interface HomeScreenProps {
   navigation: any;
 }
 
-class HomeScreen extends React.Component<HomeScreenProps, any> {
+export interface HomeScreenState {
+  habits: Habit[];
+  createWidth: number;
+  breakWidth: number;
+  createHeight: number;
+  breakHeight: number;
+  animated: boolean;
+}
+
+class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   state = {
-    habits: HABITS,
+    habits: [],
     createWidth: 0,
     breakWidth: 100,
     createHeight: 0,
     breakHeight: 0,
-    animated: false
+    animated: false,
   };
   contentRef = null;
   createRef = null;
@@ -49,17 +61,17 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
     this.contentRef.transitionTo({ opacity: 0.5 }, 500);
     this.fabRef.transitionTo(
       {
-        rotate: "45deg"
+        rotate: "45deg",
       },
       500
     );
     this.createRef.transitionTo({
-      transform: [{ translateX: -createWidth * 2.2 }]
+      transform: [{ translateX: -createWidth * 2.2 }],
     });
     setTimeout(
       () =>
         this.breakRef.transitionTo({
-          transform: [{ translateX: -breakWidth * 2.2 }]
+          transform: [{ translateX: -breakWidth * 2.2 }],
         }),
       100
     );
@@ -71,38 +83,72 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
     this.contentRef.transitionTo({ opacity: 1 }, 500);
     this.fabRef.transitionTo(
       {
-        rotate: "0deg"
+        rotate: "0deg",
       },
       500
     );
     this.createRef.transitionTo({
-      transform: [{ translateX: 0 }]
+      transform: [{ translateX: 0 }],
     });
     setTimeout(
       () =>
         this.breakRef.transitionTo({
-          transform: [{ translateX: 0 }]
+          transform: [{ translateX: 0 }],
         }),
       100
     );
   }
 
+  async getHabitList() {
+    let habitsArray = [];
+    const habits = await firebase.getHabits(firebase.uid());
+    habits.forEach((habit) => {
+      habitsArray.push({ ...habit.data(), habitId: habit.id });
+    });
+
+    this.setState({ habits: habitsArray });
+  }
+
+  componentDidMount() {
+    this.getHabitList();
+  }
+
   render() {
     const { habits, breakWidth, animated } = this.state;
+    const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
         <Animatable.View
-          ref={ref => (this.contentRef = ref)}
+          ref={(ref) => (this.contentRef = ref)}
           style={{ ...styles.contentContainer }}
           pointerEvents={animated ? "none" : "auto"}
         >
           <Header hideBack />
-          <View style={styles.progressCircleContainer}></View>
+
+          <View>
+            <ProgressCircle
+              style={styles.progressCircleContainer}
+              progress={0.7} // TODO: get this from habit streaks
+              startAngle={-Math.PI * 0.8}
+              endAngle={Math.PI * 0.8}
+              strokeWidth={15}
+              progressColor={Colors.primary} // TODO: progress < 70% make orange, progress > 70% make green, progress < 50% make red
+            />
+            <View style={styles.progressPercentage}>
+              <Text style={styles.percentageText}>70%</Text>
+              <Text style={styles.percentageLabel}>Consistency</Text>
+            </View>
+          </View>
           <Text style={styles.currentHabitsText}>Current Habits</Text>
           <FlatList
             data={habits}
-            keyExtractor={item => item.name}
-            renderItem={({ item }) => <HabitButton data={item} />}
+            keyExtractor={(item) => item.habitId}
+            renderItem={({ item }) => (
+              <HabitButton
+                data={item}
+                onPress={() => navigate("Habit", item)}
+              />
+            )}
           />
         </Animatable.View>
         <TouchableOpacity
@@ -110,7 +156,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
           onPress={() => this.handleFab()}
         >
           <Animatable.View
-            ref={ref => (this.fabRef = ref)}
+            ref={(ref) => (this.fabRef = ref)}
             useNativeDriver
             style={{ transform: [{ rotate: "0deg" }] }}
           >
@@ -125,7 +171,7 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
           style={{
             right: -breakWidth * 2,
             bottom: 65,
-            ...styles.actionOptionsContainer
+            ...styles.actionOptionsContainer,
           }}
         >
           <AnimatableTouchable
@@ -134,31 +180,31 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
             onLayout={({ nativeEvent }) =>
               this.setState({
                 breakWidth: nativeEvent.layout.width,
-                breakHeight: nativeEvent.layout.height
+                breakHeight: nativeEvent.layout.height,
               })
             }
-            ref={ref => (this.createRef = ref)}
+            ref={(ref) => (this.createRef = ref)}
             style={{
               ...styles.actionOptionContainer,
-              borderColor: Colors.good
+              borderColor: Colors.good,
             }}
           >
             <MaterialCommunityIcons name="check" color="#fff" size={25} />
             <Text style={styles.actionText}>Custom Habit</Text>
           </AnimatableTouchable>
           <AnimatableTouchable
-            onPress={() => this.handleAction('PresetHabit')}
+            onPress={() => this.handleAction("PresetHabit")}
             useNativeDriver
             onLayout={({ nativeEvent }) =>
               this.setState({
                 createWidth: nativeEvent.layout.width,
-                createHeight: nativeEvent.layout.height
+                createHeight: nativeEvent.layout.height,
               })
             }
-            ref={ref => (this.breakRef = ref)}
+            ref={(ref) => (this.breakRef = ref)}
             style={{
               ...styles.actionOptionContainer,
-              borderColor: Colors.bad
+              borderColor: Colors.bad,
             }}
           >
             <MaterialCommunityIcons name="close" color="#fff" size={25} />
@@ -172,10 +218,11 @@ class HomeScreen extends React.Component<HomeScreenProps, any> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: Colors.background,
   },
   contentContainer: {
-    flex: 1
+    flex: 1,
   },
   progressCircleContainer: {
     height: Layout.height * 0.23,
@@ -183,24 +230,36 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     alignSelf: "center",
     margin: Layout.padding,
-
-    // temp
-    backgroundColor: Colors.primary
+    backgroundColor: Colors.background,
+  },
+  progressPercentage: {
+    position: "absolute",
+    alignSelf: "center",
+    fontSize: 25,
+    top: Layout.padding + (Layout.height * 0.14) / 2,
+  },
+  percentageText: {
+    alignSelf: "center",
+    fontSize: 30,
+  },
+  percentageLabel: {
+    alignSelf: "center",
+    fontSize: 15,
   },
   currentHabitsText: {
     fontFamily: "Roboto-Regular",
     alignSelf: "center",
     fontSize: 30,
     color: Colors.textPrimary,
-    padding: Layout.padding
+    padding: Layout.padding,
   },
   floatingActionButtonContainer: {
     position: "absolute",
     bottom: 15,
-    right: 15
+    right: 15,
   },
   actionOptionsContainer: {
-    position: "absolute"
+    position: "absolute",
   },
   actionOptionContainer: {
     flexDirection: "row",
@@ -209,14 +268,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     borderRadius: Layout.roundness,
-    marginBottom: 5
+    marginBottom: 5,
   },
   actionText: {
     fontSize: 20,
     paddingLeft: 5,
     fontFamily: "Roboto-Regular",
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 });
 
 export default HomeScreen;
@@ -224,14 +283,14 @@ export default HomeScreen;
 const HABITS = [
   {
     name: "Gym",
-    streak: 8
+    streak: 8,
   },
   {
     name: "Smoking",
-    streak: 33
+    streak: 33,
   },
   {
     name: "Games",
-    streak: 176
-  }
+    streak: 176,
+  },
 ];

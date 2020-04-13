@@ -6,14 +6,22 @@ import { Layout, Colors } from "../config";
 
 export interface SearchItemProps {
   user: User;
-  isFriend: boolean;
+  isFollowing: boolean;
+  selecting: boolean;
   onPress: Function;
 }
 
 class SearchItem extends Component<SearchItemProps, any> {
+  shouldComponentUpdate(prevProps) {
+    if (prevProps.user === this.props.user) {
+      return false;
+    }
+    return true;
+  }
+
   render() {
     const { fullName, avatar } = this.props.user;
-    const { isFriend, onPress } = this.props;
+    const { isFollowing, onPress, selecting } = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.leftSideContainer}>
@@ -29,21 +37,40 @@ class SearchItem extends Component<SearchItemProps, any> {
           </View>
           <Text style={styles.name}>{fullName}</Text>
         </View>
-        {isFriend ? (
-          <Text>friends</Text>
-        ) : (
+        {isFollowing ? (
+          <TouchableOpacity
+            style={styles.rightSideContainer}
+            onPress={() => onPress()}
+          >
+            <MaterialCommunityIcons
+              name={"message"}
+              size={18}
+              color={Colors.secondary}
+            />
+            <Text style={styles.addFriendText}>Chat</Text>
+          </TouchableOpacity>
+        ) : null}
+        {selecting ? (
+          <TouchableOpacity
+            style={styles.rightSideContainer}
+            onPress={() => onPress()}
+          >
+            <Text style={styles.addFriendText}>Select</Text>
+          </TouchableOpacity>
+        ) : null}
+        {!selecting && !isFollowing ? (
           <TouchableOpacity
             style={styles.rightSideContainer}
             onPress={() => onPress()}
           >
             <MaterialCommunityIcons
               name={"plus"}
-              size={30}
-              color={Colors.primary}
+              size={18}
+              color={Colors.secondary}
             />
             <Text style={styles.addFriendText}>Follow</Text>
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
     );
   }
@@ -56,9 +83,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
-    marginTop: Layout.padding,
     borderRadius: Layout.roundness,
-    ...Colors.shadow,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.offWhite,
   },
   leftSideContainer: {
     flexDirection: "row",
@@ -67,23 +94,30 @@ const styles = StyleSheet.create({
   avatarContainer: {
     height: 50,
     width: 50,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
     overflow: "hidden",
     borderRadius: 100,
     marginRight: Layout.padding,
   },
   name: {
     fontFamily: "Roboto-Regular",
-    fontSize: 20,
-    color: Colors.secondary,
+    fontSize: 18,
+    color: Colors.textPrimary,
   },
   rightSideContainer: {
+    borderRadius: 3,
+    borderColor: Colors.secondary,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
   },
   addFriendText: {
     fontFamily: "Roboto-Regular",
     color: Colors.secondary,
+    paddingLeft: 5,
   },
 });
 
