@@ -69,10 +69,10 @@ class MessagesScreen extends React.Component<
           followers,
           following,
         },
-        () => this.setState({ loading: false })
+        () => setTimeout(() => this.setState({ loading: false }), 200)
       );
     } catch (err) {
-      console.log(err);
+      console.log("fetch users err", err);
     }
   }
 
