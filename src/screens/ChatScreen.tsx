@@ -1,13 +1,16 @@
 import React, { Component } from "react";
 import {
-  Text,
+  Image,
   View,
   StyleSheet,
   FlatList,
   TextInput,
   KeyboardAvoidingView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { connect } from "react-redux";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header, ChatMessage } from "../components";
 import { Layout, Colors } from "../config";
 import * as firebase from "../firebase";
@@ -20,20 +23,28 @@ interface Props {
 }
 interface State {
   input: string;
-  chat: Chat;
+  chat: Chat | Object;
+  sending: Boolean;
 }
 
 class ChatScreen extends Component<Props, State> {
   state = {
-    chat: {},
+    chat: { messages: [] },
     input: "",
+    sending: false,
   };
+  inputRef = null;
+  chatRef = null;
   listener: () => void;
 
   async componentDidMount() {
     // destructure
     const { route, user } = this.props;
     const friend: User = route.params.user;
+
+    [user.avatar, friend.avatar].forEach(async (image) => {
+      await Image.prefetch(image);
+    });
 
     try {
       // get chat from db
@@ -53,9 +64,18 @@ class ChatScreen extends Component<Props, State> {
 
   async sendMessageAsync() {
     // destructure
-    const { chat, input } = this.state;
+    const { input } = this.state;
     const { route, user } = this.props;
     const friend: User = route.params.user;
+
+    // if message is empty, abort
+    if (input.length === 0) return;
+
+    // clear input
+    this.inputRef.clear();
+
+    // set loading state
+    this.setState({ sending: true });
 
     // create chat obj
     const message: Message = {
@@ -67,7 +87,9 @@ class ChatScreen extends Component<Props, State> {
     // send message
     try {
       await firebase.sendMessage(message, user.uid, friend.uid);
+      this.setState({ sending: false });
     } catch (err) {
+      this.setState({ sending: false });
       console.log("send message err", err);
     }
   }
@@ -75,7 +97,7 @@ class ChatScreen extends Component<Props, State> {
   render() {
     const friend: User = this.props.route.params.user;
     const { user } = this.props;
-    const { chat, input } = this.state;
+    const { chat, input, sending } = this.state;
     return (
       <View style={styles.container}>
         <Header chatHeader={friend.fullName} />
@@ -84,24 +106,42 @@ class ChatScreen extends Component<Props, State> {
           behavior="padding"
         >
           <FlatList
+            ref={(ref) => (this.chatRef = ref)}
             style={{ flex: 1 }}
             data={chat.messages}
-            renderItem={({ item }) => (
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => (
               <ChatMessage
                 sender={item.uid === user.uid}
                 message={item}
                 image={item.uid === user.uid ? user.avatar : friend.avatar}
+                style={{
+                  marginBottom:
+                    index === chat.messages.length - 1 ? Layout.padding : 0,
+                }}
               />
             )}
           />
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={{ flex: 1 }}
+              ref={(ref) => (this.inputRef = ref)}
               placeholder="Send a message"
               value={input}
               onChangeText={(text) => this.setState({ input: text })}
-              onSubmitEditing={() => this.sendMessageAsync()}
+              onFocus={() => setTimeout(() => this.chatRef.scrollToEnd(), 100)}
             />
+            {!sending ? (
+              <TouchableOpacity onPress={() => this.sendMessageAsync()}>
+                <MaterialCommunityIcons
+                  name="send"
+                  size={20}
+                  color={Colors.primary}
+                />
+              </TouchableOpacity>
+            ) : (
+              <ActivityIndicator />
+            )}
           </View>
         </KeyboardAvoidingView>
       </View>
@@ -115,8 +155,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: Layout.padding,
+    paddingHorizontal: Layout.padding,
     backgroundColor: Colors.background,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    paddingVertical: Layout.padding / 2,
+    paddingHorizontal: Layout.padding,
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: Layout.roundness,
+    marginBottom: Layout.padding,
   },
 });
 
