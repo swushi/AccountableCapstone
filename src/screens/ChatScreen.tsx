@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { connect } from "react-redux";
-import { Header } from "../components";
+import { Header, ChatMessage } from "../components";
 import { Layout, Colors } from "../config";
 import * as firebase from "../firebase";
 import { User, Chat, Message } from "../types";
@@ -20,12 +20,12 @@ interface Props {
 }
 interface State {
   input: string;
-  messages: Message[];
+  chat: Chat;
 }
 
 class ChatScreen extends Component<Props, State> {
   state = {
-    messages: [],
+    chat: {},
     input: "",
   };
   listener: () => void;
@@ -40,7 +40,7 @@ class ChatScreen extends Component<Props, State> {
       this.listener = await firebase.getChat(
         user.uid,
         friend.uid,
-        (messages: Message[]) => this.setState({ messages })
+        (chat: Chat) => this.setState({ chat })
       );
     } catch (err) {
       console.log("chat fetch err", err);
@@ -53,7 +53,7 @@ class ChatScreen extends Component<Props, State> {
 
   async sendMessageAsync() {
     // destructure
-    const { messages, input } = this.state;
+    const { chat, input } = this.state;
     const { route, user } = this.props;
     const friend: User = route.params.user;
 
@@ -74,7 +74,8 @@ class ChatScreen extends Component<Props, State> {
 
   render() {
     const friend: User = this.props.route.params.user;
-    const { messages, input } = this.state;
+    const { user } = this.props;
+    const { chat, input } = this.state;
     return (
       <View style={styles.container}>
         <Header chatHeader={friend.fullName} />
@@ -82,11 +83,16 @@ class ChatScreen extends Component<Props, State> {
           style={styles.contentContainer}
           behavior="padding"
         >
-          <Text>where they at</Text>
           <FlatList
             style={{ flex: 1 }}
-            data={messages}
-            renderItem={({ item }) => <Text>{item.content}</Text>}
+            data={chat.messages}
+            renderItem={({ item }) => (
+              <ChatMessage
+                sender={item.uid === user.uid}
+                message={item}
+                image={item.uid === user.uid ? user.avatar : friend.avatar}
+              />
+            )}
           />
           <View style={styles.inputContainer}>
             <TextInput

@@ -202,7 +202,7 @@ export const getChat = async (
     if (!chat) {
       await initChat(userId, friendId);
     } else {
-      callback(chat.messages);
+      callback(chat);
     }
   });
 
