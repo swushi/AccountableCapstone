@@ -1,7 +1,7 @@
 import * as firebase from "firebase";
 import "firebase/firestore";
 import { FirebaseConfig } from "../config";
-import { User, UserID, Habit } from "../types";
+import { User, UserID, Habit, Chat, Message } from "../types";
 
 /**
  * Creates and initializes a Firebase instance.
@@ -182,7 +182,11 @@ export const storeUserAvatarInDB = (url: string) =>
  * @param user current user obj
  * @param friend other user obj
  */
-export const getChat = (userId: UserID, friendId: UserID) => {
+export const getChat = async (
+  userId: UserID,
+  friendId: UserID,
+  callback: Function
+) => {
   let chatId;
   if (userId < friendId) {
     chatId = userId + friendId;
@@ -190,5 +194,62 @@ export const getChat = (userId: UserID, friendId: UserID) => {
     chatId = friendId + userId;
   }
 
-  return firebase.firestore().collection("chats").doc(chatId);
+  const chatRef = await firebase.firestore().collection("chats").doc(chatId);
+
+  const listener = chatRef.onSnapshot(async (doc) => {
+    // @ts-ignore
+    const chat: Chat = doc.data();
+    if (!chat) {
+      await initChat(userId, friendId);
+    } else {
+      callback(chat.messages);
+    }
+  });
+
+  return listener;
+};
+
+export const initChat = async (userId: UserID, friendId: UserID) => {
+  let chatId;
+  if (userId < friendId) {
+    chatId = userId + friendId;
+  } else {
+    chatId = friendId + userId;
+  }
+
+  const chatRef = firebase.firestore().collection("chats").doc(chatId);
+
+  const chat: Chat = {
+    createdAt: Date.now(),
+    chatId,
+    members: [userId, friendId],
+  };
+
+  await chatRef.set(chat);
+};
+
+export const sendMessage = async (
+  message: Message,
+  userId: UserID,
+  friendId: UserID
+) => {
+  let chatId;
+  if (userId < friendId) {
+    chatId = userId + friendId;
+  } else {
+    chatId = friendId + userId;
+  }
+
+  const chatRef = firebase.firestore().collection("chats").doc(chatId);
+  const snap = await chatRef.get();
+  // @ts-ignore
+  const chat: Chat = snap.data();
+
+  if (chat.messages) {
+    chat.messages = [...chat.messages, message];
+  } else {
+    chat.messages = [message];
+  }
+
+  await chatRef.update(chat);
 };

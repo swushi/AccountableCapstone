@@ -1,4 +1,5 @@
 export type UserID = string;
+export type ChatID = string; // userid < friendId
 export type ReminderID = string;
 export type HabitID = string;
 export type ExpoPushToken = string;
@@ -72,8 +73,15 @@ export type Stats = {
   timesBroken: number;
 };
 
-export type Chat = {
+export type Message = {
   content: string;
   uid: UserID;
-  createdAt: Date;
+  createdAt: Number;
+};
+
+export type Chat = {
+  createdAt: Number;
+  chatId: ChatID;
+  members: UserID[];
+  messages?: Message[];
 };

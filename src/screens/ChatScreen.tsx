@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 import { Header } from "../components";
 import { Layout, Colors } from "../config";
 import * as firebase from "../firebase";
-import { User, Chat } from "../types";
+import { User, Chat, Message } from "../types";
 
 interface Props {
   navigation: any;
@@ -20,7 +20,7 @@ interface Props {
 }
 interface State {
   input: string;
-  messages: Chat[];
+  messages: Message[];
 }
 
 class ChatScreen extends Component<Props, State> {
@@ -28,21 +28,48 @@ class ChatScreen extends Component<Props, State> {
     messages: [],
     input: "",
   };
+  listener: () => void;
 
   async componentDidMount() {
     // destructure
     const { route, user } = this.props;
     const friend: User = route.params.user;
 
-    // get chat from db
-    let chatRef = firebase.getChat(user.uid, friend.uid);
+    try {
+      // get chat from db
+      this.listener = await firebase.getChat(
+        user.uid,
+        friend.uid,
+        (messages: Message[]) => this.setState({ messages })
+      );
+    } catch (err) {
+      console.log("chat fetch err", err);
+    }
+  }
 
-    // store chats in state
-    // let messages = [];
-    // chat.forEach((message) => {
-    //   messages.push(message.data());
-    // });
-    // this.setState({ messages });
+  componentWillUnmount() {
+    this.listener();
+  }
+
+  async sendMessageAsync() {
+    // destructure
+    const { messages, input } = this.state;
+    const { route, user } = this.props;
+    const friend: User = route.params.user;
+
+    // create chat obj
+    const message: Message = {
+      content: input,
+      createdAt: Date.now(),
+      uid: firebase.uid(),
+    };
+
+    // send message
+    try {
+      await firebase.sendMessage(message, user.uid, friend.uid);
+    } catch (err) {
+      console.log("send message err", err);
+    }
   }
 
   render() {
@@ -55,10 +82,11 @@ class ChatScreen extends Component<Props, State> {
           style={styles.contentContainer}
           behavior="padding"
         >
+          <Text>where they at</Text>
           <FlatList
             style={{ flex: 1 }}
             data={messages}
-            renderItem={({ item }) => <Text>{item.body}</Text>}
+            renderItem={({ item }) => <Text>{item.content}</Text>}
           />
           <View style={styles.inputContainer}>
             <TextInput
@@ -66,6 +94,7 @@ class ChatScreen extends Component<Props, State> {
               placeholder="Send a message"
               value={input}
               onChangeText={(text) => this.setState({ input: text })}
+              onSubmitEditing={() => this.sendMessageAsync()}
             />
           </View>
         </KeyboardAvoidingView>
