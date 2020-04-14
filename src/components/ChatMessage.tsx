@@ -13,15 +13,18 @@ import { Message } from "../types";
 interface Props {
   sender: Boolean;
   message: Message;
-  image?: string;
   style?: ViewStyle;
 }
 
 const IMAGE_HEIGHT = Layout.height * 0.035;
 
 class ChatMessage extends Component<Props, any> {
+  shouldComponentUpdate(nextProps) {
+    return this.props.message === nextProps.message;
+  }
+
   render() {
-    const { sender, message, image, style } = this.props;
+    const { sender, message, style } = this.props;
     return (
       <View
         style={{

@@ -42,16 +42,15 @@ class ChatScreen extends Component<Props, State> {
     const { route, user } = this.props;
     const friend: User = route.params.user;
 
-    [user.avatar, friend.avatar].forEach(async (image) => {
-      await Image.prefetch(image);
-    });
-
     try {
       // get chat from db
       this.listener = await firebase.getChat(
         user.uid,
         friend.uid,
-        (chat: Chat) => this.setState({ chat })
+        (chat: Chat) => {
+          this.setState({ chat });
+          setTimeout(() => this.chatRef.scrollToEnd(), 200);
+        }
       );
     } catch (err) {
       console.log("chat fetch err", err);
@@ -59,6 +58,7 @@ class ChatScreen extends Component<Props, State> {
   }
 
   componentWillUnmount() {
+    // detach database listener
     this.listener();
   }
 
@@ -114,7 +114,6 @@ class ChatScreen extends Component<Props, State> {
               <ChatMessage
                 sender={item.uid === user.uid}
                 message={item}
-                image={item.uid === user.uid ? user.avatar : friend.avatar}
                 style={{
                   marginBottom:
                     index === chat.messages.length - 1 ? Layout.padding : 0,
