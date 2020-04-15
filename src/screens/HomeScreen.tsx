@@ -39,6 +39,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
     breakHeight: 0,
     animated: false,
   };
+  habitListener = null;
   contentRef = null;
   createRef = null;
   breakRef = null;
@@ -100,17 +101,15 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   }
 
   async getHabitList() {
-    let habitsArray = [];
-    const habits = await firebase.getHabits(firebase.uid());
-    habits.forEach((habit) => {
-      habitsArray.push({ ...habit.data(), habitId: habit.id });
-    });
-
-    this.setState({ habits: habitsArray });
+    this.habitListener = await firebase.getHabits(firebase.uid(), habits => this.setState({habits}));
   }
 
   componentDidMount() {
     this.getHabitList();
+  }
+
+  componentWillUnmount() {
+    this.habitListener();
   }
 
   render() {

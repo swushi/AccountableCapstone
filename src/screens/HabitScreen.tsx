@@ -13,13 +13,8 @@ interface Props {
 interface State {}
 
 class HabitScreen extends Component<Props, State> {
-  componentDidMount() {
-    // all params passed in 'this.props.route.params'
-    const { route } = this.props;
-  }
-
-  render() {
-    const data = [
+  state = {
+    chartData: [
       { value: 1, label: "Sun", svg: { fill: "green", stroke: "green" } },
       { value: 1, label: "Mon", svg: { fill: "green", stroke: "green" } },
       { value: 0.1, label: "Tue", svg: { fill: "red", stroke: "red" } },
@@ -27,7 +22,49 @@ class HabitScreen extends Component<Props, State> {
       { value: 0.1, label: "Thu", svg: { fill: "red", stroke: "red" } },
       { value: 0.1, label: "Fri", svg: { fill: "red", stroke: "red" } },
       { value: 0.1, label: "Sat", svg: { fill: "red", stroke: "red" } },
-    ];
+    ],
+    showCompletionPrompt: true
+  }
+  days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
+  componentDidMount() {
+    // all params passed in 'this.props.route.params'
+    const { route } = this.props;
+    this.getCurrentDayString();
+  }
+
+  getCurrentDayString() {
+    let today = new Date();
+    let currentDay = this.days[today.getDay()];
+    console.log(currentDay);
+    return currentDay;
+  }
+
+  getCurrentDayIndex() {
+    let today = new Date();
+    return today.getDay()
+  }
+
+  completeTask() {
+    const { chartData } = this.state;
+    const currentDay = this.getCurrentDayIndex();
+    let newChartData = this.state.chartData;
+    console.log(currentDay);
+    console.log(newChartData[currentDay].value);
+    newChartData[currentDay].value = 1;
+    newChartData[currentDay].svg.fill = "green";
+    newChartData[currentDay].svg.stroke = "green";
+    this.setState({
+      chartData: newChartData,
+      showCompletionPrompt: false
+    });
+    
+  }
+
+  // TODO: build chart data array for initial state
+
+  // TODO: have the days know if its been completed for that week in firebase
+
+  render() {
     const contentInset = { top: 10, bottom: 10 };
     return (
       <View style={styles.container}>
@@ -37,7 +74,7 @@ class HabitScreen extends Component<Props, State> {
           <View style={{ flex: 1 }}>
             <BarChart
               style={styles.chart}
-              data={data}
+              data={this.state.chartData}
               yAccessor={({ item }) => item.value}
               contentInset={contentInset}
               spacingInner={0}
@@ -48,20 +85,23 @@ class HabitScreen extends Component<Props, State> {
             ></BarChart>
             <XAxis
               style={{ marginTop: 5, marginHorizontal: 13 }}
-              data={data}
+              data={this.state.chartData}
               contentInset={{ left: 10, right: 10 }}
-              formatLabel={(value, index) => data[index].label}
+              formatLabel={(value, index) => this.state.chartData[index].label}
               svg={{ fontSize: 12, fill: "grey" }}
             />
           </View>
         </View>
-        <View style={styles.completedContainer}>
-          <Text>Has This Been Completed Today?</Text>
-          <TouchableOpacity style={styles.completedButton}>
-            <Text style={{ color: "green" }}>Yes</Text>
-            <MaterialCommunityIcons name="check" color="green" />
-          </TouchableOpacity>
-        </View>
+        {
+          this.state.showCompletionPrompt && 
+            <View style={styles.completedContainer}>
+              <Text>Has This Been Completed Today?</Text>
+              <TouchableOpacity style={styles.completedButton} onPress={() => this.completeTask()}>
+                <Text style={{ color: "green" }}>Yes</Text>
+                <MaterialCommunityIcons name="check" color="green" />
+              </TouchableOpacity>
+            </View>
+        }
       </View>
     );
   }
