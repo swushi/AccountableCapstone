@@ -127,14 +127,14 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
           <View>
             <ProgressCircle
               style={styles.progressCircleContainer}
-              progress={0.7} // TODO: get this from habit streaks
+              progress={1} // TODO: get this from habit streaks
               startAngle={-Math.PI * 0.8}
               endAngle={Math.PI * 0.8}
               strokeWidth={15}
               progressColor={Colors.primary} // TODO: progress < 70% make orange, progress > 70% make green, progress < 50% make red
             />
             <View style={styles.progressPercentage}>
-              <Text style={styles.percentageText}>70%</Text>
+              <Text style={styles.percentageText}>100%</Text>
               <Text style={styles.percentageLabel}>Consistency</Text>
             </View>
           </View>
