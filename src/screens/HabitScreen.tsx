@@ -5,12 +5,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   RecyclerViewBackedScrollView,
+  TouchableWithoutFeedback,
+  Modal,
+  ScrollView
 } from "react-native";
 import { BarChart, YAxis, XAxis, Grid } from "react-native-svg-charts";
 import { Header } from "../components";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { getHabits } from "../firebase";
+import { updateHabit } from "../firebase";
 
 interface Props {
   navigation: any;
@@ -25,6 +28,7 @@ class HabitScreen extends Component<Props, State> {
   state = {
     chartData: [],
     showCompletionPrompt: true,
+    showHelpModal: false,
   };
 
   async componentDidMount() {
@@ -92,20 +96,24 @@ class HabitScreen extends Component<Props, State> {
 
   completeTask() {
     const { chartData } = this.state;
+    const { habitId, reminders } = this.props.route.params;
+    console.log(reminders)
+
     const currentDay = this.getCurrentDayIndex();
     let newChartData = this.state.chartData;
     if (newChartData[currentDay].active) {
+      reminders[currentDay].completed = true;
       newChartData[currentDay].value = 1;
       newChartData[currentDay].svg.fill = "green";
       newChartData[currentDay].svg.stroke = "green";
       this.setState({
         chartData: newChartData,
         showCompletionPrompt: false,
+      }, () => {
+        updateHabit(habitId, {reminders})
       });
     }
   }
-
-  // TODO: build chart data array for initial state
 
   // TODO: have the days know if its been completed for that week in firebase
 
@@ -113,21 +121,57 @@ class HabitScreen extends Component<Props, State> {
 
   // TODO: Delete the habit
 
-  // TODO: Push completion to firebase
   render() {
     const contentInset = { top: 10, bottom: 10 };
     return (
       <View style={styles.container}>
         <Header />
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>This Week's Completion</Text>
+          <TouchableOpacity 
+            style={{position: 'absolute', right: 15, top: 15}} 
+            onPress={() => this.setState({showHelpModal: !this.state.showHelpModal})}
+          >
+            <MaterialCommunityIcons
+              size={22}
+              name="information-outline"
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
+          <Modal
+              animationType="fade"
+              transparent={true}
+              visible={this.state.showHelpModal}
+              onRequestClose={() => {
+                console.log('Modal has been closed.');
+              }}>
+              <TouchableOpacity 
+                style={{height: Layout.height}}
+                activeOpacity={1}
+                onPressOut={() => {
+                  this.setState({showHelpModal: false})
+                }}
+              >
+                  <TouchableWithoutFeedback>
+                    <View style={styles.modalContainer}>
+                      <Text style={{color: 'green'}}>Green = Complete</Text>
+                      <Text style={{color: 'red'}}>Red = Incomplete</Text>
+                      <Text style={{color: 'grey'}}>Grey = Not Active</Text>
+
+                      <TouchableOpacity
+                        style={styles.modalCloseButton}
+                        onPress={() => {
+                          this.setState({showHelpModal: false})
+                        }}>
+                        <Text style={{color: Colors.primary}}>Close</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </TouchableWithoutFeedback>
+              </TouchableOpacity>
+            </Modal>
+          <View style={styles.chartTitleContainer}>
+            <Text style={styles.chartTitle}>This Week's Completion</Text>
+          </View>
           <View style={{ flex: 1 }}>
-            <TouchableOpacity>
-              <MaterialCommunityIcons
-                name="information-outline"
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
             <BarChart
               style={styles.chart}
               data={this.state.chartData}
@@ -170,6 +214,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  modalContainer: {
+    padding: Layout.padding, 
+    backgroundColor: '#fff', 
+    height: Layout.height * 0.25, 
+    width: Layout.width * 0.4, 
+    top: Layout.height * 0.15, 
+    left: Layout.width * 0.46,
+    alignItems: 'center', 
+    ...Colors.shadow
+  },
+  modalCloseButton: {
+    paddingHorizontal: 2,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: Layout.roundness,
+  },
   chartContainer: {
     marginTop: 25,
     padding: 15,
@@ -179,6 +239,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderRadius: Layout.roundness,
     ...Colors.shadow,
+  },
+  chartTitleContainer: {
+    flexDirection: "row",
+    justifyContent: 'center'
   },
   chartTitle: {
     alignSelf: "center",
