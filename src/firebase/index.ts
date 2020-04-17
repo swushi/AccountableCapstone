@@ -1,7 +1,7 @@
 import * as firebase from "firebase";
 import "firebase/firestore";
 import { FirebaseConfig } from "../config";
-import { User, UserID, Habit, Chat, Message } from "../types";
+import { User, UserID, Habit, Chat, Message, ExpoPushToken } from "../types";
 
 /**
  * Creates and initializes a Firebase instance.
@@ -35,6 +35,9 @@ export const signOut = () => firebase.auth().signOut();
  * Get users id
  */
 export const uid = () => firebase.auth().currentUser.uid;
+
+export const updatePushToken = (pushToken: ExpoPushToken) =>
+  firebase.firestore().collection("users").doc(uid()).update({ pushToken });
 
 /**
  * Creates a new user in the database at location ref(`/users/${user.uid}`).
