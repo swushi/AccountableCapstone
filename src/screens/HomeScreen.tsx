@@ -101,7 +101,9 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   }
 
   async getHabitList() {
-    this.habitListener = await firebase.getHabits(firebase.uid(), habits => this.setState({habits}));
+    this.habitListener = await firebase.getHabits(firebase.uid(), (habits) =>
+      this.setState({ habits })
+    );
   }
 
   componentDidMount() {
@@ -141,7 +143,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
           <Text style={styles.currentHabitsText}>Current Habits</Text>
           <FlatList
             data={habits}
-            keyExtractor={(item) => item.habitId}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <HabitButton
                 data={item}

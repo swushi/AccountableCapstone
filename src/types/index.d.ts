@@ -38,6 +38,7 @@ export type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 export type Reminder = {
   day: Day;
   active: Boolean;
+  completed: Boolean;
   time?: String; // 00:30 or 15:50
   localId?: String; // local notification id used for cancelling notification
 };

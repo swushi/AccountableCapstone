@@ -190,11 +190,10 @@ class MessagesScreen extends React.Component<
   };
 
   handleSearchItemIconPress(user: User) {
-    const { filter } = this.state;
     const { navigation } = this.props;
 
     // follow or chat with user
-    if (filter !== "following") {
+    if (!this.isFollowing(user.uid)) {
       this.addFriendAsync(user);
     } else {
       // navigate to chat screen
@@ -214,6 +213,16 @@ class MessagesScreen extends React.Component<
 
   changeFilter(filter: "following" | "followers" | "discover") {
     this.setState({ filter });
+  }
+
+  isFollowing(uid) {
+    const { following } = this.state;
+
+    const results = following.filter((item) => {
+      return item.uid === uid;
+    });
+
+    return results.length;
   }
 
   render() {
@@ -239,7 +248,12 @@ class MessagesScreen extends React.Component<
     if (loading) {
       return (
         <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: Colors.background,
+          }}
         >
           <ActivityIndicator />
         </View>
@@ -257,7 +271,7 @@ class MessagesScreen extends React.Component<
             <SearchItem
               user={item}
               onPress={() => this.handleSearchItemIconPress(item)}
-              isFollowing={filter === "following" ? true : false}
+              isFollowing={this.isFollowing(item.uid)}
             />
           )}
           ListHeaderComponent={this.renderHeader}

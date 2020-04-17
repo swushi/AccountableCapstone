@@ -22,7 +22,7 @@ interface Props {
 
 interface State {
   value: string;
-  searchResults: User[];
+  following: User[];
   loading: Boolean;
 }
 
@@ -31,7 +31,7 @@ class SelectAccountableScreen extends Component<Props, State> {
     super(props);
     this.state = {
       value: "",
-      searchResults: [],
+      following: [],
       loading: true,
     };
   }
@@ -45,12 +45,9 @@ class SelectAccountableScreen extends Component<Props, State> {
     const followingArray = [];
     try {
       const following = await firebase.getFollowing();
-      following.forEach((user) => {
-        followingArray.push(user.data());
-      });
 
       this.setState({
-        searchResults: followingArray,
+        following,
         loading: false,
       });
     } catch (err) {
@@ -59,59 +56,19 @@ class SelectAccountableScreen extends Component<Props, State> {
   }
 
   searchFilterFunction = async (text: string) => {
-    const { searchResults } = this.state;
+    const { following } = this.state;
 
-    text = text.trim();
-    const words = [];
-    text.split(" ").forEach((word) => {
-      words.push(word.charAt(0).toUpperCase() + word.slice(1));
+    following.filter((user) => {
+      const userData = `${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`;
+      const textData = text.toUpperCase();
+      return userData.indexOf(textData) > -1;
     });
-
-    text = words.join(" ");
-
-    this.setState({
-      value: text,
-    });
-
-    // if there is no space in the search
-    //  search firstName and lastName
-    //  push both values to array
-    // else there is a space
-    //  search fullName
-
-    try {
-      let tempSearchResults = [];
-      if (text != "") {
-        if (text.split(" ").length == 1) {
-          const firstNameResults = await firebase.searchUsers(
-            text,
-            "firstName",
-            "following"
-          );
-          firstNameResults.forEach((doc) => {
-            tempSearchResults.push(doc.data());
-          });
-        } else if (text.split(" ").length == 2) {
-          const fullNameResults = await firebase.searchUsers(
-            text,
-            "fullName",
-            "following"
-          );
-          fullNameResults.forEach((doc) => {
-            tempSearchResults.push(doc.data());
-          });
-        }
-      }
-      this.setState({ searchResults: tempSearchResults });
-    } catch (error) {
-      console.log("serach err", error);
-    }
   };
 
   handleSelect(user: User) {
     const { navigation, storeAccountable } = this.props;
-    // set selected accountable in redux
 
+    // set selected accountable in redux
     storeAccountable(user);
 
     // navigate back to screen
@@ -119,7 +76,7 @@ class SelectAccountableScreen extends Component<Props, State> {
   }
 
   renderHeader = () => {
-    const { value, searchResults } = this.state;
+    const { value, following } = this.state;
     return (
       <View>
         <View style={styles.inputContainer}>
@@ -143,14 +100,14 @@ class SelectAccountableScreen extends Component<Props, State> {
   };
 
   render() {
-    const { searchResults } = this.state;
+    const { following } = this.state;
     return (
       <View style={styles.container}>
         <Header hideBack />
 
         <FlatList
           style={{ paddingHorizontal: Layout.padding }}
-          data={searchResults}
+          data={following}
           renderItem={({ item }) => (
             <SearchItem
               user={item}

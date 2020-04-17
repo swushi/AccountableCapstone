@@ -166,13 +166,17 @@ export const createHabit = (habit: Habit) =>
  * @param uid
  */
 export const getHabits = (uid: UserID, callback: Function) =>
-  firebase.firestore().collection("habits").where("uid", "==", uid).onSnapshot(snapshot => {
-    let habits = []
-    snapshot.forEach(doc => {
-      habits.push(doc.data())
-    })
-    callback(habits);
-  });
+  firebase
+    .firestore()
+    .collection("habits")
+    .where("uid", "==", uid)
+    .onSnapshot((snapshot) => {
+      let habits = [];
+      snapshot.forEach((doc) => {
+        habits.push({ ...doc.data(), habitId: doc.id });
+      });
+      callback(habits);
+    });
 
 export const getAvatarURL = () =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();

@@ -1,9 +1,16 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  RecyclerViewBackedScrollView,
+} from "react-native";
 import { BarChart, YAxis, XAxis, Grid } from "react-native-svg-charts";
 import { Header } from "../components";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { getHabits } from "../firebase";
 
 interface Props {
   navigation: any;
@@ -13,57 +20,100 @@ interface Props {
 interface State {}
 
 class HabitScreen extends Component<Props, State> {
+  days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+
   state = {
-    chartData: [
-      { value: 1, label: "Sun", svg: { fill: "green", stroke: "green" } },
-      { value: 1, label: "Mon", svg: { fill: "green", stroke: "green" } },
-      { value: 0.1, label: "Tue", svg: { fill: "red", stroke: "red" } },
-      { value: 0.1, label: "Wed", svg: { fill: "red", stroke: "red" } },
-      { value: 0.1, label: "Thu", svg: { fill: "red", stroke: "red" } },
-      { value: 0.1, label: "Fri", svg: { fill: "red", stroke: "red" } },
-      { value: 0.1, label: "Sat", svg: { fill: "red", stroke: "red" } },
-    ],
-    showCompletionPrompt: true
+    chartData: [],
+    showCompletionPrompt: true,
+  };
+
+  async componentDidMount() {
+    await this.buildChartData();
+    this.shouldShowCompletionPrompt();
   }
-  days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
-  componentDidMount() {
-    // all params passed in 'this.props.route.params'
-    const { route } = this.props;
-    this.getCurrentDayString();
+
+  buildChartData() {
+    const { reminders } = this.props.route.params;
+
+    const chartData = [];
+
+    reminders.forEach((reminder) => {
+      if (reminder.active) {
+        if (reminder.completed) {
+          chartData.push({
+            ...reminder,
+            value: 1,
+            label: reminder.day,
+            svg: { fill: "green", stroke: "green" },
+          });
+        } else {
+          chartData.push({
+            ...reminder,
+            value: 0.1,
+            label: reminder.day,
+            svg: { fill: "red", stroke: "red" },
+          });
+        }
+      } else {
+        chartData.push({
+          ...reminder,
+          value: 0.1,
+          label: reminder.day,
+          svg: { fill: "grey", stroke: "grey" },
+        });
+      }
+    });
+
+    return new Promise((resolve) => {
+      this.setState({ chartData }, () => resolve());
+    });
   }
 
   getCurrentDayString() {
     let today = new Date();
     let currentDay = this.days[today.getDay()];
-    console.log(currentDay);
     return currentDay;
   }
 
   getCurrentDayIndex() {
     let today = new Date();
-    return today.getDay()
+    return today.getDay();
+  }
+
+  shouldShowCompletionPrompt() {
+    const currentDay = this.getCurrentDayIndex();
+    if (
+      this.state.chartData[currentDay].completed ||
+      !this.state.chartData[currentDay].active
+    ) {
+      this.setState({ showCompletionPrompt: false });
+    }
   }
 
   completeTask() {
     const { chartData } = this.state;
     const currentDay = this.getCurrentDayIndex();
     let newChartData = this.state.chartData;
-    console.log(currentDay);
-    console.log(newChartData[currentDay].value);
-    newChartData[currentDay].value = 1;
-    newChartData[currentDay].svg.fill = "green";
-    newChartData[currentDay].svg.stroke = "green";
-    this.setState({
-      chartData: newChartData,
-      showCompletionPrompt: false
-    });
-    
+    if (newChartData[currentDay].active) {
+      newChartData[currentDay].value = 1;
+      newChartData[currentDay].svg.fill = "green";
+      newChartData[currentDay].svg.stroke = "green";
+      this.setState({
+        chartData: newChartData,
+        showCompletionPrompt: false,
+      });
+    }
   }
 
   // TODO: build chart data array for initial state
 
   // TODO: have the days know if its been completed for that week in firebase
 
+  // TODO: Edit the habit
+
+  // TODO: Delete the habit
+
+  // TODO: Push completion to firebase
   render() {
     const contentInset = { top: 10, bottom: 10 };
     return (
@@ -72,6 +122,12 @@ class HabitScreen extends Component<Props, State> {
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>This Week's Completion</Text>
           <View style={{ flex: 1 }}>
+            <TouchableOpacity>
+              <MaterialCommunityIcons
+                name="information-outline"
+                color={Colors.primary}
+              />
+            </TouchableOpacity>
             <BarChart
               style={styles.chart}
               data={this.state.chartData}
@@ -92,16 +148,18 @@ class HabitScreen extends Component<Props, State> {
             />
           </View>
         </View>
-        {
-          this.state.showCompletionPrompt && 
-            <View style={styles.completedContainer}>
-              <Text>Has This Been Completed Today?</Text>
-              <TouchableOpacity style={styles.completedButton} onPress={() => this.completeTask()}>
-                <Text style={{ color: "green" }}>Yes</Text>
-                <MaterialCommunityIcons name="check" color="green" />
-              </TouchableOpacity>
-            </View>
-        }
+        {this.state.showCompletionPrompt && (
+          <View style={styles.completedContainer}>
+            <Text>Has This Been Completed Today?</Text>
+            <TouchableOpacity
+              style={styles.completedButton}
+              onPress={() => this.completeTask()}
+            >
+              <Text style={{ color: "green" }}>Yes</Text>
+              <MaterialCommunityIcons name="check" color="green" />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   }

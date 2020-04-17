@@ -49,7 +49,6 @@ class ChatScreen extends Component<Props, State> {
         friend.uid,
         (chat: Chat) => {
           this.setState({ chat });
-          setTimeout(() => this.chatRef.scrollToEnd(), 200);
         }
       );
     } catch (err) {
@@ -109,6 +108,7 @@ class ChatScreen extends Component<Props, State> {
             ref={(ref) => (this.chatRef = ref)}
             style={{ flex: 1 }}
             data={chat.messages}
+            onContentSizeChange={() => this.chatRef.scrollToEnd()}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => (
               <ChatMessage

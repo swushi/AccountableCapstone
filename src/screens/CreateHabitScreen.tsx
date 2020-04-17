@@ -8,6 +8,7 @@ import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import * as firebase from "../firebase";
 import { User, Habit, Reminder, ExpoLocalNotification } from "../types";
+import * as actions from "../redux/actions";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
@@ -15,6 +16,7 @@ export interface CreateHabitScreenProps {
   user: User;
   accountable: User;
   navigation: any;
+  storeAccountable: Function;
 }
 
 export interface CreateHabitScreenState {
@@ -22,7 +24,7 @@ export interface CreateHabitScreenState {
   reminders: Array<Reminder>;
   showPicker: Boolean;
   chosenTime: Date | null;
-  habitType: "Create" | "Break";
+  habitType: String;
 }
 
 class CreateHabitScreen extends React.Component<
@@ -37,10 +39,14 @@ class CreateHabitScreen extends React.Component<
     habitType: "Create",
   };
   reminderRef = null;
+  accountableRef = null;
 
   componentDidUpdate() {
-    console.log("update");
-    console.log("accountable", this.props.accountable);
+    const { accountable } = this.props;
+
+    if (accountable) {
+      this.accountableRef.setValue(accountable.fullName);
+    }
   }
 
   handleFocus() {}
@@ -72,7 +78,7 @@ class CreateHabitScreen extends React.Component<
   async createHabit() {
     // destructure
     const { reminders, title, chosenTime, habitType } = this.state;
-    const { accountable, navigation } = this.props;
+    const { accountable, navigation, storeAccountable } = this.props;
 
     const uid = firebase.uid();
 
@@ -85,6 +91,9 @@ class CreateHabitScreen extends React.Component<
     // add times to reminders
     const newReminders = reminders;
     newReminders.map((reminder) => (reminder.time = remindTime));
+
+    //add completed to reminders
+    newReminders.map((reminder) => (reminder.completed = false));
 
     // create local notifications
     const notificationTitle = `Did you finish ${title} today?`;
@@ -136,6 +145,7 @@ class CreateHabitScreen extends React.Component<
     // generate habit object
     const habit: Habit = {
       uid,
+      // @ts-ignore
       type: habitType,
       active: true,
       title,
@@ -148,10 +158,12 @@ class CreateHabitScreen extends React.Component<
       // push habit to database
       await firebase.createHabit(habit);
 
-      // reset redux accountable
-
       // navigate home
       navigation.popToTop();
+
+      // reset redux accountable
+      // @ts-ignore
+      storeAccountable({});
     } catch (error) {
       console.warn(error);
     }
@@ -279,6 +291,7 @@ class CreateHabitScreen extends React.Component<
           <TouchableOpacity onPress={() => this.getAccountable()}>
             <View pointerEvents={"none"}>
               <TextField
+                ref={(ref) => (this.accountableRef = ref)}
                 value={this.props.accountable.fullName}
                 label="Add An Accountable (Optional)"
                 tintColor={Colors.secondary}
@@ -395,13 +408,13 @@ const styles = StyleSheet.create({
 });
 
 const REMINDERS: Array<Reminder> = [
-  { day: "Sun", active: false },
-  { day: "Mon", active: false },
-  { day: "Tue", active: false },
-  { day: "Wed", active: false },
-  { day: "Thu", active: false },
-  { day: "Fri", active: false },
-  { day: "Sat", active: false },
+  { day: "Sun", active: false, completed: false },
+  { day: "Mon", active: false, completed: false },
+  { day: "Tue", active: false, completed: false },
+  { day: "Wed", active: false, completed: false },
+  { day: "Thu", active: false, completed: false },
+  { day: "Fri", active: false, completed: false },
+  { day: "Sat", active: false, completed: false },
 ];
 
 const mapStateToProps = (state) => ({
@@ -409,4 +422,4 @@ const mapStateToProps = (state) => ({
   accountable: state.accountable,
 });
 
-export default connect(mapStateToProps)(CreateHabitScreen);
+export default connect(mapStateToProps, actions)(CreateHabitScreen);
