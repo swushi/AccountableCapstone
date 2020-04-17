@@ -15,14 +15,13 @@ exports.onMessageSend = functions.firestore
       const { uid } = message;
 
       const db = admin.firestore();
-      const snap = await admin.firestore().collection("users").doc(uid).get();
+      const snap = await db.collection("users").doc(uid).get();
       const user = snap.data();
       const { firstName, pushToken } = user;
 
       // Check that all your push tokens appear to be valid Expo push tokens
       if (!Expo.isExpoPushToken(pushToken)) {
-        // reject(Error("Not a valid ExpoPushToken"));
-        console.log("not a valie expopushtoken");
+        throw "Not a valid ExpoPushToken";
       }
 
       const body = `${firstName} sent you a message`;
@@ -39,10 +38,7 @@ exports.onMessageSend = functions.firestore
 
       // attempt to send notification
       await expo.sendPushNotificationsAsync(msg);
-
-      // resolve("Success");
     } catch (err) {
-      console.log("Send notification err", err);
-      // reject(err);
+      console.log(err);
     }
   });
