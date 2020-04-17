@@ -1,0 +1,262 @@
+[debug] [2020-04-17T04:06:00.453Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:06:00.457Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-04-17T04:06:00.457Z] CLI Version:   8.1.0
+[debug] [2020-04-17T04:06:00.457Z] Platform:      win32
+[debug] [2020-04-17T04:06:00.457Z] Node Version:  v12.16.1
+[debug] [2020-04-17T04:06:00.458Z] Time:          Thu Apr 16 2020 23:06:00 GMT-0500 (Central Daylight Time)
+[debug] [2020-04-17T04:06:00.459Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:06:00.459Z] 
+[debug] [2020-04-17T04:06:00.476Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-17T04:06:00.477Z] > authorizing via signed-in user
+[debug] [2020-04-17T04:06:00.477Z] [iam] checking project accountable-ba5c6 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-04-17T04:06:00.482Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2020-04-17T04:06:00.482Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2020-04-17T04:06:00.650Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:05:58 GMT","server":"scaffolding on HTTPServer2","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-17T04:06:00.658Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/accountable-ba5c6:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2020-04-17T04:06:00.857Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:05:58 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=103","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-17T04:06:00.859Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/accountable-ba5c6/serviceAccounts/accountable-ba5c6@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-04-17T04:06:01.205Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:05:58 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'accountable-ba5c6'...
+[info] 
+[info] i  deploying functions
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
+[info] +  functions: Finished running predeploy script.
+[debug] [2020-04-17T04:06:09.029Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "dependencies": {
+    "expo-server-sdk": "^3.5.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "firebase-functions-test": "^0.2.0"
+  },
+  "private": true
+}
+[debug] [2020-04-17T04:06:09.141Z] Error: ENOENT: no such file or directory, stat 'functions\package.json'
+    at Object.statSync (fs.js:932:3)
+    at Object.load (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\cjson\index.js:200:12)
+    at getRuntimeChoice (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\parseRuntimeAndValidateSDK.js:55:26)
+    at module.exports (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\prepare.js:26:29)
+    at _chain (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:22:40)
+    at C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:63:16
+    at processTicksAndRejections (internal/process/task_queues.js:97:5)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2020-04-17T04:06:33.261Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:06:33.265Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-04-17T04:06:33.265Z] CLI Version:   8.1.0
+[debug] [2020-04-17T04:06:33.265Z] Platform:      win32
+[debug] [2020-04-17T04:06:33.266Z] Node Version:  v12.16.1
+[debug] [2020-04-17T04:06:33.267Z] Time:          Thu Apr 16 2020 23:06:33 GMT-0500 (Central Daylight Time)
+[debug] [2020-04-17T04:06:33.267Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:06:33.267Z] 
+[debug] [2020-04-17T04:06:33.283Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-17T04:06:33.283Z] > authorizing via signed-in user
+[debug] [2020-04-17T04:06:33.284Z] [iam] checking project accountable-ba5c6 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-04-17T04:06:33.288Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/accountable-ba5c6:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2020-04-17T04:06:33.476Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:06:30 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=106","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-17T04:06:33.479Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/accountable-ba5c6/serviceAccounts/accountable-ba5c6@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-04-17T04:06:33.705Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:06:31 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'accountable-ba5c6'...
+[info] 
+[info] i  deploying functions
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
+[info] +  functions: Finished running predeploy script.
+[debug] [2020-04-17T04:06:40.951Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "dependencies": {
+    "expo-server-sdk": "^3.5.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "firebase-functions-test": "^0.2.0"
+  },
+  "private": true
+}
+[debug] [2020-04-17T04:06:41.059Z] Error: ENOENT: no such file or directory, stat 'functions\package.json'
+    at Object.statSync (fs.js:932:3)
+    at Object.load (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\cjson\index.js:200:12)
+    at getRuntimeChoice (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\parseRuntimeAndValidateSDK.js:55:26)
+    at module.exports (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\prepare.js:26:29)
+    at _chain (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:22:40)
+    at C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:63:16
+    at processTicksAndRejections (internal/process/task_queues.js:97:5)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2020-04-17T04:08:51.850Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:08:51.853Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-04-17T04:08:51.854Z] CLI Version:   8.1.0
+[debug] [2020-04-17T04:08:51.854Z] Platform:      win32
+[debug] [2020-04-17T04:08:51.854Z] Node Version:  v12.16.1
+[debug] [2020-04-17T04:08:51.855Z] Time:          Thu Apr 16 2020 23:08:51 GMT-0500 (Central Daylight Time)
+[debug] [2020-04-17T04:08:51.855Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:08:51.855Z] 
+[debug] [2020-04-17T04:08:51.869Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-17T04:08:51.870Z] > authorizing via signed-in user
+[debug] [2020-04-17T04:08:51.870Z] [iam] checking project accountable-ba5c6 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-04-17T04:08:51.874Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/accountable-ba5c6:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2020-04-17T04:08:52.071Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:08:49 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=117","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-17T04:08:52.073Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/accountable-ba5c6/serviceAccounts/accountable-ba5c6@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-04-17T04:08:52.299Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:08:49 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'accountable-ba5c6'...
+[info] 
+[info] i  deploying functions
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
+[info] +  functions: Finished running predeploy script.
+[debug] [2020-04-17T04:08:59.582Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "dependencies": {
+    "expo-server-sdk": "^3.5.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "firebase-functions-test": "^0.2.0"
+  },
+  "private": true
+}
+[debug] [2020-04-17T04:08:59.639Z] Error: ENOENT: no such file or directory, stat 'functions\package.json'
+    at Object.statSync (fs.js:932:3)
+    at Object.load (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\cjson\index.js:200:12)
+    at getRuntimeChoice (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\parseRuntimeAndValidateSDK.js:55:26)
+    at module.exports (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\prepare.js:26:29)
+    at _chain (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:22:40)
+    at C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:63:16
+    at processTicksAndRejections (internal/process/task_queues.js:97:5)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2020-04-17T04:09:28.681Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:09:28.684Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-04-17T04:09:28.685Z] CLI Version:   8.1.0
+[debug] [2020-04-17T04:09:28.685Z] Platform:      win32
+[debug] [2020-04-17T04:09:28.685Z] Node Version:  v12.16.1
+[debug] [2020-04-17T04:09:28.686Z] Time:          Thu Apr 16 2020 23:09:28 GMT-0500 (Central Daylight Time)
+[debug] [2020-04-17T04:09:28.686Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:09:28.686Z] 
+[debug] [2020-04-17T04:09:28.700Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-17T04:09:28.701Z] > authorizing via signed-in user
+[debug] [2020-04-17T04:09:28.701Z] [iam] checking project accountable-ba5c6 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-04-17T04:09:28.706Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/accountable-ba5c6:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2020-04-17T04:09:28.897Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:09:26 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=116","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-17T04:09:28.899Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/accountable-ba5c6/serviceAccounts/accountable-ba5c6@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-04-17T04:09:29.099Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:09:26 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'accountable-ba5c6'...
+[info] 
+[info] i  deploying functions
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
+[info] +  functions: Finished running predeploy script.
+[debug] [2020-04-17T04:09:36.332Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "dependencies": {
+    "expo-server-sdk": "^3.5.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "firebase-functions-test": "^0.2.0"
+  },
+  "private": true
+}
+[debug] [2020-04-17T04:09:36.391Z] Error: ENOENT: no such file or directory, stat 'functions\package.json'
+    at Object.statSync (fs.js:932:3)
+    at Object.load (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\node_modules\cjson\index.js:200:12)
+    at getRuntimeChoice (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\parseRuntimeAndValidateSDK.js:55:26)
+    at module.exports (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\prepare.js:26:29)
+    at _chain (C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:22:40)
+    at C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:63:16
+    at processTicksAndRejections (internal/process/task_queues.js:97:5)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2020-04-17T04:11:30.402Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:11:30.406Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\sja0128\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-04-17T04:11:30.406Z] CLI Version:   8.1.0
+[debug] [2020-04-17T04:11:30.406Z] Platform:      win32
+[debug] [2020-04-17T04:11:30.407Z] Node Version:  v12.16.1
+[debug] [2020-04-17T04:11:30.408Z] Time:          Thu Apr 16 2020 23:11:30 GMT-0500 (Central Daylight Time)
+[debug] [2020-04-17T04:11:30.408Z] ----------------------------------------------------------------------
+[debug] [2020-04-17T04:11:30.409Z] 
+[debug] [2020-04-17T04:11:30.423Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-04-17T04:11:30.424Z] > authorizing via signed-in user
+[debug] [2020-04-17T04:11:30.424Z] [iam] checking project accountable-ba5c6 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-04-17T04:11:30.429Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/accountable-ba5c6:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2020-04-17T04:11:30.690Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:11:28 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=105","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-04-17T04:11:30.692Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/accountable-ba5c6/serviceAccounts/accountable-ba5c6@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-04-17T04:11:30.994Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Fri, 17 Apr 2020 04:11:28 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'accountable-ba5c6'...
+[info] 
+[info] i  deploying functions
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
