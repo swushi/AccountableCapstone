@@ -7,7 +7,8 @@ import {
   RecyclerViewBackedScrollView,
   TouchableWithoutFeedback,
   Modal,
-  ScrollView
+  ScrollView,
+  FlatList
 } from "react-native";
 import { BarChart, YAxis, XAxis, Grid } from "react-native-svg-charts";
 import { Header } from "../components";
@@ -24,6 +25,20 @@ interface State {}
 
 class HabitScreen extends Component<Props, State> {
   days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+  tempDate = new Date()
+
+  tempData = [ 
+    {
+      id: '2',
+      note: "Today was so much better i lifted triple my previous set",
+      timeStamp: 'Mon Apr 13 2020'
+    },
+    {
+      id: '1',
+      note: "Today was rough but i'm getting better",
+      timeStamp: 'Sun Apr 12 2020'
+    }
+  ]
 
   state = {
     chartData: [],
@@ -122,10 +137,18 @@ class HabitScreen extends Component<Props, State> {
   // TODO: Delete the habit
 
   render() {
+    const { title } = this.props.route.params;
     const contentInset = { top: 10, bottom: 10 };
     return (
       <View style={styles.container}>
         <Header />
+        <View style={styles.titleContainer}>
+          <Text style={styles.habitTitle}>{title}</Text>
+          <View style={styles.streakContainer}>
+            <Text style={styles.streak}>{30}</Text>
+            <MaterialCommunityIcons name="fire" size={30} color={"red"} />
+          </View>
+        </View>
         <View style={styles.chartContainer}>
           <TouchableOpacity 
             style={{position: 'absolute', right: 15, top: 15}} 
@@ -204,6 +227,21 @@ class HabitScreen extends Component<Props, State> {
             </TouchableOpacity>
           </View>
         )}
+        <View style={styles.notesContainer}>
+          <Text style={{alignSelf: 'center', fontSize: 20}}>Habit Log</Text>
+          <FlatList
+            data={this.tempData}
+            renderItem={({item}) => {
+              return(
+                <View style={styles.individualNote}>
+                  <Text>{item.timeStamp}</Text>
+                  <Text>{item.note}</Text>
+                </View>
+              )
+            }}
+            keyExtractor={item => item.id}
+          />
+        </View>
       </View>
     );
   }
@@ -213,6 +251,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  titleContainer: {
+    marginTop: 5,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    width: Layout.width * 0.9,
+    justifyContent: 'space-between'
+  },
+  habitTitle: {
+    fontSize: 20,
+    fontFamily: "Roboto-Regular",
+  },
+  streakContainer: {
+    flexDirection: 'row',
+  },
+  streak: {
+    fontSize: 20,
+    alignSelf: 'flex-end',
+    fontFamily: "Roboto-Regular",
   },
   modalContainer: {
     padding: Layout.padding, 
@@ -231,7 +288,7 @@ const styles = StyleSheet.create({
     borderRadius: Layout.roundness,
   },
   chartContainer: {
-    marginTop: 25,
+    marginTop: 3,
     padding: 15,
     height: Layout.height * 0.25,
     width: Layout.width * 0.9,
@@ -272,6 +329,23 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     paddingHorizontal: 5,
   },
+  notesContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+    width: Layout.width * 0.9,
+    alignSelf: 'center',
+    borderRadius: Layout.roundness,
+    ...Colors.shadow
+  },
+  individualNote: {
+    padding: 5,
+    margin: 7,
+    backgroundColor: "#fff",
+    borderRadius: Layout.roundness,
+  }
 });
 
 export default HabitScreen;
