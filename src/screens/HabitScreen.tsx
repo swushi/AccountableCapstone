@@ -151,7 +151,7 @@ class HabitScreen extends Component<Props, State> {
       time: readableTime
     }
     let newNotes = notes
-    newNotes.push(note)
+    newNotes.unshift(note)
     console.log('NEW NOTES', newNotes)
     try {
       this.setState({
@@ -298,6 +298,9 @@ class HabitScreen extends Component<Props, State> {
                   }}
                   keyExtractor={item => item.id}
                 />
+              )}
+              {this.state.habitLog.length === 0 && (
+                <Text style={{alignSelf: 'center', justifyContent:'center', color: "grey", marginHorizontal: 20}}>Looks like your log is empty. Complete your habit on an active day to add a log.</Text>
               )}
             </View>
           )}
