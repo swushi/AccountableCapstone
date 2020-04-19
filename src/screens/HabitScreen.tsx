@@ -14,6 +14,7 @@ import { BarChart, YAxis, XAxis, Grid } from "react-native-svg-charts";
 import { Header } from "../components";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TextField } from "react-native-material-textfield";
 import { updateHabit } from "../firebase";
 
 interface Props {
@@ -44,10 +45,15 @@ class HabitScreen extends Component<Props, State> {
     chartData: [],
     showCompletionPrompt: true,
     showHelpModal: false,
+    showNotePrompt: false,
+    showNotesInput: false,
+    habitLog: [],
+    notesValue: '',
   };
 
   async componentDidMount() {
     await this.buildChartData();
+    this.loadHabitNotes();
     this.shouldShowCompletionPrompt();
   }
 
@@ -124,13 +130,39 @@ class HabitScreen extends Component<Props, State> {
       this.setState({
         chartData: newChartData,
         showCompletionPrompt: false,
+        showNotePrompt: true,
       }, () => {
         updateHabit(habitId, {reminders})
       });
     }
   }
 
-  // TODO: have the days know if its been completed for that week in firebase
+  loadHabitNotes() {
+    const { notes } = this.props.route.params;
+    this.setState({habitLog: notes})
+  }
+
+  addHabitNote() {
+    const { notes, habitId } = this.props.route.params;
+    const date = new Date()
+    const readableTime = date.toDateString()
+    const note = {
+      note: this.state.notesValue, 
+      time: readableTime
+    }
+    let newNotes = notes
+    newNotes.push(note)
+    console.log('NEW NOTES', newNotes)
+    try {
+      this.setState({
+        habitLog: newNotes,
+        showNotesInput: false
+      })
+      updateHabit(habitId, {notes: newNotes})
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   // TODO: Edit the habit
 
@@ -227,20 +259,67 @@ class HabitScreen extends Component<Props, State> {
             </TouchableOpacity>
           </View>
         )}
+        {this.state.showNotePrompt && (
+          <View style={styles.notePromptContainer}>
+            <Text>Would you like to add to your log?</Text>
+            <TouchableOpacity
+              style={styles.completedButton}
+              onPress={() => this.setState({
+                showNotesInput: true,
+                showNotePrompt: false
+              })}
+            >
+              <Text style={{color: "green"}}>Yes</Text>
+              <MaterialCommunityIcons name="check" color="green" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => this.setState({showNotePrompt: false})}
+            >
+              <Text style={{color: "red"}}>No</Text>
+              <MaterialCommunityIcons name="close" color="red"/>
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.notesContainer}>
-          <Text style={{alignSelf: 'center', fontSize: 20}}>Habit Log</Text>
-          <FlatList
-            data={this.tempData}
-            renderItem={({item}) => {
-              return(
-                <View style={styles.individualNote}>
-                  <Text>{item.timeStamp}</Text>
-                  <Text>{item.note}</Text>
-                </View>
-              )
-            }}
-            keyExtractor={item => item.id}
-          />
+          {!this.state.showNotesInput && (
+            <View>
+              <Text style={{alignSelf: 'center', fontSize: 20}}>Habit Log</Text>
+              {!!this.state.habitLog.length && (
+                <FlatList
+                  data={this.state.habitLog}
+                  renderItem={({item}) => {
+                    return(
+                      <View style={styles.individualNote}>
+                        <Text>{item.time}</Text>
+                        <Text>{item.note}</Text>
+                      </View>
+                    )
+                  }}
+                  keyExtractor={item => item.id}
+                />
+              )}
+            </View>
+          )}
+          {this.state.showNotesInput && (
+            <View style={styles.habitLogInputContainer}>
+              <TextField
+                label="Enter Notes Here"
+                onChangeText={(text) => this.setState({ notesValue: text })}
+                tintColor={"grey"}
+                baseColor={"grey"}
+                multiline={true}
+                lineWidth={1}
+                textColor={Colors.textPrimary}
+              />
+              <TouchableOpacity 
+                style={styles.saveNoteButton}
+                onPress={() => this.addHabitNote()}
+              >
+                <Text style={{color: Colors.primary}}>Save Note</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
     );
@@ -329,9 +408,41 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     paddingHorizontal: 5,
   },
+  cancelButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "red",
+    borderRadius: Layout.roundness,
+    paddingVertical: 1,
+    paddingHorizontal: 5,
+  },
+  habitLogInputContainer: {
+    width: Layout.width * 0.9,
+    paddingHorizontal: Layout.padding,
+    justifyContent: 'space-between'
+  },
+  saveNoteButton: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderRadius: Layout.roundness,
+    alignItems: 'center'
+  },
+  notePromptContainer: {
+    height: Layout.height * 0.05,
+    width: Layout.width * 0.9,
+    paddingHorizontal: Layout.padding,
+    flexDirection: "row",
+    marginTop: 10,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "space-between",
+    backgroundColor: Colors.background,
+    borderRadius: Layout.roundness,
+    ...Colors.shadow,
+  },
   notesContainer: {
     flex: 1,
-    alignItems: 'center',
     marginTop: 10,
     marginBottom: 10,
     backgroundColor: '#fff',

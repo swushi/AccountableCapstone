@@ -151,6 +151,7 @@ class CreateHabitScreen extends React.Component<
       title,
       dateStart: new Date(),
       reminders: newReminders,
+      notes: [],
       accountable,
     };
 

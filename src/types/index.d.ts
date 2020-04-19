@@ -60,6 +60,7 @@ export type Habit = {
   active: Boolean; // if the habit is currently on-going
   dateStart: Date;
   reminders: Array<Reminder>;
+  notes: Array<string>;
   desc?: string;
   stats?: Stats;
   habitId?: HabitID; // optional because when created on client, will not have id yet
