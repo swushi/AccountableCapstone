@@ -9,3 +9,4 @@ export { default as PresetHabitScreen } from "./PresetHabitScreen";
 export { default as SelectAccountableScreen } from "./SelectAccountableScreen";
 export { default as HabitScreen } from "./HabitScreen";
 export { default as ChatScreen } from "./ChatScreen";
+export { default as EditHabitScreen } from "./EditHabitScreen";

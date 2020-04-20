@@ -1,62 +1,77 @@
-import * as React from "react";
-import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import React, { Component } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Platform
+} from "react-native";
+import { Colors, Layout } from "../config";
 import { TextField } from "react-native-material-textfield";
-import { connect } from "react-redux";
-import { Notifications } from "expo";
-import { Layout, Colors, getTimeString, getRemindTime } from "../config";
-import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
-import * as firebase from "../firebase";
-import { User, Habit, Reminder, ExpoLocalNotification } from "../types";
-import * as actions from "../redux/actions";
+import { updateHabit } from "../firebase";
+import { getTimeString } from '../config';
+import { Header, DateTimePickerModal } from "../components";
+import {Reminder} from "../types";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
-export interface CreateHabitScreenProps {
-  user: User;
-  accountable: User;
+interface Props {
   navigation: any;
-  storeAccountable: Function;
+  route: any;
 }
 
-export interface CreateHabitScreenState {
+interface State {
   title: string;
   reminders: Array<Reminder>;
-  showPicker: Boolean;
-  chosenTime: Date | null;
   habitType: String;
+  chosenTime: Date | null;
+  showPicker: boolean;
 }
 
-class CreateHabitScreen extends React.Component<
-  CreateHabitScreenProps,
-  CreateHabitScreenState
-> {
+class EditHabitScreen extends Component<Props, State> { 
+  
   state = {
     title: "",
-    reminders: REMINDERS,
-    showPicker: false,
-    chosenTime: new Date(),
     habitType: "Create",
-  };
+    reminders: REMINDERS,
+    chosenTime: new Date(),
+    showPicker: false
+  }
+  titleRef = null;
   reminderRef = null;
-  accountableRef = null;
 
-  componentDidUpdate() {
-    const { accountable } = this.props;
-
-    if (accountable) {
-      this.accountableRef.setValue(accountable.fullName);
-    }
+  componentDidMount() {
+    this.preFillEditForm()
+    console.log('edit habit info', this.props.route.params)
   }
 
-  handleFocus() {}
+  preFillEditForm(){
+    const { title, type, reminders } = this.props.route.params
+    this.titleRef.setValue(title)
+    this.reminderRef.setValue(reminders[0].time)
 
-  handleBlur() {}
+    this.setState({
+      title,
+      habitType: type,
+      reminders,
+    })
+  }
+
+  toggleReminder(day: Reminder, index: number) {
+    const newReminders = this.state.reminders;
+    newReminders[index].active = !day.active;
+
+    this.setState({ reminders: newReminders });
+  }
 
   showModal() {
     const { chosenTime } = this.state;
     this.setState({ showPicker: true });
     this.reminderRef.setValue(getTimeString(chosenTime));
+  }
+
+  handlePickerSubmit() {
+    setTimeout(() => this.setState({ showPicker: false }, () => null), 100);
   }
 
   handleTimeChange(event: any, date: Date) {
@@ -67,134 +82,27 @@ class CreateHabitScreen extends React.Component<
     this.setState({ chosenTime: date });
   }
 
-  toggleReminder(day: Reminder, index: number) {
-    const newReminders = this.state.reminders;
-    newReminders[index].active = !day.active;
-
-    this.setState({ reminders: newReminders });
+  saveEdit() {
+    const { title, habitType, reminders, chosenTime } = this.state
+    
   }
 
-  // TODO: get user id and save actual habit info
-  async createHabit() {
-    // destructure
-    const { reminders, title, chosenTime, habitType } = this.state;
-    const { accountable, navigation, storeAccountable } = this.props;
-
-    const uid = firebase.uid();
-
-    // TODO: pass type param to screen through navigation
-    const isCreate = habitType === "Create";
-
-    // create time string
-    const remindTime = getTimeString(chosenTime);
-
-    // add times to reminders
-    const newReminders = reminders;
-    newReminders.map((reminder) => (reminder.time = remindTime));
-
-    //add completed to reminders
-    newReminders.map((reminder) => (reminder.completed = false));
-
-    // create local notifications
-    const notificationTitle = `Did you finish ${title} today?`;
-    const notificationBody = `Go into the app and continue your streak!`;
-    const localNotifications: ExpoLocalNotification[] = [];
-    newReminders.map((reminder, index) => {
-      if (reminder.active) {
-        const remindTime = getRemindTime(chosenTime, reminder.day);
-
-        const localNotification: ExpoLocalNotification = {
-          notification: {
-            title: notificationTitle,
-            body: notificationBody,
-          },
-          repeat: {
-            time: remindTime,
-            repeat: "week",
-          },
-        };
-
-        localNotifications.push(localNotification);
-      }
-    });
-
-    let notificationIds = [];
-
-    localNotifications.forEach(({ notification, repeat }) => {
-      const prom = Notifications.scheduleLocalNotificationAsync(
-        notification,
-        repeat
-      );
-      notificationIds.push(prom);
-    });
-
-    // get ids
-    notificationIds = await Promise.all(notificationIds);
-
-    // store ids in reminder array
-    let idIter = 0;
-    newReminders.forEach((reminder) => {
-      if (reminder.active) {
-        reminder.localId = notificationIds[idIter];
-        idIter++;
-      }
-    });
-
-    //await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
-
-    // generate habit object
-    const habit: Habit = {
-      uid,
-      // @ts-ignore
-      type: habitType,
-      active: true,
-      title,
-      dateStart: new Date(),
-      reminders: newReminders,
-      notes: [],
-      accountable,
-    };
-
-    try {
-      // push habit to database
-      await firebase.createHabit(habit);
-
-      // navigate home
-      navigation.popToTop();
-
-      // reset redux accountable
-      // @ts-ignore
-      storeAccountable({});
-    } catch (error) {
-      console.warn(error);
-    }
-  }
-
-  handlePickerSubmit() {
-    setTimeout(() => this.setState({ showPicker: false }, () => null), 100);
-  }
-
-  getAccountable() {
-    const { navigate } = this.props.navigation;
-    navigate("SelectAccountable");
-  }
 
   render() {
-    const { reminders, showPicker, chosenTime, habitType } = this.state;
-    return (
+    const { habitType, reminders, showPicker, chosenTime } = this.state;
+    return(
       <View style={styles.container}>
         <Header />
         <View style={styles.contentContainer}>
-          <Text style={styles.label}>Setup Your Habit</Text>
+          <Text style={styles.label}>Edit Your Habit</Text>
           <TextField
+            ref={(ref) => (this.titleRef = ref)}
             label="Title"
             onChangeText={(text) => this.setState({ title: text })}
             tintColor={Colors.secondary}
             baseColor={Colors.secondary}
             lineWidth={1}
             textColor={Colors.textPrimary}
-            onFocus={() => this.handleFocus()}
-            onSubmitEditing={() => this.handleBlur()}
           />
           <Text style={styles.dayLabel}>Habit Type</Text>
           <View style={styles.createOrBreakContainer}>
@@ -281,26 +189,10 @@ class CreateHabitScreen extends React.Component<
               <TextField
                 ref={(ref) => (this.reminderRef = ref)}
                 label="Time"
-                onChangeText={(text) => this.setState({ title: text })}
                 baseColor={Colors.secondary}
                 lineWidth={1}
                 tintColor={Colors.secondary}
                 textColor={Colors.textPrimary}
-              />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.getAccountable()}>
-            <View pointerEvents={"none"}>
-              <TextField
-                ref={(ref) => (this.accountableRef = ref)}
-                value={this.props.accountable.fullName}
-                label="Add An Accountable (Optional)"
-                tintColor={Colors.secondary}
-                baseColor={Colors.secondary}
-                lineWidth={1}
-                textColor={Colors.textPrimary}
-                onFocus={() => this.handleFocus()}
-                onSubmitEditing={() => this.handleBlur()}
               />
             </View>
           </TouchableOpacity>
@@ -315,20 +207,20 @@ class CreateHabitScreen extends React.Component<
           />
         ) : null}
         <TouchableOpacity
-          onPress={() => this.createHabit()}
-          style={styles.createHabitButton}
+          onPress={() => this.saveEdit()}
+          style={styles.saveEditButton}
         >
           <Text style={styles.buttonText}>{`${habitType} habit`}</Text>
         </TouchableOpacity>
       </View>
-    );
+    )
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.background
   },
   contentContainer: {
     flex: 1,
@@ -339,21 +231,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontFamily: "Roboto-Regular",
     color: Colors.textPrimary,
-  },
-  repeatText: {
-    fontSize: 25,
-    fontFamily: "Roboto-Regular",
-    marginTop: Layout.padding * 2,
-    color: Colors.textPrimary,
-  },
-  remindersContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: Layout.padding,
-    borderRadius: Layout.roundness,
-    borderWidth: 1,
-    marginTop: Layout.padding * 0.9,
-    borderColor: Colors.secondary,
   },
   createOrBreakContainer: {
     flexDirection: "row",
@@ -390,7 +267,16 @@ const styles = StyleSheet.create({
     marginTop: Layout.padding * 3,
     color: Colors.secondary,
   },
-  createHabitButton: {
+  remindersContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: Layout.padding,
+    borderRadius: Layout.roundness,
+    borderWidth: 1,
+    marginTop: Layout.padding * 0.9,
+    borderColor: Colors.secondary,
+  },
+  saveEditButton: {
     position: "absolute",
     top: Layout.height * 0.83,
     padding: Layout.padding,
@@ -406,7 +292,7 @@ const styles = StyleSheet.create({
     color: Colors.secondary,
     fontSize: 20,
   },
-});
+})
 
 const REMINDERS: Array<Reminder> = [
   { day: "Sun", active: false, completed: false },
@@ -418,9 +304,4 @@ const REMINDERS: Array<Reminder> = [
   { day: "Sat", active: false, completed: false },
 ];
 
-const mapStateToProps = (state) => ({
-  user: state.user,
-  accountable: state.accountable,
-});
-
-export default connect(mapStateToProps, actions)(CreateHabitScreen);
+export default EditHabitScreen;

@@ -181,6 +181,13 @@ export const getHabits = (uid: UserID, callback: Function) =>
       callback(habits);
     });
 
+export const updateHabit = (habitId, habit) => 
+    firebase
+      .firestore()
+      .collection("habits")
+      .doc(habitId)
+      .update(habit)
+
 export const getAvatarURL = () =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();
 
