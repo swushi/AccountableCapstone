@@ -55,6 +55,7 @@ class HabitScreen extends Component<Props, State> {
     await this.buildChartData();
     this.loadHabitNotes();
     this.shouldShowCompletionPrompt();
+    
   }
 
   buildChartData() {
@@ -152,7 +153,6 @@ class HabitScreen extends Component<Props, State> {
     }
     let newNotes = notes
     newNotes.unshift(note)
-    console.log('NEW NOTES', newNotes)
     try {
       this.setState({
         habitLog: newNotes,
@@ -164,9 +164,10 @@ class HabitScreen extends Component<Props, State> {
     }
   }
 
-  // TODO: Edit the habit
-
-  // TODO: Delete the habit
+  navigateToEdit() {
+    const { navigate } = this.props.navigation;
+    navigate("EditHabit", this.props.route.params)
+  }
 
   render() {
     const { title } = this.props.route.params;
@@ -175,7 +176,19 @@ class HabitScreen extends Component<Props, State> {
       <View style={styles.container}>
         <Header />
         <View style={styles.titleContainer}>
-          <Text style={styles.habitTitle}>{title}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.habitTitle}>{title}</Text>
+            <TouchableOpacity 
+              style={{justifyContent: 'center', marginLeft: 5}}
+              onPress={() => this.navigateToEdit()}
+            >
+              <MaterialCommunityIcons 
+                size={18}
+                name='pencil'
+                color={Colors.primary}
+              />
+            </TouchableOpacity>
+          </View>
           <View style={styles.streakContainer}>
             <Text style={styles.streak}>{30}</Text>
             <MaterialCommunityIcons name="fire" size={30} color={"red"} />
@@ -296,7 +309,7 @@ class HabitScreen extends Component<Props, State> {
                       </View>
                     )
                   }}
-                  keyExtractor={item => item.id}
+                  keyExtractor={(item, index) => index.toString()}
                 />
               )}
               {this.state.habitLog.length === 0 && (
