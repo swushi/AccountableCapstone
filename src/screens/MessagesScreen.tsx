@@ -72,7 +72,11 @@ class MessagesScreen extends React.Component<
         () => setTimeout(() => this.setState({ loading: false }), 200)
       );
     } catch (err) {
-      console.log("fetch users err", err);
+      firebase.logError({
+        screen: "MessagesScreen",
+        function: "fetchAllUsers()",
+        error: err,
+      });
     }
   }
 
@@ -206,8 +210,12 @@ class MessagesScreen extends React.Component<
     try {
       await firebase.follow(userToFollow.uid);
       await firebase.addFollower(userToFollow.uid);
-    } catch (error) {
-      console.log("follow err", error);
+    } catch (err) {
+      firebase.logError({
+        screen: "MessagesScreen",
+        function: "addFriendAsync()",
+        error: err,
+      });
     }
   }
 
