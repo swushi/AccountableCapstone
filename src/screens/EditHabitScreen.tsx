@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Platform, Alert } from "react-native";
 import { Colors, Layout } from "../config";
 import { TextField } from "react-native-material-textfield";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import { Notifications } from "expo";
 import * as firebase from "../firebase";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { getTimeString, getRemindTime } from "../config";
 import { Header, DateTimePickerModal } from "../components";
 import { Reminder, ExpoLocalNotification, Habit } from "../types";
@@ -179,6 +180,22 @@ class EditHabitScreen extends Component<Props, State> {
     }
   }
 
+  deleteHabit() {
+    const { habitId } = this.props.route.params
+    const { navigation } = this.props
+
+    try {
+      firebase.deleteHabit(habitId);
+      navigation.popToTop();
+    } catch (err) {
+      firebase.logError({
+        screen: 'EditHabitScreen',
+        function: "deleteHabit()",
+        error: err
+      })     
+    }
+  }
+
   getAccountable() {
     const { navigate } = this.props.navigation;
     navigate("SelectAccountable");
@@ -191,7 +208,31 @@ class EditHabitScreen extends Component<Props, State> {
       <View style={styles.container}>
         <Header />
         <View style={styles.contentContainer}>
-          <Text style={styles.label}>Edit Your Habit</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={styles.label}>Edit Your Habit</Text>
+            </View>
+              <TouchableOpacity onPress={() => Alert.alert(
+                'Delete Habit',
+                'Are you sure you want to delete this habit? All Progress Will be lost.',
+              [
+                {
+                  text: 'No',
+                  style: 'cancel'
+                },
+                {
+                  text: 'Yes',
+                  onPress: () => this.deleteHabit()
+                }
+              ]
+              )}>
+                <MaterialCommunityIcons 
+                  size={30}
+                  name='trash-can-outline'
+                  color={'red'}
+                />
+              </TouchableOpacity>
+          </View>
           <TextField
             ref={(ref) => (this.titleRef = ref)}
             label="Title"

@@ -184,6 +184,9 @@ export const getHabits = (uid: UserID, callback: Function) =>
 export const updateHabit = (habitId, habit) =>
   firebase.firestore().collection("habits").doc(habitId).update(habit);
 
+export const deleteHabit = (habitId) =>
+    firebase.firestore().collection("habits").doc(habitId).delete();
+
 export const getAvatarURL = () =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();
 
