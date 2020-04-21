@@ -162,6 +162,10 @@ class CreateHabitScreen extends React.Component<
         reminders: newReminders,
         notes: [],
         streak: 0,
+        stats: {
+          timesBroken: 0,
+          timesHit: 0,
+        },
         accountable:
           Object.keys(accountable).length !== 0 ? accountable.uid : null,
       };

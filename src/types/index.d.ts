@@ -63,7 +63,7 @@ export type Habit = {
   notes: Array<string>;
   streak?: number;
   desc?: string;
-  stats?: Stats;
+  stats: Stats;
   habitId?: HabitID; // optional because when created on client, will not have id yet
   accountable?: UserID;
 };
@@ -72,7 +72,7 @@ export type Habit = {
  * Stats for a single habit.
  */
 export type Stats = {
-  streak: number;
+  timesHit: number;
   timesBroken: number;
 };
 

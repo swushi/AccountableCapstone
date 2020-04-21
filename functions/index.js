@@ -167,8 +167,8 @@ exports.resetHabitCompleted = functions.pubsub
     }
   });
 
-exports.checkStreaks = functions.pubsub
-  .schedule("every 1 minutes") // will need to be "every sunday 00:00"
+exports.updateStats = functions.pubsub
+  .schedule("every day 00:00") // will need to be "every sunday 00:00"
   .onRun(async (context) => {
     try {
       // ref
@@ -182,32 +182,32 @@ exports.checkStreaks = functions.pubsub
 
       // get all habits
       const habitsSnap = await habitsRef.get();
-      habitsSnap.forEach((habitSnap) => {
+      habitsSnap.forEach(async (habitSnap) => {
         const habit = habitSnap.data();
 
         // add habitId for reference
         habit.habitId = habitSnap.id;
 
-        // check if today is an active reminder
-        if (!habit.reminders[todayInt].active) {
-          console.log("Day not active, streak unaffected.");
-          return;
+        // check if completed
+        if (habit.reminders[todayInt].completed) {
+          return null;
         }
 
-        // check if not completed
-        if (!habit.reminders[todayInt].completed) {
-          // reset streak
-          habit.streak = 0;
+        // reset streak
+        habit.streak = 0;
 
-          // get habitRef
-          const habitRef = habitsRef.doc(habit.habitId);
+        // iterate timesBroken
+        habit.stats.timesBroken++;
 
-          // delete habitId
-          delete habit.habitId;
+        // get ref
+        const habitRef = habitsRef.doc(habit.habitId);
 
-          // add to batch
-          batch.update(habitRef, habit);
-        }
+        // delete habitId
+        delete habit.habitId;
+
+        // add to batch
+        batch.update(habitRef, habit);
+        return true;
       });
       // commit batch
       await batch.commit();
