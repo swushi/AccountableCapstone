@@ -5,6 +5,7 @@ import { TextField } from "react-native-material-textfield";
 import { connect } from "react-redux";
 import { Notifications } from "expo";
 import { Layout, Colors, getTimeString, getRemindTime } from "../config";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Header, DateTimePickerModal } from "../components";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import * as firebase from "../firebase";
@@ -295,6 +296,7 @@ class CreateHabitScreen extends React.Component<
               />
             </View>
           </TouchableOpacity>
+          <View>
           <TouchableOpacity onPress={() => this.getAccountable()}>
             <View pointerEvents={"none"}>
               <TextField
@@ -310,6 +312,19 @@ class CreateHabitScreen extends React.Component<
               />
             </View>
           </TouchableOpacity>
+          {!!this.props.accountable.uid && (<TouchableOpacity 
+              style={{position: 'absolute', right: 0, top: 35, zIndex: 5}}
+              onPress={() => {
+                this.props.storeAccountable({})
+              }}>
+                <MaterialCommunityIcons 
+                  size={20}
+                  name='close'
+                  color='red'
+                />
+            </TouchableOpacity>
+          )}
+          </View>
         </View>
         {showPicker ? (
           <DateTimePickerModal
