@@ -54,7 +54,6 @@ class CreateHabitScreen extends React.Component<
   }
 
   handleFocus = () => {
-    
     this.setState({
       titleError: null,
     });
@@ -162,6 +161,7 @@ class CreateHabitScreen extends React.Component<
         dateStart: new Date(),
         reminders: newReminders,
         notes: [],
+        streak: 0,
         accountable:
           Object.keys(accountable).length !== 0 ? accountable.uid : null,
       };
@@ -197,7 +197,7 @@ class CreateHabitScreen extends React.Component<
 
     if (error) return false;
     else return true;
-  }
+  };
   handlePickerSubmit() {
     setTimeout(() => this.setState({ showPicker: false }, () => null), 100);
   }
@@ -208,7 +208,13 @@ class CreateHabitScreen extends React.Component<
   }
 
   render() {
-    const { reminders, showPicker, chosenTime, habitType, titleError } = this.state;
+    const {
+      reminders,
+      showPicker,
+      chosenTime,
+      habitType,
+      titleError,
+    } = this.state;
     return (
       <View style={styles.container}>
         <Header />
@@ -319,33 +325,31 @@ class CreateHabitScreen extends React.Component<
             </View>
           </TouchableOpacity>
           <View>
-          <TouchableOpacity onPress={() => this.getAccountable()}>
-            <View pointerEvents={"none"}>
-              <TextField
-                ref={(ref) => (this.accountableRef = ref)}
-                value={this.props.accountable.fullName}
-                label="Add An Accountable (Optional)"
-                tintColor={Colors.secondary}
-                baseColor={Colors.secondary}
-                lineWidth={1}
-                textColor={Colors.textPrimary}
-                onFocus={() => this.handleFocus()}
-                onSubmitEditing={() => this.handleBlur()}
-              />
-            </View>
-          </TouchableOpacity>
-          {!!this.props.accountable.uid && (<TouchableOpacity 
-              style={{position: 'absolute', right: 0, top: 35, zIndex: 5}}
-              onPress={() => {
-                this.props.storeAccountable({})
-              }}>
-                <MaterialCommunityIcons 
-                  size={20}
-                  name='close'
-                  color='red'
+            <TouchableOpacity onPress={() => this.getAccountable()}>
+              <View pointerEvents={"none"}>
+                <TextField
+                  ref={(ref) => (this.accountableRef = ref)}
+                  value={this.props.accountable.fullName}
+                  label="Add An Accountable (Optional)"
+                  tintColor={Colors.secondary}
+                  baseColor={Colors.secondary}
+                  lineWidth={1}
+                  textColor={Colors.textPrimary}
+                  onFocus={() => this.handleFocus()}
+                  onSubmitEditing={() => this.handleBlur()}
                 />
+              </View>
             </TouchableOpacity>
-          )}
+            {!!this.props.accountable.uid && (
+              <TouchableOpacity
+                style={{ position: "absolute", right: 0, top: 35, zIndex: 5 }}
+                onPress={() => {
+                  this.props.storeAccountable({});
+                }}
+              >
+                <MaterialCommunityIcons size={20} name="close" color="red" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         {showPicker ? (
@@ -359,11 +363,10 @@ class CreateHabitScreen extends React.Component<
         ) : null}
         <TouchableOpacity
           onPress={() => {
-            if(this.formIsValid()) {
-              this.createHabit()
+            if (this.formIsValid()) {
+              this.createHabit();
             }
-          }
-        }
+          }}
           style={styles.createHabitButton}
         >
           <Text style={styles.buttonText}>{`${habitType} habit`}</Text>

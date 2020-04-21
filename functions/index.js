@@ -113,3 +113,105 @@ exports.onHabitCreate = functions.firestore
       console.log("ERR:", error);
     }
   });
+
+/**
+ * This function will reset all of the weekly stats gained over the week
+ */
+exports.resetHabitCompleted = functions.pubsub
+  .schedule("every sunday 00:00") // will need to be "every sunday 00:00"
+  .onRun(async (context) => {
+    try {
+      // ref database
+      const db = admin.firestore();
+      const batch = db.batch();
+      const habitsRef = db.collection("habits");
+
+      // get all habits
+      const habits = [];
+      const habitsSnap = await habitsRef.get();
+      habitsSnap.forEach((habitSnap) => {
+        const habitId = habitSnap.id;
+        const habit = habitSnap.data();
+
+        // track habitId
+        habit.habitId = habitId;
+        habits.push(habit);
+      });
+
+      console.log("habits", habits);
+
+      // update all completed in reminders to false
+      habits.forEach((habit) => {
+        // get ids
+        const { habitId } = habit;
+
+        // iter through reminders to access completed
+        habit.reminders.forEach((reminder) => {
+          reminder.completed = false;
+        });
+
+        // get habit ref
+        const habitRef = habitsRef.doc(habitId);
+
+        // delete habitId off of object
+        delete habit.habitId;
+
+        // add to batch
+        batch.update(habitRef, habit);
+      });
+
+      // write batch
+      await batch.commit();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+exports.checkStreaks = functions.pubsub
+  .schedule("every 1 minutes") // will need to be "every sunday 00:00"
+  .onRun(async (context) => {
+    try {
+      // ref
+      const db = admin.firestore();
+      const batch = db.batch();
+      const habitsRef = db.collection("habits");
+
+      const today = new Date();
+      let todayInt = today.getDay() - 1;
+      todayInt = todayInt === -1 ? 6 : todayInt;
+
+      // get all habits
+      const habitsSnap = await habitsRef.get();
+      habitsSnap.forEach((habitSnap) => {
+        const habit = habitSnap.data();
+
+        // add habitId for reference
+        habit.habitId = habitSnap.id;
+
+        // check if today is an active reminder
+        if (!habit.reminders[todayInt].active) {
+          console.log("Day not active, streak unaffected.");
+          return;
+        }
+
+        // check if not completed
+        if (!habit.reminders[todayInt].completed) {
+          // reset streak
+          habit.streak = 0;
+
+          // get habitRef
+          const habitRef = habitsRef.doc(habit.habitId);
+
+          // delete habitId
+          delete habit.habitId;
+
+          // add to batch
+          batch.update(habitRef, habit);
+        }
+      });
+      // commit batch
+      await batch.commit();
+    } catch (error) {
+      console.log(error);
+    }
+  });

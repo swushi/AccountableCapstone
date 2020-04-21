@@ -15,7 +15,7 @@ import { Header } from "../components";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextField } from "react-native-material-textfield";
-import { updateHabit} from "../firebase";
+import { updateHabit } from "../firebase";
 
 interface Props {
   navigation: any;
@@ -49,12 +49,20 @@ class HabitScreen extends Component<Props, State> {
     showNotesInput: false,
     habitLog: [],
     notesValue: "",
+    streak: 0,
   };
 
   async componentDidMount() {
     await this.buildChartData();
+    this.buildStats();
     this.loadHabitNotes();
     this.shouldShowCompletionPrompt();
+  }
+
+  buildStats() {
+    const { streak } = this.props.route.params;
+
+    this.setState({ streak });
   }
 
   buildChartData() {
@@ -117,7 +125,10 @@ class HabitScreen extends Component<Props, State> {
 
   completeTask() {
     const { chartData } = this.state;
-    const { habitId, reminders } = this.props.route.params;
+    const { habitId, reminders, streak } = this.props.route.params;
+
+    let newStreak = streak;
+    newStreak++;
 
     const currentDay = this.getCurrentDayIndex();
     let newChartData = this.state.chartData;
@@ -131,9 +142,10 @@ class HabitScreen extends Component<Props, State> {
           chartData: newChartData,
           showCompletionPrompt: false,
           showNotePrompt: true,
+          streak: newStreak,
         },
         () => {
-          updateHabit(habitId, { reminders });
+          updateHabit(habitId, { reminders, streak: newStreak });
         }
       );
     }
@@ -162,7 +174,6 @@ class HabitScreen extends Component<Props, State> {
       updateHabit(habitId, { notes: newNotes });
     } catch (err) {
       console.log(err);
-      
     }
   }
 
@@ -173,6 +184,7 @@ class HabitScreen extends Component<Props, State> {
 
   render() {
     const { title } = this.props.route.params;
+    const { streak } = this.state;
     const contentInset = { top: 10, bottom: 10 };
     return (
       <View style={styles.container}>
@@ -192,7 +204,7 @@ class HabitScreen extends Component<Props, State> {
             </TouchableOpacity>
           </View>
           <View style={styles.streakContainer}>
-            <Text style={styles.streak}>{30}</Text>
+            <Text style={styles.streak}>{streak}</Text>
             <MaterialCommunityIcons name="fire" size={30} color={"red"} />
           </View>
         </View>
@@ -226,7 +238,7 @@ class HabitScreen extends Component<Props, State> {
             >
               <TouchableWithoutFeedback>
                 <View style={styles.modalContainer}>
-                  <View style={{flex: 1}}>
+                  <View style={{ flex: 1 }}>
                     <Text style={{ color: "green" }}>Green = Complete</Text>
                     <Text style={{ color: "red" }}>Red = Incomplete</Text>
                     <Text style={{ color: "grey" }}>Grey = Not Active</Text>

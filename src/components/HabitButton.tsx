@@ -12,7 +12,7 @@ export interface HabitButtonProps {
 function HabitButton(props: HabitButtonProps) {
   const iconColor = "red";
   const { data, onPress } = props;
-  const { title, type } = data;
+  const { title, type, streak } = data;
   let underlineColor = type === "Create" ? "green" : "red";
   return (
     <TouchableOpacity
@@ -25,7 +25,7 @@ function HabitButton(props: HabitButtonProps) {
     >
       <Text style={styles.name}>{title}</Text>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={styles.streak}>{30}</Text>
+        <Text style={styles.streak}>{streak}</Text>
         <MaterialCommunityIcons name="fire" size={30} color={iconColor} />
       </View>
     </TouchableOpacity>

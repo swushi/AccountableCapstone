@@ -61,6 +61,7 @@ export type Habit = {
   dateStart: Date;
   reminders: Array<Reminder>;
   notes: Array<string>;
+  streak?: number;
   desc?: string;
   stats?: Stats;
   habitId?: HabitID; // optional because when created on client, will not have id yet
