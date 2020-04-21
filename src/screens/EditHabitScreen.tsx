@@ -5,15 +5,19 @@ import { TextField } from "react-native-material-textfield";
 import { createAnimatableComponent, Text } from "react-native-animatable";
 import { Notifications } from "expo";
 import * as firebase from "../firebase";
+import { connect } from "react-redux";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { getTimeString, getRemindTime } from "../config";
 import { Header, DateTimePickerModal } from "../components";
-import { Reminder, ExpoLocalNotification, Habit } from "../types";
+import { Reminder, ExpoLocalNotification, Habit, User } from "../types";
+import * as actions from "../redux/actions";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
 interface Props {
   navigation: any;
+  accountable: User;
+  storeAccountable: Function;
   route: any;
 }
 
@@ -41,12 +45,32 @@ class EditHabitScreen extends Component<Props, State> {
     this.preFillEditForm();
   }
 
-  preFillEditForm() {
-    const { title, type, reminders, accountable } = this.props.route.params;
-    this.titleRef.setValue(title);
-    this.reminderRef.setValue(reminders[0].time);
+  componentDidUpdate() {
+    const { accountable } = this.props;
+
     if (accountable) {
       this.accountableRef.setValue(accountable.fullName);
+    }
+  }
+
+  async preFillEditForm() {
+    const { title, type, reminders, accountable } = this.props.route.params;
+    const { storeAccountable } = this.props
+    this.titleRef.setValue(title);
+    this.reminderRef.setValue(reminders[0].time);
+
+    try {
+      if (accountable) {
+        const accountableDetailsRef = await firebase.getUser(accountable);
+        const accountableDetails = accountableDetailsRef.data();
+        storeAccountable(accountableDetails)
+      }
+    } catch (err) {
+      firebase.logError({
+        screen: 'EditHabitScreen',
+        function: 'preFillEditForm()',
+        error: err
+      });
     }
 
     this.setState({
@@ -82,16 +106,15 @@ class EditHabitScreen extends Component<Props, State> {
   }
 
   async saveEdit() {
-    const { navigation } = this.props;
+    const { navigation, accountable, storeAccountable} = this.props;
     const { title, habitType, reminders, chosenTime } = this.state;
-    const { accountable, habitId, notes, dateStart } = this.props.route.params;
+    const { habitId, notes, dateStart } = this.props.route.params;
 
     const uid = firebase.uid();
 
     try {
       this.props.route.params.reminders.forEach((oldReminder, index) => {
         if (oldReminder.localId) {
-          console.log("getting rid of", oldReminder.day);
           Notifications.dismissNotificationAsync(oldReminder.localId);
           delete reminders[index].localId;
         }
@@ -129,8 +152,6 @@ class EditHabitScreen extends Component<Props, State> {
         }
       });
 
-      console.table(newReminders);
-
       let notificationIds = [];
 
       localNotifications.forEach(({ notification, repeat }) => {
@@ -165,13 +186,13 @@ class EditHabitScreen extends Component<Props, State> {
         dateStart,
         reminders: newReminders,
         notes,
-        accountable,
+        accountable: accountable.uid ? accountable.uid : null,
       };
 
       firebase.updateHabit(habitId, habit);
+      storeAccountable({});
       navigation.popToTop();
     } catch (err) {
-      console.log("ERROR", err);
       firebase.logError({
         screen: "EditHabitScreen",
         function: "saveEdit()",
@@ -203,36 +224,36 @@ class EditHabitScreen extends Component<Props, State> {
 
   render() {
     const { habitType, reminders, showPicker, chosenTime } = this.state;
-    const { accountable } = this.props.route.params;
+    const { storeAccountable, accountable } = this.props;
     return (
       <View style={styles.container}>
         <Header />
         <View style={styles.contentContainer}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
               <Text style={styles.label}>Edit Your Habit</Text>
-            </View>
-              <TouchableOpacity onPress={() => Alert.alert(
-                'Delete Habit',
-                'Are you sure you want to delete this habit? All Progress Will be lost.',
-              [
-                {
-                  text: 'No',
-                  style: 'cancel'
-                },
-                {
-                  text: 'Yes',
-                  onPress: () => this.deleteHabit()
-                }
-              ]
-              )}>
+              <TouchableOpacity
+                style={{position: 'absolute', right: 0, top: 9}} 
+                onPress={() => Alert.alert(
+                  'Delete Habit',
+                  'Are you sure you want to delete this habit? All Progress Will be lost.',
+                  [
+                    {
+                      text: 'No',
+                      style: 'cancel'
+                    },
+                    {
+                      text: 'Yes',
+                      onPress: () => this.deleteHabit()
+                    }
+                  ]
+                )}>
                 <MaterialCommunityIcons 
                   size={30}
                   name='trash-can-outline'
                   color={'red'}
                 />
               </TouchableOpacity>
-          </View>
+              </View>
           <TextField
             ref={(ref) => (this.titleRef = ref)}
             label="Title"
@@ -334,18 +355,32 @@ class EditHabitScreen extends Component<Props, State> {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => this.getAccountable()}>
-            <View pointerEvents={"none"}>
-              <TextField
-                ref={(ref) => (this.accountableRef = ref)}
-                label="Add An Accountable (Optional)"
-                tintColor={Colors.secondary}
-                baseColor={Colors.secondary}
-                lineWidth={1}
-                textColor={Colors.textPrimary}
-              />
-            </View>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={() => this.getAccountable()}>
+              <View pointerEvents={"none"}>
+                <TextField
+                  ref={(ref) => (this.accountableRef = ref)}
+                  label="Add An Accountable (Optional)"
+                  tintColor={Colors.secondary}
+                  baseColor={Colors.secondary}
+                  lineWidth={1}
+                  textColor={Colors.textPrimary}
+                />
+              </View>
+            </TouchableOpacity>
+            {!!accountable.uid && (<TouchableOpacity 
+              style={{position: 'absolute', right: 0, top: 35, zIndex: 5}}
+              onPress={() => {
+                storeAccountable({})
+              }}>
+                <MaterialCommunityIcons 
+                  size={20}
+                  name='close'
+                  color='red'
+                />
+            </TouchableOpacity>
+            )}
+          </View>
         </View>
         {showPicker ? (
           <DateTimePickerModal
@@ -454,4 +489,8 @@ const REMINDERS: Array<Reminder> = [
   { day: "Sat", active: false, completed: false },
 ];
 
-export default EditHabitScreen;
+const mapStateToProps = (state) => ({
+  accountable: state.accountable,
+});
+
+export default connect(mapStateToProps, actions)(EditHabitScreen);

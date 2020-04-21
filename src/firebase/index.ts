@@ -277,5 +277,6 @@ export const sendMessage = async (
  *
  */
 export const logError = (params: Object) => {
-  firebase.analytics().logEvent("error", params);
+  firebase.firestore().collection("errors").add({ type: 'error', ...params});
+  //firebase.analytics().logEvent('Error', params);
 };

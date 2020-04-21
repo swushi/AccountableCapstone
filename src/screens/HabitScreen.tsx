@@ -225,9 +225,11 @@ class HabitScreen extends Component<Props, State> {
             >
               <TouchableWithoutFeedback>
                 <View style={styles.modalContainer}>
-                  <Text style={{ color: "green" }}>Green = Complete</Text>
-                  <Text style={{ color: "red" }}>Red = Incomplete</Text>
-                  <Text style={{ color: "grey" }}>Grey = Not Active</Text>
+                  <View style={{flex: 1}}>
+                    <Text style={{ color: "green" }}>Green = Complete</Text>
+                    <Text style={{ color: "red" }}>Red = Incomplete</Text>
+                    <Text style={{ color: "grey" }}>Grey = Not Active</Text>
+                  </View>
 
                   <TouchableOpacity
                     style={styles.modalCloseButton}
