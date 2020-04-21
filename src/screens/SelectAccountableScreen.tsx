@@ -103,7 +103,7 @@ class SelectAccountableScreen extends Component<Props, State> {
     const { following } = this.state;
     return (
       <View style={styles.container}>
-        <Header hideBack />
+        <Header />
 
         <FlatList
           style={{ paddingHorizontal: Layout.padding }}

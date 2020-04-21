@@ -1,17 +1,13 @@
 import React, { Component } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Platform
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { Colors, Layout } from "../config";
 import { TextField } from "react-native-material-textfield";
 import { createAnimatableComponent, Text } from "react-native-animatable";
-import { updateHabit } from "../firebase";
-import { getTimeString } from '../config';
+import { Notifications } from "expo";
+import * as firebase from "../firebase";
+import { getTimeString, getRemindTime } from "../config";
 import { Header, DateTimePickerModal } from "../components";
-import {Reminder} from "../types";
+import { Reminder, ExpoLocalNotification, Habit } from "../types";
 
 const AnimatableTouchable = createAnimatableComponent(TouchableOpacity);
 
@@ -28,33 +24,35 @@ interface State {
   showPicker: boolean;
 }
 
-class EditHabitScreen extends Component<Props, State> { 
-  
+class EditHabitScreen extends Component<Props, State> {
   state = {
     title: "",
     habitType: "Create",
     reminders: REMINDERS,
     chosenTime: new Date(),
-    showPicker: false
-  }
+    showPicker: false,
+  };
   titleRef = null;
   reminderRef = null;
+  accountableRef = null;
 
   componentDidMount() {
-    this.preFillEditForm()
-    console.log('edit habit info', this.props.route.params)
+    this.preFillEditForm();
   }
 
-  preFillEditForm(){
-    const { title, type, reminders } = this.props.route.params
-    this.titleRef.setValue(title)
-    this.reminderRef.setValue(reminders[0].time)
+  preFillEditForm() {
+    const { title, type, reminders, accountable } = this.props.route.params;
+    this.titleRef.setValue(title);
+    this.reminderRef.setValue(reminders[0].time);
+    if (accountable) {
+      this.accountableRef.setValue(accountable.fullName);
+    }
 
     this.setState({
       title,
       habitType: type,
       reminders,
-    })
+    });
   }
 
   toggleReminder(day: Reminder, index: number) {
@@ -82,15 +80,114 @@ class EditHabitScreen extends Component<Props, State> {
     this.setState({ chosenTime: date });
   }
 
-  saveEdit() {
-    const { title, habitType, reminders, chosenTime } = this.state
-    
+  async saveEdit() {
+    const { navigation } = this.props;
+    const { title, habitType, reminders, chosenTime } = this.state;
+    const { accountable, habitId, notes, dateStart } = this.props.route.params;
+
+    const uid = firebase.uid();
+
+    try {
+      this.props.route.params.reminders.forEach((oldReminder, index) => {
+        if (oldReminder.localId) {
+          console.log("getting rid of", oldReminder.day);
+          Notifications.dismissNotificationAsync(oldReminder.localId);
+          delete reminders[index].localId;
+        }
+      });
+
+      const remindTime = getTimeString(chosenTime);
+
+      // add times to reminders
+      const newReminders = reminders;
+      newReminders.map((reminder) => (reminder.time = remindTime));
+
+      //add completed to reminders
+      newReminders.map((reminder) => (reminder.completed = false));
+
+      // create local notifications
+      const notificationTitle = `Did you finish ${title} today?`;
+      const notificationBody = `Go into the app and continue your streak!`;
+      const localNotifications: ExpoLocalNotification[] = [];
+      newReminders.map((reminder, index) => {
+        if (reminder.active) {
+          const remindTime = getRemindTime(chosenTime, reminder.day);
+
+          const localNotification: ExpoLocalNotification = {
+            notification: {
+              title: notificationTitle,
+              body: notificationBody,
+            },
+            repeat: {
+              time: remindTime,
+              repeat: "week",
+            },
+          };
+
+          localNotifications.push(localNotification);
+        }
+      });
+
+      console.table(newReminders);
+
+      let notificationIds = [];
+
+      localNotifications.forEach(({ notification, repeat }) => {
+        const prom = Notifications.scheduleLocalNotificationAsync(
+          notification,
+          repeat
+        );
+        notificationIds.push(prom);
+      });
+
+      // get ids
+      notificationIds = await Promise.all(notificationIds);
+
+      // store ids in reminder array
+      let idIter = 0;
+      newReminders.forEach((reminder) => {
+        if (reminder.active) {
+          reminder.localId = notificationIds[idIter];
+          idIter++;
+        }
+      });
+
+      //await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
+
+      // generate habit object
+      const habit: Habit = {
+        uid,
+        // @ts-ignore
+        type: habitType,
+        active: true,
+        title,
+        dateStart,
+        reminders: newReminders,
+        notes,
+        accountable,
+      };
+
+      firebase.updateHabit(habitId, habit);
+      navigation.popToTop();
+    } catch (err) {
+      console.log("ERROR", err);
+      firebase.logError({
+        screen: "EditHabitScreen",
+        function: "saveEdit()",
+        error: err,
+      });
+    }
   }
 
+  getAccountable() {
+    const { navigate } = this.props.navigation;
+    navigate("SelectAccountable");
+  }
 
   render() {
     const { habitType, reminders, showPicker, chosenTime } = this.state;
-    return(
+    const { accountable } = this.props.route.params;
+    return (
       <View style={styles.container}>
         <Header />
         <View style={styles.contentContainer}>
@@ -196,6 +293,18 @@ class EditHabitScreen extends Component<Props, State> {
               />
             </View>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.getAccountable()}>
+            <View pointerEvents={"none"}>
+              <TextField
+                ref={(ref) => (this.accountableRef = ref)}
+                label="Add An Accountable (Optional)"
+                tintColor={Colors.secondary}
+                baseColor={Colors.secondary}
+                lineWidth={1}
+                textColor={Colors.textPrimary}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
         {showPicker ? (
           <DateTimePickerModal
@@ -210,17 +319,17 @@ class EditHabitScreen extends Component<Props, State> {
           onPress={() => this.saveEdit()}
           style={styles.saveEditButton}
         >
-          <Text style={styles.buttonText}>{`${habitType} habit`}</Text>
+          <Text style={styles.buttonText}>Save Edits</Text>
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background
+    backgroundColor: Colors.background,
   },
   contentContainer: {
     flex: 1,
@@ -292,7 +401,7 @@ const styles = StyleSheet.create({
     color: Colors.secondary,
     fontSize: 20,
   },
-})
+});
 
 const REMINDERS: Array<Reminder> = [
   { day: "Sun", active: false, completed: false },

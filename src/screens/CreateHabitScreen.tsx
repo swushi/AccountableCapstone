@@ -1,6 +1,7 @@
 import * as React from "react";
 import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { TextField } from "react-native-material-textfield";
+// @ts-ignore
 import { connect } from "react-redux";
 import { Notifications } from "expo";
 import { Layout, Colors, getTimeString, getRemindTime } from "../config";
@@ -76,86 +77,87 @@ class CreateHabitScreen extends React.Component<
 
   // TODO: get user id and save actual habit info
   async createHabit() {
-    // destructure
-    const { reminders, title, chosenTime, habitType } = this.state;
-    const { accountable, navigation, storeAccountable } = this.props;
-
-    const uid = firebase.uid();
-
-    // TODO: pass type param to screen through navigation
-    const isCreate = habitType === "Create";
-
-    // create time string
-    const remindTime = getTimeString(chosenTime);
-
-    // add times to reminders
-    const newReminders = reminders;
-    newReminders.map((reminder) => (reminder.time = remindTime));
-
-    //add completed to reminders
-    newReminders.map((reminder) => (reminder.completed = false));
-
-    // create local notifications
-    const notificationTitle = `Did you finish ${title} today?`;
-    const notificationBody = `Go into the app and continue your streak!`;
-    const localNotifications: ExpoLocalNotification[] = [];
-    newReminders.map((reminder, index) => {
-      if (reminder.active) {
-        const remindTime = getRemindTime(chosenTime, reminder.day);
-
-        const localNotification: ExpoLocalNotification = {
-          notification: {
-            title: notificationTitle,
-            body: notificationBody,
-          },
-          repeat: {
-            time: remindTime,
-            repeat: "week",
-          },
-        };
-
-        localNotifications.push(localNotification);
-      }
-    });
-
-    let notificationIds = [];
-
-    localNotifications.forEach(({ notification, repeat }) => {
-      const prom = Notifications.scheduleLocalNotificationAsync(
-        notification,
-        repeat
-      );
-      notificationIds.push(prom);
-    });
-
-    // get ids
-    notificationIds = await Promise.all(notificationIds);
-
-    // store ids in reminder array
-    let idIter = 0;
-    newReminders.forEach((reminder) => {
-      if (reminder.active) {
-        reminder.localId = notificationIds[idIter];
-        idIter++;
-      }
-    });
-
-    //await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
-
-    // generate habit object
-    const habit: Habit = {
-      uid,
-      // @ts-ignore
-      type: habitType,
-      active: true,
-      title,
-      dateStart: new Date(),
-      reminders: newReminders,
-      notes: [],
-      accountable,
-    };
-
     try {
+      // destructure
+      const { reminders, title, chosenTime, habitType } = this.state;
+      const { accountable, navigation, storeAccountable } = this.props;
+
+      const uid = firebase.uid();
+
+      // TODO: pass type param to screen through navigation
+      const isCreate = habitType === "Create";
+
+      // create time string
+      const remindTime = getTimeString(chosenTime);
+
+      // add times to reminders
+      const newReminders = reminders;
+      newReminders.map((reminder) => (reminder.time = remindTime));
+
+      //add completed to reminders
+      newReminders.map((reminder) => (reminder.completed = false));
+
+      // create local notifications
+      const notificationTitle = `Did you finish ${title} today?`;
+      const notificationBody = `Go into the app and continue your streak!`;
+      const localNotifications: ExpoLocalNotification[] = [];
+      newReminders.map((reminder, index) => {
+        if (reminder.active) {
+          const remindTime = getRemindTime(chosenTime, reminder.day);
+
+          const localNotification: ExpoLocalNotification = {
+            notification: {
+              title: notificationTitle,
+              body: notificationBody,
+            },
+            repeat: {
+              time: remindTime,
+              repeat: "week",
+            },
+          };
+
+          localNotifications.push(localNotification);
+        }
+      });
+
+      let notificationIds = [];
+
+      localNotifications.forEach(({ notification, repeat }) => {
+        const prom = Notifications.scheduleLocalNotificationAsync(
+          notification,
+          repeat
+        );
+        notificationIds.push(prom);
+      });
+
+      // get ids
+      notificationIds = await Promise.all(notificationIds);
+
+      // store ids in reminder array
+      let idIter = 0;
+      newReminders.forEach((reminder) => {
+        if (reminder.active) {
+          reminder.localId = notificationIds[idIter];
+          idIter++;
+        }
+      });
+
+      //await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
+
+      // generate habit object
+      const habit: Habit = {
+        uid,
+        // @ts-ignore
+        type: habitType,
+        active: true,
+        title,
+        dateStart: new Date(),
+        reminders: newReminders,
+        notes: [],
+        accountable:
+          Object.keys(accountable).length !== 0 ? accountable.uid : null,
+      };
+
       // push habit to database
       await firebase.createHabit(habit);
 

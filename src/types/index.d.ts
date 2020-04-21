@@ -64,7 +64,7 @@ export type Habit = {
   desc?: string;
   stats?: Stats;
   habitId?: HabitID; // optional because when created on client, will not have id yet
-  accountable?: User;
+  accountable?: UserID;
 };
 
 /**

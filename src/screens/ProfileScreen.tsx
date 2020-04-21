@@ -2,6 +2,7 @@ import * as React from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
 import { Layout, Colors } from "../config";
 import { Header, ToggleButton } from "../components";
+
 import * as Animatable from "react-native-animatable";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { connect } from "react-redux";
@@ -9,6 +10,7 @@ import * as firebase from "../firebase";
 import * as actions from "../redux/actions";
 import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
+import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import { User } from "../types";
 
@@ -36,9 +38,40 @@ class ProfileScreen extends React.Component<
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.checkForAvatar();
+    await this.registerForPushNotificationsAsync();
   }
+
+  registerForPushNotificationsAsync = async () => {
+    let token;
+
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = await Notifications.getExpoPushTokenAsync();
+
+      try {
+        await firebase.updatePushToken(token);
+      } catch (error) {
+        console.log("push token err", error);
+      }
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+  };
 
   // store user avatar from redux
   checkForAvatar() {
@@ -80,10 +113,10 @@ class ProfileScreen extends React.Component<
       this.setState({ avatar: result.uri });
       this.uploadImage(result.uri)
         .then(() => {
-          console.log(this.state.avatar);
+          null;
         })
         .catch((error) => {
-          console.log(error);
+          console.log("upload img", error);
         });
     }
   };

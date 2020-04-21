@@ -8,7 +8,7 @@ import { User, UserID, Habit, Chat, Message, ExpoPushToken } from "../types";
  */
 export const init = () => {
   if (!firebase.apps.length) {
-    return firebase.initializeApp(FirebaseConfig);
+    firebase.initializeApp(FirebaseConfig);
   }
   return;
 };
@@ -181,12 +181,8 @@ export const getHabits = (uid: UserID, callback: Function) =>
       callback(habits);
     });
 
-export const updateHabit = (habitId, habit) => 
-    firebase
-      .firestore()
-      .collection("habits")
-      .doc(habitId)
-      .update(habit)
+export const updateHabit = (habitId, habit) =>
+  firebase.firestore().collection("habits").doc(habitId).update(habit);
 
 export const getAvatarURL = () =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();
@@ -272,4 +268,11 @@ export const sendMessage = async (
   }
 
   await chatRef.update(chat);
+};
+
+/**
+ *
+ */
+export const logError = (params: Object) => {
+  firebase.analytics().logEvent("error", params);
 };
