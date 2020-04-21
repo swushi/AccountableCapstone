@@ -27,6 +27,7 @@ export interface CreateHabitScreenState {
   showPicker: Boolean;
   chosenTime: Date | null;
   habitType: String;
+  titleError: any;
 }
 
 class CreateHabitScreen extends React.Component<
@@ -39,6 +40,7 @@ class CreateHabitScreen extends React.Component<
     showPicker: false,
     chosenTime: new Date(),
     habitType: "Create",
+    titleError: null,
   };
   reminderRef = null;
   accountableRef = null;
@@ -51,7 +53,12 @@ class CreateHabitScreen extends React.Component<
     }
   }
 
-  handleFocus() {}
+  handleFocus = () => {
+    
+    this.setState({
+      titleError: null,
+    });
+  };
 
   handleBlur() {}
 
@@ -177,6 +184,20 @@ class CreateHabitScreen extends React.Component<
     }
   }
 
+  formIsValid = () => {
+    const { title, reminders } = this.state;
+    let error = false;
+
+    if (title === "") {
+      this.setState({
+        titleError: "Please enter a Habit",
+      });
+      error = true;
+    }
+
+    if (error) return false;
+    else return true;
+  }
   handlePickerSubmit() {
     setTimeout(() => this.setState({ showPicker: false }, () => null), 100);
   }
@@ -187,7 +208,7 @@ class CreateHabitScreen extends React.Component<
   }
 
   render() {
-    const { reminders, showPicker, chosenTime, habitType } = this.state;
+    const { reminders, showPicker, chosenTime, habitType, titleError } = this.state;
     return (
       <View style={styles.container}>
         <Header />
@@ -195,6 +216,7 @@ class CreateHabitScreen extends React.Component<
           <Text style={styles.label}>Setup Your Habit</Text>
           <TextField
             label="Title"
+            error={titleError}
             onChangeText={(text) => this.setState({ title: text })}
             tintColor={Colors.secondary}
             baseColor={Colors.secondary}
@@ -336,7 +358,12 @@ class CreateHabitScreen extends React.Component<
           />
         ) : null}
         <TouchableOpacity
-          onPress={() => this.createHabit()}
+          onPress={() => {
+            if(this.formIsValid()) {
+              this.createHabit()
+            }
+          }
+        }
           style={styles.createHabitButton}
         >
           <Text style={styles.buttonText}>{`${habitType} habit`}</Text>

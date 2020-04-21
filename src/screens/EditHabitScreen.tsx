@@ -27,6 +27,7 @@ interface State {
   habitType: String;
   chosenTime: Date | null;
   showPicker: boolean;
+  titleError: any;
 }
 
 class EditHabitScreen extends Component<Props, State> {
@@ -36,6 +37,7 @@ class EditHabitScreen extends Component<Props, State> {
     reminders: REMINDERS,
     chosenTime: new Date(),
     showPicker: false,
+    titleError: null,
   };
   titleRef = null;
   reminderRef = null;
@@ -52,6 +54,13 @@ class EditHabitScreen extends Component<Props, State> {
       this.accountableRef.setValue(accountable.fullName);
     }
   }
+
+  handleFocus = () => {
+    
+    this.setState({
+      titleError: null,
+    });
+  };
 
   async preFillEditForm() {
     const { title, type, reminders, accountable } = this.props.route.params;
@@ -78,6 +87,21 @@ class EditHabitScreen extends Component<Props, State> {
       habitType: type,
       reminders,
     });
+  }
+
+  formIsValid = () => {
+    const { title, reminders } = this.state;
+    let error = false;
+
+    if (title === "") {
+      this.setState({
+        titleError: "Please enter a Habit",
+      });
+      error = true;
+    }
+
+    if (error) return false;
+    else return true;
   }
 
   toggleReminder(day: Reminder, index: number) {
@@ -223,7 +247,7 @@ class EditHabitScreen extends Component<Props, State> {
   }
 
   render() {
-    const { habitType, reminders, showPicker, chosenTime } = this.state;
+    const { habitType, reminders, showPicker, chosenTime, titleError } = this.state;
     const { storeAccountable, accountable } = this.props;
     return (
       <View style={styles.container}>
@@ -257,6 +281,8 @@ class EditHabitScreen extends Component<Props, State> {
           <TextField
             ref={(ref) => (this.titleRef = ref)}
             label="Title"
+            error={titleError}
+            onFocus={() => this.handleFocus()}
             onChangeText={(text) => this.setState({ title: text })}
             tintColor={Colors.secondary}
             baseColor={Colors.secondary}
@@ -392,7 +418,12 @@ class EditHabitScreen extends Component<Props, State> {
           />
         ) : null}
         <TouchableOpacity
-          onPress={() => this.saveEdit()}
+          onPress={() => {
+            if(this.formIsValid()) {
+              this.saveEdit()
+            }
+          }
+        }
           style={styles.saveEditButton}
         >
           <Text style={styles.buttonText}>Save Edits</Text>
