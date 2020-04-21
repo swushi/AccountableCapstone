@@ -51,8 +51,11 @@ class SelectAccountableScreen extends Component<Props, State> {
         loading: false,
       });
     } catch (err) {
-      console.log(err);
-    }
+      firebase.logError({
+        screen: "Select Accountable Screen",
+        function: "fetchFollowing()",
+        error: err,
+      });    }
   }
 
   searchFilterFunction = async (text: string) => {

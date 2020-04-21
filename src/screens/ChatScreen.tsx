@@ -52,7 +52,16 @@ class ChatScreen extends Component<Props, State> {
         }
       );
     } catch (err) {
-      console.log("chat fetch err", err);
+    firebase.logError(
+    {
+      screen: "Chat Screen",
+      function: "getChat()",
+      error:err
+      
+
+    }
+    )  
+    
     }
   }
 
@@ -89,7 +98,12 @@ class ChatScreen extends Component<Props, State> {
       this.setState({ sending: false });
     } catch (err) {
       this.setState({ sending: false });
-      console.log("send message err", err);
+      firebase.logError({
+        screen: "Chat Screen",
+        function: "sendMessage()",
+        error: err,
+      });
+      
     }
   }
 

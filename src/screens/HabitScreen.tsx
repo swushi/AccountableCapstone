@@ -15,7 +15,7 @@ import { Header } from "../components";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextField } from "react-native-material-textfield";
-import { updateHabit } from "../firebase";
+import { updateHabit} from "../firebase";
 
 interface Props {
   navigation: any;
@@ -162,6 +162,7 @@ class HabitScreen extends Component<Props, State> {
       updateHabit(habitId, { notes: newNotes });
     } catch (err) {
       console.log(err);
+      
     }
   }
 

@@ -112,7 +112,13 @@ class SignInScreen extends React.Component<
 
       // navigate if okay
       this.props.navigation.navigate("App");
-    } catch (err) {}
+    } catch (err) {
+      firebase.logError({
+        screen: "SignInScreen",
+        function: "handlePress()",
+        error: err,
+      });
+    }
   };
 
   signInAsync = async () => {

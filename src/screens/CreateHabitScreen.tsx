@@ -168,7 +168,11 @@ class CreateHabitScreen extends React.Component<
       // @ts-ignore
       storeAccountable({});
     } catch (error) {
-      console.warn(error);
+      firebase.logError({
+        screen: "Create Habit Screen",
+        function: "createHabit()",
+        error: error,
+      });
     }
   }
 

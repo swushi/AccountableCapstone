@@ -65,8 +65,12 @@ class ProfileScreen extends React.Component<
 
       try {
         await firebase.updatePushToken(token);
-      } catch (error) {
-        console.log("push token err", error);
+      } catch (err) {
+        firebase.logError({
+          screen: "ProfileScreen",
+          function: "registerForPushNotificationsAsync()",
+          error: err,
+        });
       }
     } else {
       alert("Must use physical device for Push Notifications");
@@ -129,8 +133,12 @@ class ProfileScreen extends React.Component<
       await firebase.storeUserAvatarInStorage(blob);
       const url = await firebase.getAvatarURL();
       await firebase.storeUserAvatarInDB(url);
-    } catch (error) {
-      console.log("upload err", error);
+    } catch (err) {
+      firebase.logError({
+        screen: "Profile Screen",
+        function: "uploadImage()",
+        error: err,
+      });    
     }
   };
 
