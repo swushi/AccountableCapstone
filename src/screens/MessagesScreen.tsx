@@ -28,6 +28,7 @@ export interface MessagesScreenState {
   searching: boolean;
   error: any;
   filter: "following" | "followers" | "discover";
+  displayDataIsEmpty: boolean;
 }
 
 class MessagesScreen extends React.Component<
@@ -47,6 +48,7 @@ class MessagesScreen extends React.Component<
       searching: false,
       searchResults: [],
       filter: "following",
+      displayDataIsEmpty: false
     };
   }
 
@@ -189,6 +191,12 @@ class MessagesScreen extends React.Component<
             color={Colors.primary}
           />
         </View>
+        { ((filter === "following" && following.length === 0) || (filter === 'followers' && followers.length === 0)) &&
+          <View style={{padding: Layout.padding}}>
+              { (filter === "following" && following.length === 0) && <Text style={{color: 'grey'}}>Looks like you aren't following anyone. Find people on the discover tab!</Text> }
+              { (filter === 'followers' && followers.length === 0) && <Text style={{color: 'grey'}}>When someone follows you they will show up here.</Text> }
+          </View>
+        }
       </View>
     );
   };
@@ -244,6 +252,7 @@ class MessagesScreen extends React.Component<
       searchResults,
     } = this.state;
     let displayData = [];
+    let displayDataIsEmpty = false
 
     if (filter === "following") {
       displayData = following;
@@ -252,6 +261,8 @@ class MessagesScreen extends React.Component<
     } else {
       displayData = allUsers;
     }
+
+    displayDataIsEmpty = displayData.length === 0
 
     if (loading) {
       return (
@@ -271,20 +282,19 @@ class MessagesScreen extends React.Component<
     return (
       <View style={styles.container}>
         <Header hideBack />
-
-        <FlatList
-          style={{ paddingHorizontal: Layout.padding }}
-          data={searching ? searchResults : displayData}
-          renderItem={({ item }) => (
-            <SearchItem
-              user={item}
-              onPress={() => this.handleSearchItemIconPress(item)}
-              isFollowing={this.isFollowing(item.uid)}
-            />
-          )}
-          ListHeaderComponent={this.renderHeader}
-          keyExtractor={(item) => item.uid}
-        />
+          <FlatList
+            style={{ paddingHorizontal: Layout.padding }}
+            data={searching ? searchResults : displayData}
+            renderItem={({ item }) => (
+              <SearchItem
+                user={item}
+                onPress={() => this.handleSearchItemIconPress(item)}
+                isFollowing={this.isFollowing(item.uid)}
+              />
+            )}
+            ListHeaderComponent={this.renderHeader}
+            keyExtractor={(item) => item.uid}
+          />
       </View>
     );
   }

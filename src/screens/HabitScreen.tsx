@@ -354,7 +354,7 @@ class HabitScreen extends Component<Props, State> {
               renderItem={({ item }) => {
                 return (
                   <View style={styles.individualNote}>
-                    <Text>{item.time}</Text>
+                    <Text style={{color: 'grey', fontSize: 10}}>{item.time}</Text>
                     <Text>{item.note}</Text>
                   </View>
                 );
@@ -384,7 +384,8 @@ class HabitScreen extends Component<Props, State> {
     const { dateStart, stats, title } = this.props.route.params;
     const { streak } = this.state;
     const startDate = new Date(dateStart.seconds * 1000);
-    let completion = stats.timesHit / (stats.timesHit + stats.timesBroken);
+    let completion = (stats.timesHit + stats.timesBroken) === 0 ? 0 : stats.timesHit / (stats.timesHit + stats.timesBroken);
+    let progress = streak / 66;
     let precision;
 
     if (completion < 0.1) {
@@ -409,7 +410,7 @@ class HabitScreen extends Component<Props, State> {
           }}
         >
           <Text>Streak:</Text>
-          <ProgressBar progress={0.4} color={"red"} />
+          <ProgressBar progress={progress} color={"red"} />
           <View style={styles.streakContainer}>
             <Text style={styles.streak}>{streak}</Text>
             <MaterialCommunityIcons name="fire" size={30} color={"red"} />
@@ -423,18 +424,20 @@ class HabitScreen extends Component<Props, State> {
           }}
         >
           <Text>{title} Consistency: </Text>
-          <ProgressCircle
-            style={styles.progressCircleContainer}
-            progress={completion} // TODO: get this from habit streaks
-            startAngle={-Math.PI * 0.8}
-            endAngle={Math.PI * 0.8}
-            strokeWidth={5}
-            progressColor={Colors.primary} // TODO: progress < 70% make orange, progress > 70% make green, progress < 50% make red
-          />
-          <View style={styles.progressPercentage}>
-            <Text style={styles.percentageText}>
-              {`${(completion * 100).toPrecision(precision)}%`}
-            </Text>
+          <View style={{alignItems: 'center', justifyContent: 'center'}}>
+            <ProgressCircle
+              style={styles.progressCircleContainer}
+              progress={completion} // TODO: get this from habit streaks
+              startAngle={-Math.PI * 0.8}
+              endAngle={Math.PI * 0.8}
+              strokeWidth={5}
+              progressColor={Colors.primary} // TODO: progress < 70% make orange, progress > 70% make green, progress < 50% make red
+            />
+            <View style={styles.progressPercentage}>
+              <Text style={styles.percentageText}>
+                {`${(completion * 100).toPrecision(precision)}%`}
+              </Text>
+            </View>
           </View>
         </View>
       </View>
@@ -483,7 +486,7 @@ const styles = StyleSheet.create({
     borderRadius: Layout.roundness,
   },
   chartContainer: {
-    marginTop: 3,
+    marginTop: 5,
     padding: 15,
     height: Layout.height * 0.25,
     width: Layout.width * 0.9,
@@ -577,7 +580,6 @@ const styles = StyleSheet.create({
     height: Layout.height * 0.1,
     width: Layout.height * 0.1,
     borderRadius: 100,
-    alignSelf: "center",
     margin: Layout.padding,
     backgroundColor: Colors.background,
   },
@@ -585,7 +587,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignSelf: "center",
     fontSize: 15,
-    right: 30,
   },
   percentageText: {
     alignSelf: "center",

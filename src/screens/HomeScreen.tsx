@@ -29,6 +29,7 @@ export interface HomeScreenState {
   breakHeight: number;
   animated: boolean;
   completion: number;
+  showCreateHabitGuide: boolean;
 }
 
 class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
@@ -40,6 +41,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
     breakHeight: 0,
     animated: false,
     completion: 0,
+    showCreateHabitGuide: false
   };
   habitListener = null;
   contentRef = null;
@@ -105,6 +107,11 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   async getHabitList() {
     this.habitListener = await firebase.getHabits(firebase.uid(), (habits) => {
       this.setState({ habits, completion: this.calculateCompletion(habits) });
+      if(habits.length === 0) {
+        this.setState({showCreateHabitGuide: true})
+      } else {
+        this.setState({showCreateHabitGuide: false})
+      }
     });
   }
 
@@ -137,7 +144,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   }
 
   render() {
-    const { habits, breakWidth, animated, completion } = this.state;
+    const { habits, breakWidth, animated, completion, showCreateHabitGuide } = this.state;
     const { navigate } = this.props.navigation;
     let precision;
 
@@ -175,16 +182,30 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
             </View>
           </View>
           <Text style={styles.currentHabitsText}>Current Habits</Text>
-          <FlatList
-            data={habits}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <HabitButton
-                data={item}
-                onPress={() => navigate("Habit", item)}
-              />
-            )}
-          />
+          { !showCreateHabitGuide && (
+            <FlatList
+              data={habits}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <HabitButton
+                  data={item}
+                  onPress={() => navigate("Habit", item)}
+                />
+              )}
+            />
+          )}
+          { showCreateHabitGuide && (
+            <View style={{flex: 1}}>
+              <Text style={{alignSelf: 'center', padding: Layout.padding, color: 'grey'}}>Looks like you have no habits. It only takes the average person 66 days to get a new habit going. Get one started right now!</Text>
+              <View style={styles.arrowContainer}>
+                <MaterialCommunityIcons 
+                  size={50}
+                  name='arrow-bottom-right'
+                  color="lightgrey"
+                />
+              </View>
+            </View>
+          )}
         </Animatable.View>
         <TouchableOpacity
           style={styles.floatingActionButtonContainer}
@@ -311,6 +332,11 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     color: "#fff",
   },
+  arrowContainer: {
+    position: 'absolute',
+    bottom: 60,
+    right: 60
+  }
 });
 
 export default HomeScreen;
