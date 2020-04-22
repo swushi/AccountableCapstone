@@ -8,11 +8,13 @@ import * as firebase from "../firebase";
 export interface HeaderProps {
   hideBack?: Boolean;
   chatHeader?: String;
+  rightIcon?: String;
+  rightOnPress?: Function;
 }
 
 function Header(props: HeaderProps) {
   const navigation = useNavigation();
-  const { hideBack, chatHeader } = props;
+  const { hideBack, chatHeader, rightIcon, rightOnPress } = props;
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>
@@ -24,6 +26,17 @@ function Header(props: HeaderProps) {
             <MaterialCommunityIcons
               name="chevron-left"
               size={35}
+              color={Colors.headerText}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+      {rightIcon && (
+        <View style={styles.rightButton}>
+          <TouchableOpacity onPress={() => rightOnPress()}>
+            <MaterialCommunityIcons
+              name={rightIcon}
+              size={20}
               color={Colors.headerText}
             />
           </TouchableOpacity>
@@ -49,8 +62,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: Layout.statusBarHeight,
-    left: 5,
+    top: Layout.statusBarHeight + 10,
+    left: 10,
+  },
+  rightButton: {
+    position: "absolute",
+    top: Layout.statusBarHeight + 18,
+    right: 10,
   },
 });
 

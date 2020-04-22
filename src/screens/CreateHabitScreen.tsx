@@ -149,7 +149,7 @@ class CreateHabitScreen extends React.Component<
         }
       });
 
-      //await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
+      await Notifications.cancelAllScheduledNotificationsAsync(); // dont actually send notifications
 
       // generate habit object
       const habit: Habit = {

@@ -8,7 +8,8 @@ import {
   PresetHabitScreen,
   SelectAccountableScreen,
   HabitScreen,
-  EditHabitScreen
+  EditHabitScreen,
+  AddToLogScreen,
 } from "../screens";
 
 const Stack = createStackNavigator();
@@ -24,10 +25,8 @@ export default function MainStack() {
         name="SelectAccountable"
         component={SelectAccountableScreen}
       />
-      <Stack.Screen
-        name="EditHabit"
-        component={EditHabitScreen}
-      />
+      <Stack.Screen name="EditHabit" component={EditHabitScreen} />
+      <Stack.Screen name="AddToLog" component={AddToLogScreen} />
     </Stack.Navigator>
   );
 }

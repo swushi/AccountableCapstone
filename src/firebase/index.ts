@@ -181,11 +181,11 @@ export const getHabits = (uid: UserID, callback: Function) =>
       callback(habits);
     });
 
-export const updateHabit = (habitId, habit) =>
-  firebase.firestore().collection("habits").doc(habitId).update(habit);
+export const updateHabit = async (habitId, habit) =>
+  await firebase.firestore().collection("habits").doc(habitId).update(habit);
 
 export const deleteHabit = (habitId) =>
-    firebase.firestore().collection("habits").doc(habitId).delete();
+  firebase.firestore().collection("habits").doc(habitId).delete();
 
 export const getAvatarURL = () =>
   firebase.storage().ref().child(`profilePictures/${uid()}`).getDownloadURL();
@@ -277,6 +277,9 @@ export const sendMessage = async (
  *
  */
 export const logError = (params: Object) => {
-  firebase.firestore().collection("errors").add({ type: 'error', ...params});
+  firebase
+    .firestore()
+    .collection("errors")
+    .add({ type: "error", ...params });
   //firebase.analytics().logEvent('Error', params);
 };

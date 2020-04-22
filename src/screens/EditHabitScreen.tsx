@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { View, StyleSheet, TouchableOpacity, Platform, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  Alert,
+} from "react-native";
 import { Colors, Layout } from "../config";
 import { TextField } from "react-native-material-textfield";
 import { createAnimatableComponent, Text } from "react-native-animatable";
@@ -56,7 +62,6 @@ class EditHabitScreen extends Component<Props, State> {
   }
 
   handleFocus = () => {
-    
     this.setState({
       titleError: null,
     });
@@ -64,7 +69,7 @@ class EditHabitScreen extends Component<Props, State> {
 
   async preFillEditForm() {
     const { title, type, reminders, accountable } = this.props.route.params;
-    const { storeAccountable } = this.props
+    const { storeAccountable } = this.props;
     this.titleRef.setValue(title);
     this.reminderRef.setValue(reminders[0].time);
 
@@ -72,13 +77,13 @@ class EditHabitScreen extends Component<Props, State> {
       if (accountable) {
         const accountableDetailsRef = await firebase.getUser(accountable);
         const accountableDetails = accountableDetailsRef.data();
-        storeAccountable(accountableDetails)
+        storeAccountable(accountableDetails);
       }
     } catch (err) {
       firebase.logError({
-        screen: 'EditHabitScreen',
-        function: 'preFillEditForm()',
-        error: err
+        screen: "EditHabitScreen",
+        function: "preFillEditForm()",
+        error: err,
       });
     }
 
@@ -102,7 +107,7 @@ class EditHabitScreen extends Component<Props, State> {
 
     if (error) return false;
     else return true;
-  }
+  };
 
   toggleReminder(day: Reminder, index: number) {
     const newReminders = this.state.reminders;
@@ -130,7 +135,7 @@ class EditHabitScreen extends Component<Props, State> {
   }
 
   async saveEdit() {
-    const { navigation, accountable, storeAccountable} = this.props;
+    const { navigation, accountable, storeAccountable } = this.props;
     const { title, habitType, reminders, chosenTime } = this.state;
     const { habitId, notes, dateStart } = this.props.route.params;
 
@@ -213,9 +218,9 @@ class EditHabitScreen extends Component<Props, State> {
         accountable: accountable.uid ? accountable.uid : null,
       };
 
-      firebase.updateHabit(habitId, habit);
+      await firebase.updateHabit(habitId, habit);
       storeAccountable({});
-      navigation.popToTop();
+      navigation.goBack();
     } catch (err) {
       firebase.logError({
         screen: "EditHabitScreen",
@@ -226,18 +231,18 @@ class EditHabitScreen extends Component<Props, State> {
   }
 
   deleteHabit() {
-    const { habitId } = this.props.route.params
-    const { navigation } = this.props
+    const { habitId } = this.props.route.params;
+    const { navigation } = this.props;
 
     try {
       firebase.deleteHabit(habitId);
       navigation.popToTop();
     } catch (err) {
       firebase.logError({
-        screen: 'EditHabitScreen',
+        screen: "EditHabitScreen",
         function: "deleteHabit()",
-        error: err
-      })     
+        error: err,
+      });
     }
   }
 
@@ -247,37 +252,52 @@ class EditHabitScreen extends Component<Props, State> {
   }
 
   render() {
-    const { habitType, reminders, showPicker, chosenTime, titleError } = this.state;
+    const {
+      habitType,
+      reminders,
+      showPicker,
+      chosenTime,
+      titleError,
+    } = this.state;
     const { storeAccountable, accountable } = this.props;
     return (
       <View style={styles.container}>
         <Header />
         <View style={styles.contentContainer}>
-            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-              <Text style={styles.label}>Edit Your Habit</Text>
-              <TouchableOpacity
-                style={{position: 'absolute', right: 0, top: 9}} 
-                onPress={() => Alert.alert(
-                  'Delete Habit',
-                  'Are you sure you want to delete this habit? All Progress Will be lost.',
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.label}>Edit Your Habit</Text>
+            <TouchableOpacity
+              style={{ position: "absolute", right: 0, top: 9 }}
+              onPress={() =>
+                Alert.alert(
+                  "Delete Habit",
+                  "Are you sure you want to delete this habit? All Progress Will be lost.",
                   [
                     {
-                      text: 'No',
-                      style: 'cancel'
+                      text: "No",
+                      style: "cancel",
                     },
                     {
-                      text: 'Yes',
-                      onPress: () => this.deleteHabit()
-                    }
+                      text: "Yes",
+                      onPress: () => this.deleteHabit(),
+                    },
                   ]
-                )}>
-                <MaterialCommunityIcons 
-                  size={30}
-                  name='trash-can-outline'
-                  color={'red'}
-                />
-              </TouchableOpacity>
-              </View>
+                )
+              }
+            >
+              <MaterialCommunityIcons
+                size={30}
+                name="trash-can-outline"
+                color={"red"}
+              />
+            </TouchableOpacity>
+          </View>
           <TextField
             ref={(ref) => (this.titleRef = ref)}
             label="Title"
@@ -394,17 +414,15 @@ class EditHabitScreen extends Component<Props, State> {
                 />
               </View>
             </TouchableOpacity>
-            {!!accountable.uid && (<TouchableOpacity 
-              style={{position: 'absolute', right: 0, top: 35, zIndex: 5}}
-              onPress={() => {
-                storeAccountable({})
-              }}>
-                <MaterialCommunityIcons 
-                  size={20}
-                  name='close'
-                  color='red'
-                />
-            </TouchableOpacity>
+            {!!accountable.uid && (
+              <TouchableOpacity
+                style={{ position: "absolute", right: 0, top: 35, zIndex: 5 }}
+                onPress={() => {
+                  storeAccountable({});
+                }}
+              >
+                <MaterialCommunityIcons size={20} name="close" color="red" />
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -419,11 +437,10 @@ class EditHabitScreen extends Component<Props, State> {
         ) : null}
         <TouchableOpacity
           onPress={() => {
-            if(this.formIsValid()) {
-              this.saveEdit()
+            if (this.formIsValid()) {
+              this.saveEdit();
             }
-          }
-        }
+          }}
           style={styles.saveEditButton}
         >
           <Text style={styles.buttonText}>Save Edits</Text>

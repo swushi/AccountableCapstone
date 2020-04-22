@@ -28,6 +28,7 @@ export interface HomeScreenState {
   createHeight: number;
   breakHeight: number;
   animated: boolean;
+  completion: number;
 }
 
 class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
@@ -38,6 +39,7 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
     createHeight: 0,
     breakHeight: 0,
     animated: false,
+    completion: 0,
   };
   habitListener = null;
   contentRef = null;
@@ -101,9 +103,29 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   }
 
   async getHabitList() {
-    this.habitListener = await firebase.getHabits(firebase.uid(), (habits) =>
-      this.setState({ habits })
+    this.habitListener = await firebase.getHabits(firebase.uid(), (habits) => {
+      this.setState({ habits, completion: this.calculateCompletion(habits) });
+    });
+  }
+
+  calculateCompletion(habits: Habit[]) {
+    const total = habits.reduce(
+      (acc, { stats }: Habit) => acc + stats.timesBroken + stats.timesHit,
+      0
     );
+
+    if (total === 0) {
+      return 0;
+    }
+
+    const totalHit = habits.reduce(
+      (acc, { stats }: Habit) => acc + stats.timesHit,
+      0
+    );
+
+    const completion = totalHit / total;
+
+    return completion;
   }
 
   componentDidMount() {
@@ -115,8 +137,18 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
   }
 
   render() {
-    const { habits, breakWidth, animated } = this.state;
+    const { habits, breakWidth, animated, completion } = this.state;
     const { navigate } = this.props.navigation;
+    let precision;
+
+    if (completion < 0.1) {
+      precision = 1;
+    } else if (completion === 1) {
+      precision = 3;
+    } else {
+      precision = 2;
+    }
+
     return (
       <View style={styles.container}>
         <Animatable.View
@@ -129,14 +161,16 @@ class HomeScreen extends React.Component<HomeScreenProps, HomeScreenState> {
           <View>
             <ProgressCircle
               style={styles.progressCircleContainer}
-              progress={1} // TODO: get this from habit streaks
+              progress={completion} // TODO: get this from habit streaks
               startAngle={-Math.PI * 0.8}
               endAngle={Math.PI * 0.8}
               strokeWidth={15}
               progressColor={Colors.primary} // TODO: progress < 70% make orange, progress > 70% make green, progress < 50% make red
             />
             <View style={styles.progressPercentage}>
-              <Text style={styles.percentageText}>100%</Text>
+              <Text style={styles.percentageText}>
+                {`${(completion * 100).toPrecision(precision)}%`}
+              </Text>
               <Text style={styles.percentageLabel}>Consistency</Text>
             </View>
           </View>

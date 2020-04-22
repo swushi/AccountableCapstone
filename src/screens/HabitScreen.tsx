@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ProgressBar from "react-native-progress/Bar";
 import {
   Text,
   View,
@@ -12,9 +13,11 @@ import {
 } from "react-native";
 import { BarChart, YAxis, XAxis, Grid } from "react-native-svg-charts";
 import { Header } from "../components";
+import { ProgressCircle } from "react-native-svg-charts";
 import { Layout, Colors } from "../config";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextField } from "react-native-material-textfield";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { updateHabit } from "../firebase";
 
 interface Props {
@@ -40,19 +43,44 @@ class HabitScreen extends Component<Props, State> {
       timeStamp: "Sun Apr 12 2020",
     },
   ];
+  willFocusSubscription: any;
+  constructor(props) {
+    super(props);
+    this.renderHabitLog = this.renderHabitLog.bind(this);
+    this.renderStats = this.renderStats.bind(this);
+    this.renderTabBar = this.renderTabBar.bind(this);
+  }
 
   state = {
     chartData: [],
     showCompletionPrompt: true,
     showHelpModal: false,
     showNotePrompt: false,
-    showNotesInput: false,
     habitLog: [],
     notesValue: "",
     streak: 0,
+    index: 0,
+    routes: [
+      {
+        key: "habitLog",
+        title: "Log",
+      },
+      { key: "habitStats", title: "Stats" },
+    ],
   };
 
+  componentWillUnmount() {
+    this.willFocusSubscription();
+  }
   async componentDidMount() {
+    this.willFocusSubscription = this.props.navigation.addListener(
+      "focus",
+      async () => {
+        this.forceUpdate();
+        await this.buildChartData();
+      }
+    );
+
     await this.buildChartData();
     this.buildStats();
     this.loadHabitNotes();
@@ -125,7 +153,7 @@ class HabitScreen extends Component<Props, State> {
 
   completeTask() {
     const { chartData } = this.state;
-    const { habitId, reminders, streak } = this.props.route.params;
+    const { habitId, reminders, streak, stats } = this.props.route.params;
 
     let newStreak = streak;
     newStreak++;
@@ -137,6 +165,7 @@ class HabitScreen extends Component<Props, State> {
       newChartData[currentDay].value = 1;
       newChartData[currentDay].svg.fill = "green";
       newChartData[currentDay].svg.stroke = "green";
+      stats.timesHit++;
       this.setState(
         {
           chartData: newChartData,
@@ -145,7 +174,7 @@ class HabitScreen extends Component<Props, State> {
           streak: newStreak,
         },
         () => {
-          updateHabit(habitId, { reminders, streak: newStreak });
+          updateHabit(habitId, { reminders, streak: newStreak, stats });
         }
       );
     }
@@ -156,27 +185,6 @@ class HabitScreen extends Component<Props, State> {
     this.setState({ habitLog: notes });
   }
 
-  addHabitNote() {
-    const { notes, habitId } = this.props.route.params;
-    const date = new Date();
-    const readableTime = date.toDateString();
-    const note = {
-      note: this.state.notesValue,
-      time: readableTime,
-    };
-    let newNotes = notes;
-    newNotes.unshift(note);
-    try {
-      this.setState({
-        habitLog: newNotes,
-        showNotesInput: false,
-      });
-      updateHabit(habitId, { notes: newNotes });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   navigateToEdit() {
     const { navigate } = this.props.navigation;
     navigate("EditHabit", this.props.route.params);
@@ -184,30 +192,16 @@ class HabitScreen extends Component<Props, State> {
 
   render() {
     const { title } = this.props.route.params;
-    const { streak } = this.state;
+    const { navigate } = this.props.navigation;
+    const { streak, index, routes } = this.state;
     const contentInset = { top: 10, bottom: 10 };
     return (
       <View style={styles.container}>
-        <Header />
-        <View style={styles.titleContainer}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={styles.habitTitle}>{title}</Text>
-            <TouchableOpacity
-              style={{ justifyContent: "center", marginLeft: 5 }}
-              onPress={() => this.navigateToEdit()}
-            >
-              <MaterialCommunityIcons
-                size={18}
-                name="pencil"
-                color={Colors.primary}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.streakContainer}>
-            <Text style={styles.streak}>{streak}</Text>
-            <MaterialCommunityIcons name="fire" size={30} color={"red"} />
-          </View>
-        </View>
+        <Header
+          chatHeader={title}
+          rightIcon="pencil"
+          rightOnPress={() => this.navigateToEdit()}
+        />
         <View style={styles.chartContainer}>
           <TouchableOpacity
             style={{ position: "absolute", right: 15, top: 15, zIndex: 5 }}
@@ -297,12 +291,12 @@ class HabitScreen extends Component<Props, State> {
             <Text>Would you like to add to your log?</Text>
             <TouchableOpacity
               style={styles.completedButton}
-              onPress={() =>
+              onPress={() => {
+                navigate("AddToLog", this.props.route.params);
                 this.setState({
-                  showNotesInput: true,
                   showNotePrompt: false,
-                })
-              }
+                });
+              }}
             >
               <Text style={{ color: "green" }}>Yes</Text>
               <MaterialCommunityIcons name="check" color="green" />
@@ -317,59 +311,131 @@ class HabitScreen extends Component<Props, State> {
           </View>
         )}
         <View style={styles.notesContainer}>
-          {!this.state.showNotesInput && (
-            <View>
-              <Text style={{ alignSelf: "center", fontSize: 20 }}>
-                Habit Log
-              </Text>
-              {!!this.state.habitLog.length && (
-                <FlatList
-                  data={this.state.habitLog}
-                  renderItem={({ item }) => {
-                    return (
-                      <View style={styles.individualNote}>
-                        <Text>{item.time}</Text>
-                        <Text>{item.note}</Text>
-                      </View>
-                    );
-                  }}
-                  keyExtractor={(item, index) => index.toString()}
-                />
-              )}
-              {this.state.habitLog.length === 0 && (
-                <Text
-                  style={{
-                    alignSelf: "center",
-                    justifyContent: "center",
-                    color: "grey",
-                    marginHorizontal: 20,
-                  }}
-                >
-                  Looks like your log is empty. Complete your habit on an active
-                  day to add a log.
-                </Text>
-              )}
-            </View>
+          <TabView
+            navigationState={{ index, routes }}
+            onIndexChange={(index) => this.setState({ index })}
+            renderScene={({ route }) => {
+              switch (route.key) {
+                case "habitLog":
+                  return this.renderHabitLog();
+                case "habitStats":
+                  return this.renderStats();
+                default:
+                  console.log(route.key);
+                  return null;
+              }
+            }}
+            renderTabBar={this.renderTabBar}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  renderTabBar(props) {
+    return (
+      <TabBar
+        {...props}
+        indicatorStyle={{ backgroundColor: Colors.primary }}
+        activeColor={Colors.primary}
+        inactiveColor={Colors.textPrimary}
+        style={{ backgroundColor: Colors.background }}
+      />
+    );
+  }
+
+  renderHabitLog() {
+    return (
+      <View style={{ padding: Layout.padding, flex: 1 }}>
+        <View>
+          {!!this.state.habitLog.length && (
+            <FlatList
+              data={this.state.habitLog}
+              renderItem={({ item }) => {
+                return (
+                  <View style={styles.individualNote}>
+                    <Text>{item.time}</Text>
+                    <Text>{item.note}</Text>
+                  </View>
+                );
+              }}
+              keyExtractor={(item, index) => index.toString()}
+            />
           )}
-          {this.state.showNotesInput && (
-            <View style={styles.habitLogInputContainer}>
-              <TextField
-                label="Enter Notes Here"
-                onChangeText={(text) => this.setState({ notesValue: text })}
-                tintColor={"grey"}
-                baseColor={"grey"}
-                multiline={true}
-                lineWidth={1}
-                textColor={Colors.textPrimary}
-              />
-              <TouchableOpacity
-                style={styles.saveNoteButton}
-                onPress={() => this.addHabitNote()}
-              >
-                <Text style={{ color: Colors.primary }}>Save Note</Text>
-              </TouchableOpacity>
-            </View>
+          {this.state.habitLog.length === 0 && (
+            <Text
+              style={{
+                alignSelf: "center",
+                justifyContent: "center",
+                color: "grey",
+                marginHorizontal: 20,
+              }}
+            >
+              Looks like your log is empty. Complete your habit on an active day
+              to add a log.
+            </Text>
           )}
+        </View>
+      </View>
+    );
+  }
+
+  renderStats() {
+    const { dateStart, stats, title } = this.props.route.params;
+    const { streak } = this.state;
+    const startDate = new Date(dateStart.seconds * 1000);
+    let completion = stats.timesHit / (stats.timesHit + stats.timesBroken);
+    let precision;
+
+    if (completion < 0.1) {
+      precision = 1;
+    } else if (completion === 1) {
+      precision = 3;
+    } else {
+      precision = 2;
+    }
+
+    return (
+      <View style={{ padding: Layout.padding, flex: 1 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: 15 }}>Habit Created On:</Text>
+          <Text>{startDate.toDateString()}</Text>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text>Streak:</Text>
+          <ProgressBar progress={0.4} color={"red"} />
+          <View style={styles.streakContainer}>
+            <Text style={styles.streak}>{streak}</Text>
+            <MaterialCommunityIcons name="fire" size={30} color={"red"} />
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text>{title} Consistency: </Text>
+          <ProgressCircle
+            style={styles.progressCircleContainer}
+            progress={completion} // TODO: get this from habit streaks
+            startAngle={-Math.PI * 0.8}
+            endAngle={Math.PI * 0.8}
+            strokeWidth={5}
+            progressColor={Colors.primary} // TODO: progress < 70% make orange, progress > 70% make green, progress < 50% make red
+          />
+          <View style={styles.progressPercentage}>
+            <Text style={styles.percentageText}>
+              {`${(completion * 100).toPrecision(precision)}%`}
+            </Text>
+          </View>
         </View>
       </View>
     );
@@ -506,6 +572,24 @@ const styles = StyleSheet.create({
     margin: 7,
     backgroundColor: "#fff",
     borderRadius: Layout.roundness,
+  },
+  progressCircleContainer: {
+    height: Layout.height * 0.1,
+    width: Layout.height * 0.1,
+    borderRadius: 100,
+    alignSelf: "center",
+    margin: Layout.padding,
+    backgroundColor: Colors.background,
+  },
+  progressPercentage: {
+    position: "absolute",
+    alignSelf: "center",
+    fontSize: 15,
+    right: 30,
+  },
+  percentageText: {
+    alignSelf: "center",
+    fontSize: 15,
   },
 });
 
