@@ -168,7 +168,7 @@ exports.resetHabitCompleted = functions.pubsub
   });
 
 exports.updateStats = functions.pubsub
-  .schedule("every day 00:00") // will need to be "every sunday 00:00"
+  .schedule("every day 00:00") // will need to be "every day 00:00"
   .onRun(async (context) => {
     try {
       // ref
@@ -177,8 +177,8 @@ exports.updateStats = functions.pubsub
       const habitsRef = db.collection("habits");
 
       const today = new Date();
-      let todayInt = today.getDay() - 1;
-      todayInt = todayInt === -1 ? 6 : todayInt;
+      let todayInt = today.getDay();
+      // todayInt = todayInt === -1 ? 6 : todayInt;
 
       // get all habits
       const habitsSnap = await habitsRef.get();
